@@ -1824,17 +1824,73 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<p class="form-note">Your support funds authors, learners, and open communities.</p>
-					<div class="donate-amounts">
-						<button type="button" class="amount-btn" data-amount="10">AED 10</button>
-						<button type="button" class="amount-btn selected" data-amount="25">AED 25</button>
-						<button type="button" class="amount-btn" data-amount="50">AED 50</button>
+
+					<div id="donate-step-amount">
+						<p class="form-note">Your support funds authors, learners, and open communities.</p>
+						<div class="donate-amounts">
+							<button type="button" class="amount-btn" data-amount="10">AED 10</button>
+							<button type="button" class="amount-btn selected" data-amount="25">AED 25</button>
+							<button type="button" class="amount-btn" data-amount="50">AED 50</button>
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="donate-custom">Custom amount (AED)</label>
+							<input type="number" class="form-control" id="donate-custom" min="1" placeholder="AED">
+						</div>
+						<button type="button" class="btn-flash btn-flash-primary w-100" id="donate-next">Continue to payment</button>
 					</div>
-					<div class="mb-3">
-						<label class="form-label" for="donate-custom">Custom amount (AED)</label>
-						<input type="number" class="form-control" id="donate-custom" min="1" placeholder="AED">
+
+					<div id="donate-step-pay" style="display:none">
+						<p class="donate-summary">Donating <strong id="donate-final-amount">AED 25</strong></p>
+
+						<div class="pay-methods">
+							<button type="button" class="pay-method selected" data-method="card">Credit Card</button>
+							<button type="button" class="pay-method" data-method="paypal">PayPal</button>
+							<button type="button" class="pay-method" data-method="cash">Cash</button>
+						</div>
+
+						<div id="pay-pane-card">
+							<div class="mb-3">
+								<label class="form-label" for="card-name">Name on card</label>
+								<input type="text" class="form-control" id="card-name" placeholder="Full name">
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="card-number">Card number</label>
+								<input type="text" class="form-control card-input" id="card-number" inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456" autocomplete="cc-number">
+							</div>
+							<div class="row g-2 mb-3">
+								<div class="col-6">
+									<label class="form-label" for="card-expiry">Expiry</label>
+									<input type="text" class="form-control card-input" id="card-expiry" inputmode="numeric" maxlength="5" placeholder="MM/YY" autocomplete="cc-exp">
+								</div>
+								<div class="col-6">
+									<label class="form-label" for="card-cvc">CVC</label>
+									<input type="text" class="form-control card-input" id="card-cvc" inputmode="numeric" maxlength="4" placeholder="123" autocomplete="cc-csc">
+								</div>
+							</div>
+							<button type="button" class="btn-flash btn-flash-primary w-100" id="donate-pay-btn">Donate AED 25</button>
+						</div>
+
+						<div id="pay-pane-paypal" style="display:none">
+							<p class="form-note">You will be redirected to PayPal to complete your donation securely.</p>
+							<button type="button" class="btn-flash btn-flash-primary w-100" id="donate-paypay-btn">Donate AED 25 with PayPal</button>
+						</div>
+
+						<div id="pay-pane-cash" style="display:none">
+							<p class="form-note">Reserve your donation for cash on pickup at AlioStore. We will contact you to arrange it.</p>
+							<button type="button" class="btn-flash btn-flash-primary w-100" id="donate-cash-btn">Reserve AED 25 donation</button>
+						</div>
+
+						<p class="text-center mt-3 form-note"><a href="#" id="donate-back">Back to amounts</a></p>
 					</div>
-					<button type="button" class="btn-flash btn-flash-primary w-100" id="donate-btn">Donate</button>
+
+					<div id="donate-step-done" style="display:none" class="text-center">
+						<div class="donate-success-icon">&#10003;</div>
+						<h5 class="mt-3 mb-1">Thank you!</h5>
+						<p class="form-note">Your donation of <strong id="donate-done-amount">AED 25</strong> helps fund books, authors and learners.</p>
+						<p class="form-note">Reference: <strong id="donate-reference">ALI-DON-0000</strong></p>
+						<button type="button" class="btn-flash btn-flash-primary w-100" data-bs-dismiss="modal">Done</button>
+					</div>
+
 				</div>
 			</div>
 		</div>
@@ -1994,23 +2050,109 @@
 			// Donate
 			var selectedAmount = 25;
 			var customInput = document.getElementById('donate-custom');
-			var donateBtn = document.getElementById('donate-btn');
-			[].forEach.call(document.querySelectorAll('.amount-btn'), function (btn) {
+			var amountStep = document.getElementById('donate-step-amount');
+			var payStep = document.getElementById('donate-step-pay');
+			var doneStep = document.getElementById('donate-step-done');
+			var amountBtns = [].slice.call(document.querySelectorAll('.amount-btn'));
+
+			function updateDonateAmounts() {
+				document.getElementById('donate-final-amount').textContent = 'AED ' + selectedAmount;
+				[].forEach.call(document.querySelectorAll('.donate-pay-label'), function (b) {
+					b.textContent = 'AED ' + selectedAmount;
+				});
+			}
+
+			amountBtns.forEach(function (btn) {
 				btn.addEventListener('click', function () {
-					[].forEach.call(document.querySelectorAll('.amount-btn'), function (b) { b.classList.remove('selected'); });
+					amountBtns.forEach(function (b) { b.classList.remove('selected'); });
 					btn.classList.add('selected');
 					selectedAmount = parseInt(btn.getAttribute('data-amount'), 10);
 					customInput.value = '';
 				});
 			});
 			customInput.addEventListener('input', function () {
-				[].forEach.call(document.querySelectorAll('.amount-btn'), function (b) { b.classList.remove('selected'); });
+				amountBtns.forEach(function (b) { b.classList.remove('selected'); });
 				selectedAmount = parseInt(customInput.value, 10) || 0;
 			});
-			donateBtn.addEventListener('click', function () {
-				alert('Thank you for your generous donation of AED ' + selectedAmount + '!');
-				bootstrap.Modal.getOrCreateInstance(document.getElementById('donate-modal')).hide();
+
+			document.getElementById('donate-next').addEventListener('click', function () {
+				if (selectedAmount <= 0) { customInput.focus(); return; }
+				updateDonateAmounts();
+				amountStep.style.display = 'none';
+				payStep.style.display = 'block';
 			});
+			document.getElementById('donate-back').addEventListener('click', function (e) {
+				e.preventDefault();
+				payStep.style.display = 'none';
+				amountStep.style.display = 'block';
+			});
+
+			// Payment method switch
+			var payMethods = [].slice.call(document.querySelectorAll('.pay-method'));
+			var payPanes = { card: 'pay-pane-card', paypal: 'pay-pane-paypal', cash: 'pay-pane-cash' };
+			payMethods.forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					payMethods.forEach(function (b) { b.classList.remove('selected'); });
+					btn.classList.add('selected');
+					Object.keys(payPanes).forEach(function (k) {
+						document.getElementById(payPanes[k]).style.display = (k === btn.getAttribute('data-method')) ? 'block' : 'none';
+					});
+				});
+			});
+
+			// Card input formatting
+			var cardNumber = document.getElementById('card-number');
+			var cardExpiry = document.getElementById('card-expiry');
+			var cardCvc = document.getElementById('card-cvc');
+
+			cardNumber.addEventListener('input', function () {
+				var v = cardNumber.value.replace(/\D/g, '').slice(0, 16);
+				cardNumber.value = v.replace(/(.{4})/g, '$1 ').trim();
+			});
+			cardExpiry.addEventListener('input', function () {
+				var v = cardExpiry.value.replace(/\D/g, '').slice(0, 4);
+				cardExpiry.value = v.length > 2 ? v.slice(0, 2) + '/' + v.slice(2) : v;
+			});
+			cardCvc.addEventListener('input', function () {
+				cardCvc.value = cardCvc.value.replace(/\D/g, '').slice(0, 4);
+			});
+
+			function completeDonation() {
+				var ref = 'ALI-DON-' + Math.floor(1000 + Math.random() * 9000);
+				document.getElementById('donate-done-amount').textContent = 'AED ' + selectedAmount;
+				document.getElementById('donate-reference').textContent = ref;
+				payStep.style.display = 'none';
+				doneStep.style.display = 'block';
+			}
+
+			function cardValid() {
+				var name = document.getElementById('card-name').value.trim();
+				var num = cardNumber.value.replace(/\s/g, '');
+				var exp = cardExpiry.value.trim();
+				var cvc = cardCvc.value.trim();
+				var ok = name.length >= 2 && num.length >= 12 && /^\d{2}\/\d{2}$/.test(exp) && cvc.length >= 3;
+				if (!ok) {
+					var list = [document.getElementById('card-name'), cardNumber, cardExpiry, cardCvc];
+					var bad = list.filter(function (el) {
+						if (el.id === 'card-name') { return el.value.trim().length < 2; }
+						if (el.id === 'card-number') { return el.value.replace(/\s/g, '').length < 12; }
+						if (el.id === 'card-expiry') { return !/^\d{2}\/\d{2}$/.test(el.value.trim()); }
+						return el.value.trim().length < 3;
+					});
+					if (bad[0]) { bad[0].focus(); bad[0].classList.add('is-invalid'); }
+					return false;
+				}
+				return true;
+			}
+			[cardNumber, cardExpiry, cardCvc, document.getElementById('card-name')].forEach(function (el) {
+				if (el) { el.addEventListener('input', function () { el.classList.remove('is-invalid'); }); }
+			});
+
+			document.getElementById('donate-pay-btn').addEventListener('click', function () {
+				if (cardValid()) { completeDonation(); }
+			});
+			document.getElementById('donate-paypay-btn').addEventListener('click', completeDonation);
+			document.getElementById('donate-cash-btn').addEventListener('click', completeDonation);
 		})();
 	</script>
 

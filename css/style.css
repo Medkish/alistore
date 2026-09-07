@@ -1386,3 +1386,59 @@ html {
 	border-color: var(--accent);
 	color: #0d1b3e;
 }
+
+/* ---------- Donation payment ---------- */
+.donate-summary {
+	margin-bottom: 14px;
+	font-size: 0.95rem;
+}
+
+.donate-summary strong {
+	color: var(--accent-dark);
+}
+
+.pay-methods {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.pay-method {
+	flex: 1;
+	background: #ffffff;
+	border: 2px solid var(--line);
+	border-radius: 10px;
+	padding: 10px 6px;
+	font-weight: 700;
+	font-size: 0.85rem;
+	color: var(--dark);
+	cursor: pointer;
+	transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.pay-method:hover {
+	border-color: var(--accent);
+}
+
+.pay-method.selected {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: #0d1b3e;
+}
+
+.card-input {
+	letter-spacing: 0.04em;
+}
+
+.donate-success-icon {
+	width: 56px;
+	height: 56px;
+	margin: 8px auto 0;
+	border-radius: 50%;
+	background: var(--accent);
+	color: #0d1b3e;
+	font-size: 1.6rem;
+	font-weight: 800;
+	line-height: 56px;
+	box-shadow: 0 0 0 8px rgba(255, 196, 0, 0.2);
+}
