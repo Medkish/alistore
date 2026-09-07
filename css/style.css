@@ -219,11 +219,11 @@ h1, h2, h3, h4, h5 {
 }
 
 .top-logo .brand-link img {
-	max-height: 40px;
+	max-height: 28px;
 }
 
 .top-logo .brand-name {
-	font-size: 1.1rem;
+	font-size: 0.95rem;
 }
 
 .top-account-links {
