@@ -158,22 +158,6 @@
 		.voice-btn.play-btn.playing { background: #16a085; }
 		.voice-btn.stop-btn { background: #a0331b; }
 
-		.install-btn {
-			border: none;
-			background: #c0392b;
-			color: #fff;
-			padding: 8px 14px;
-			border-radius: 20px;
-			font-weight: 700;
-			font-size: 0.8rem;
-			cursor: pointer;
-			white-space: nowrap;
-		}
-
-		.install-btn:active {
-			transform: scale(0.96);
-		}
-
 		.voice-status {
 			color: #a8f0c0;
 			font-size: 0.82rem;
@@ -1097,11 +1081,6 @@
 				font-size: 0.78rem;
 			}
 
-			.install-btn {
-				font-size: 0.72rem;
-				padding: 6px 10px;
-			}
-
 			.voice-bar .voice-inner {
 				flex-wrap: wrap;
 				gap: 6px;
@@ -1133,7 +1112,6 @@
 			<div class="book-select-wrap d-flex align-items-center">
 				<label for="book-select">Book:</label>
 				<select id="book-select"></select>
-				<button id="install-app" class="install-btn" type="button">&#11015; Install App</button>
 			</div>
 		</div>
 	</header>
@@ -2165,31 +2143,6 @@
 		<a href="index.html" style="color:#c0392b;text-decoration:none;font-weight:600;margin-right:8px;">&#8592; Back to Store</a>
 		<span style="opacity:.65">&copy; 2025 AlioStore</span>
 	</footer>
-
-	<script>
-		(function () {
-			var btn = document.getElementById('install-app');
-			if (!btn) return;
-			var deferred = null;
-			var isApple = /iphone|ipad|ipod/i.test(navigator.userAgent);
-			window.addEventListener('beforeinstallprompt', function (e) {
-				e.preventDefault();
-				deferred = e;
-			});
-			btn.addEventListener('click', function () {
-				if (deferred) {
-					deferred.prompt();
-					deferred.userChoice.then(function () {
-						deferred = null;
-					});
-				} else if (isApple) {
-					alert('Tap the Share button in your browser, then choose "Add to Home Screen" to install AlioStore.');
-				} else {
-					alert('Open this page in your phone\'s browser (Chrome/Safari), tap the menu or Share icon, and choose "Add to Home Screen" / "Install App".');
-				}
-			});
-		})();
-	</script>
 
 	<script>
 		if ('serviceWorker' in navigator) {

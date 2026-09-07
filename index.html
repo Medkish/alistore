@@ -243,24 +243,6 @@
 			border-color: #c0392b;
 		}
 
-		.install-app-btn {
-			border: none;
-			background: #c0392b;
-			color: #fff;
-			padding: 9px 16px;
-			border-radius: 20px;
-			font-weight: 700;
-			font-size: 0.82rem;
-			cursor: pointer;
-			vertical-align: middle;
-			white-space: nowrap;
-			display: inline-block;
-		}
-
-		.install-app-btn:active {
-			transform: scale(0.96);
-		}
-
 		/* Phone (<576px): icon opens a dropdown search */
 		@media (max-width: 575.98px) {
 			.search-box {
@@ -614,7 +596,6 @@
 							<a href="#" class="for-buy user-account"><i class="icon icon-user"></i><span>Account</span></a>
 							<a href="#" class="for-buy cart"><i class="icon icon-clipboard"></i><span>Cart (0$)</span></a>
 							<a href="#" class="for-buy my-orders"><i class="icon icon-notes"></i><span>My Orders</span></a>
-							<button id="install-app" class="install-app-btn" type="button">&#11015; Install App</button>
 
 							<div class="action-menu">
 								<div class="search-bar">
@@ -1750,31 +1731,6 @@
 					link.appendChild(img);
 				}
 			}
-		})();
-	</script>
-
-	<script>
-		(function () {
-			var btn = document.getElementById('install-app');
-			if (!btn) return;
-			var deferred = null;
-			var isApple = /iphone|ipad|ipod/i.test(navigator.userAgent);
-			window.addEventListener('beforeinstallprompt', function (e) {
-				e.preventDefault();
-				deferred = e;
-			});
-			btn.addEventListener('click', function () {
-				if (deferred) {
-					deferred.prompt();
-					deferred.userChoice.then(function () {
-						deferred = null;
-					});
-				} else if (isApple) {
-					alert('Tap the Share button in your browser, then choose "Add to Home Screen" to install AlioStore.');
-				} else {
-					alert('Open this page in your phone\'s browser (Chrome/Safari), tap the menu or Share icon, and choose "Add to Home Screen" / "Install App".');
-				}
-			});
 		})();
 	</script>
 
