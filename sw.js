@@ -1,5 +1,5 @@
 /* AlioStore service worker - offline cache */
-var CACHE_NAME = 'alistore-v2';
+var CACHE_NAME = 'alistore-v3';
 var CORE_ASSETS = [
   './',
   './index.html',
@@ -51,9 +51,42 @@ self.addEventListener('fetch', function (event) {
   if (request.method !== 'GET' || request.url.indexOf('http') !== 0) {
     return;
   }
+
+  /* Pages (navigations): always try the network first so updates
+     show up immediately; fall back to cache when offline. */
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).then(function (response) {
+        if (response && response.ok) {
+          var copy = response.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put(request, copy);
+          });
+        }
+        return response;
+      }).catch(function () {
+        return caches.match(request).then(function (cached) {
+          return cached || caches.match('./index.html');
+        });
+      })
+    );
+    return;
+  }
+
+  /* Static assets: cache-first with background refresh */
   event.respondWith(
     caches.match(request).then(function (cached) {
-      if (cached) return cached;
+      if (cached) {
+        fetch(request).then(function (response) {
+          if (response && response.ok) {
+            var copy = response.clone();
+            caches.open(CACHE_NAME).then(function (cache) {
+              cache.put(request, copy);
+            });
+          }
+        }).catch(function () {});
+        return cached;
+      }
       return fetch(request).then(function (response) {
         if (response && response.ok &&
             (response.type === 'basic' || response.type === 'cors')) {
@@ -64,9 +97,7 @@ self.addEventListener('fetch', function (event) {
         }
         return response;
       }).catch(function () {
-        if (request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
+        return caches.match('./index.html');
       });
     })
   );
