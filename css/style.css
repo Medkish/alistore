@@ -1620,3 +1620,24 @@ html {
 		flex: 1 1 46%;
 	}
 }
+
+/* ---------- Mobile number with country code ---------- */
+.mobile-row {
+	display: flex;
+	gap: 8px;
+}
+
+.country-select {
+	flex: none;
+	width: 150px;
+}
+
+@media (max-width: 575.98px) {
+	.country-select {
+		width: 128px;
+	}
+
+	.mobile-row {
+		gap: 6px;
+	}
+}
