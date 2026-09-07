@@ -119,11 +119,31 @@
       once: true,
     })
 
-    jQuery('.stellarnav').stellarNav({
-      theme: 'plain',
-      closingDelay: 250,
-      // mobileMode: false,
-    });
+    // Header dropdown menu
+    var dropBtn = document.getElementById('menu-btn');
+    var dropMenu = document.getElementById('drop-menu');
+    var dropdown = document.getElementById('site-dropdown');
+
+    if (dropBtn && dropMenu && dropdown) {
+      dropBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        dropdown.classList.toggle('open');
+      });
+
+      dropMenu.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+
+      [].forEach.call(dropMenu.querySelectorAll('a'), function (link) {
+        link.addEventListener('click', function () {
+          dropdown.classList.remove('open');
+        });
+      });
+
+      document.addEventListener('click', function () {
+        dropdown.classList.remove('open');
+      });
+    }
 
   }); // End of a document
 
