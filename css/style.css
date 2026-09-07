@@ -287,49 +287,6 @@ h1, h2, h3, h4, h5 {
 	color: var(--accent);
 }
 
-.main-menu > .menu-list.responsive {
-	position: absolute;
-	top: 100%;
-	left: 0;
-	right: 0;
-	flex-direction: column;
-	align-items: flex-start;
-	background: #ffffff;
-	padding: 10px 0;
-	box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
-	z-index: 99;
-}
-
-.hamburger {
-	display: none;
-	flex-direction: column;
-	gap: 5px;
-	cursor: pointer;
-	background: none;
-	border: 0;
-	padding: 6px;
-}
-
-.hamburger .bar {
-	width: 26px;
-	height: 3px;
-	background: var(--dark);
-	border-radius: 2px;
-	transition: transform 0.25s, opacity 0.25s;
-}
-
-.hamburger.active .bar:nth-child(1) {
-	transform: translateY(8px) rotate(45deg);
-}
-
-.hamburger.active .bar:nth-child(2) {
-	opacity: 0;
-}
-
-.hamburger.active .bar:nth-child(3) {
-	transform: translateY(-8px) rotate(-45deg);
-}
-
 /* ---------- Billboard banner ---------- */
 #billboard {
 	background: linear-gradient(180deg, #f6f1e7 0%, #fbf8f2 100%);
@@ -884,27 +841,14 @@ ul.tabs {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 991.98px) {
-	.main-menu > .menu-list:not(.responsive) {
-		display: none;
-	}
-
 	.main-menu {
-		justify-content: space-between;
+		justify-content: center;
 	}
 
-	.hamburger {
-		display: flex;
-	}
-
-	.main-menu > .menu-list.responsive .menu-item.has-sub > ul {
-		position: static;
-		opacity: 1;
-		visibility: visible;
-		transform: none;
-		box-shadow: none;
-		background: transparent;
-		min-width: 0;
-		padding-left: 18px;
+	.main-menu > .menu-list {
+		flex-wrap: wrap;
+		justify-content: center;
+		row-gap: 6px;
 	}
 }
 

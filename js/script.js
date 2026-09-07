@@ -19,27 +19,6 @@
     })
   });
 
-  // Responsive Navigation with Button
-
-  const hamburger = document.querySelector(".hamburger");
-  const navMenu = document.querySelector(".menu-list");
-
-  hamburger.addEventListener("click", mobileMenu);
-
-  function mobileMenu() {
-      hamburger.classList.toggle("active");
-      navMenu.classList.toggle("responsive");
-  }
-
-  const navLink = document.querySelectorAll(".nav-link");
-
-  navLink.forEach(n => n.addEventListener("click", closeMenu));
-
-  function closeMenu() {
-      hamburger.classList.remove("active");
-      navMenu.classList.remove("responsive");
-  }
-
   var initScrollNav = function() {
     var scroll = $(window).scrollTop();
 
@@ -139,12 +118,6 @@
       duration: 1200,
       once: true,
     })
-
-    jQuery('.stellarnav').stellarNav({
-      theme: 'plain',
-      closingDelay: 250,
-      // mobileMode: false,
-    });
 
   }); // End of a document
 
