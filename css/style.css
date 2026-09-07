@@ -213,11 +213,13 @@ h1, h2, h3, h4, h5 {
 	max-height: 54px;
 }
 
-/* Logo sits on the dark top bar */
+/* Logo sits on the dark top bar, left corner */
 .top-logo {
-	display: flex;
-	justify-content: center;
 	padding: 10px 0 4px;
+}
+
+.top-account-links {
+	justify-content: flex-end;
 }
 
 .top-logo .brand-name {
