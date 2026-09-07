@@ -1749,7 +1749,7 @@
 					</div>
 
 					<div id="auth-pane-register" style="display:none">
-						<form id="register-form">
+						<form id="register-form" novalidate>
 							<div class="mb-3">
 								<label class="form-label" for="reg-name">Full name</label>
 								<input type="text" class="form-control" id="reg-name" required>
@@ -1759,8 +1759,22 @@
 								<input type="email" class="form-control" id="reg-email" required>
 							</div>
 							<div class="mb-3">
+								<label class="form-label" for="reg-mobile">Mobile number</label>
+								<input type="tel" class="form-control" id="reg-mobile" inputmode="tel" placeholder="+971 5x xxx xxxx" required>
+							</div>
+							<div class="mb-3">
 								<label class="form-label" for="reg-pass">Password</label>
-								<input type="password" class="form-control" id="reg-pass" required>
+								<input type="password" class="form-control" id="reg-pass" minlength="6" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="reg-pass-confirm">Confirm password</label>
+								<input type="password" class="form-control" id="reg-pass-confirm" required>
+							</div>
+							<div class="form-check mb-3">
+								<input class="form-check-input" type="checkbox" id="reg-terms" required>
+								<label class="form-check-label form-note" for="reg-terms">
+									I agree to the <a href="#" id="terms-link">Terms &amp; Conditions</a>
+								</label>
 							</div>
 							<button type="submit" class="btn-flash btn-flash-primary w-100">Register</button>
 						</form>
@@ -2023,10 +2037,50 @@
 			}); }
 			if (regForm) { regForm.addEventListener('submit', function (e) {
 				e.preventDefault();
-				var name = document.getElementById('reg-name').value || 'Reader';
-				var email = document.getElementById('reg-email').value;
+				var name = document.getElementById('reg-name').value.trim();
+				var email = document.getElementById('reg-email').value.trim();
+				var mobile = document.getElementById('reg-mobile').value.replace(/[\s()-]/g, '');
+				var pass = document.getElementById('reg-pass').value;
+				var passConfirm = document.getElementById('reg-pass-confirm').value;
+				var terms = document.getElementById('reg-terms');
+
+				var fields = [
+					{ el: document.getElementById('reg-name'), ok: name.length >= 2 && name.indexOf(' ') > 0 },
+					{ el: document.getElementById('reg-email'), ok: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) },
+					{ el: document.getElementById('reg-mobile'), ok: /^\+?\d{7,15}$/.test(mobile) },
+					{ el: document.getElementById('reg-pass'), ok: pass.length >= 6 },
+					{ el: document.getElementById('reg-pass-confirm'), ok: pass.length >= 6 && pass === passConfirm }
+				];
+
+				fields.forEach(function (f) { f.el.classList.toggle('is-invalid', !f.ok); });
+
+				if (!terms.checked) { terms.closest('.form-check').classList.add('text-danger'); }
+				else { terms.closest('.form-check').classList.remove('text-danger'); }
+
+				var allOk = fields.every(function (f) { return f.ok; }) && terms.checked;
+				if (!allOk) {
+					var firstBad = fields.filter(function (f) { return !f.ok; })[0];
+					if (firstBad) { firstBad.el.focus(); }
+					else { terms.closest('.form-check').scrollIntoView({ block: 'center' }); }
+					return;
+				}
+
 				afterAuth({ name: name, email: email });
 			}); }
+
+			['reg-name', 'reg-email', 'reg-mobile', 'reg-pass', 'reg-pass-confirm'].forEach(function (id) {
+				var el = document.getElementById(id);
+				if (el) { el.addEventListener('input', function () { el.classList.remove('is-invalid'); }); }
+			});
+
+			var termsLink = document.getElementById('terms-link');
+			if (termsLink) {
+				termsLink.addEventListener('click', function (e) {
+					e.preventDefault();
+					var text = 'AlioStore Terms & Conditions\n\nBy creating an account you agree to:\n- Provide accurate profile and mobile contact details.\n- Use the store for lawful purchases and donations only.\n- Respect authors, contributors, and community content.\nYour data is used only to manage orders, donations, and the Alio & Palma Cooperative community.';
+					alert(text + '\n\n(Full terms will be posted here soon.)');
+				});
+			}
 
 			document.getElementById('go-register').addEventListener('click', function (e) {
 				e.preventDefault(); showPane('register', 'Register');
