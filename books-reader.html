@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>AlioStore - Books Reader</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#3d1c07">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<link rel="manifest" href="manifest.json">
+	<link rel="apple-touch-icon" href="icons/icon-180.png">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="css/normalize.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+	<style>
+		:root {
+			--paper-dark: #b9815a;
+			--paper-mid: #d4a373;
+			--paper: #e7c9a0;
+			--paper-light: #f0d9b5;
+			--ink: #4a2f1d;
+			--ink-soft: #6b4a2f;
+			--cover-a: #5a2d0e;
+			--cover-b: #3d1c07;
+			--accent: #b5451c;
+		}
+
+		body {
+			background: #4a2c1a;
+			font-family: Georgia, 'Times New Roman', serif;
+			overflow-x: hidden;
+		}
+
+		.reader-header {
+			background: linear-gradient(135deg, #3d1c07, #2a1306);
+			padding: 14px 0;
+			box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+			position: relative;
+			z-index: 50;
+		}
+
+		.reader-header .navbar-brand {
+			color: #f0d9b5;
+			font-weight: 800;
+			font-family: Georgia, serif;
+			font-size: 1.3rem;
+		}
+
+		.reader-header .navbar-brand img {
+			max-height: 45px;
+			margin-right: 10px;
+			border-radius: 6px;
+		}
+
+		.reader-header .book-select-wrap label {
+			color: #d9b98a;
+			margin-right: 8px;
+			font-weight: 600;
+		}
+
+		.reader-header select {
+			padding: 7px 12px;
+			border-radius: 8px;
+			border: none;
+			font-weight: 600;
+			background: #f0d9b5;
+			color: #4a2f1d;
+			cursor: pointer;
+		}
+
+		/* ===== Voice reader bar ===== */
+		.voice-bar {
+			position: sticky;
+			top: 0;
+			z-index: 200;
+			background: linear-gradient(90deg, #2a1306, #3d1c07);
+			border-bottom: 1px solid rgba(240, 217, 181, 0.2);
+			padding: 10px 0;
+			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+		}
+
+		.voice-bar .voice-inner {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: center;
+			gap: 12px;
+		}
+
+		.voice-bar .voice-label {
+			color: #d9b98a;
+			font-weight: 700;
+			font-size: 0.95rem;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.voice-bar select,
+		.voice-bar input[type="range"] {
+			cursor: pointer;
+		}
+
+		.voice-bar select {
+			padding: 8px 12px;
+			border-radius: 8px;
+			border: none;
+			font-weight: 600;
+			background: #f0d9b5;
+			color: #4a2f1d;
+		}
+
+		.voice-btn {
+			background: var(--accent);
+			color: #fff;
+			border: none;
+			padding: 10px 18px;
+			border-radius: 30px;
+			font-weight: 700;
+			font-size: 0.95rem;
+			cursor: pointer;
+			transition: transform 0.15s, background 0.2s, opacity 0.2s;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+		}
+
+		.voice-btn:hover:not(:disabled) {
+			transform: translateY(-2px);
+		}
+
+		.voice-btn:disabled {
+			opacity: 0.5;
+			cursor: default;
+		}
+
+		.voice-btn.play-btn { background: #8a5a2c; }
+		.voice-btn.play-btn.playing { background: #16a085; }
+		.voice-btn.stop-btn { background: #a0331b; }
+
+		.install-btn {
+			border: none;
+			background: #c0392b;
+			color: #fff;
+			padding: 8px 14px;
+			border-radius: 20px;
+			font-weight: 700;
+			font-size: 0.8rem;
+			cursor: pointer;
+			white-space: nowrap;
+		}
+
+		.install-btn:active {
+			transform: scale(0.96);
+		}
+
+		.voice-status {
+			color: #a8f0c0;
+			font-size: 0.82rem;
+			font-weight: 600;
+			min-width: 120px;
+			text-align: center;
+		}
+
+		.voice-speed {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			color: #d9b98a;
+			font-size: 0.82rem;
+			font-weight: 600;
+		}
+
+		.voice-speed input {
+			width: 90px;
+			accent-color: #b5451c;
+		}
+
+		/* highlight while speaking */
+		.speak-target .current-sentence {
+			background: rgba(240, 217, 181, 0.65);
+			border-radius: 4px;
+			box-shadow: 0 0 0 2px rgba(181, 69, 28, 0.4);
+		}
+
+		#book-shell {
+			position: relative;
+			padding: 46px 16px 30px;
+			text-align: center;
+			background:
+				radial-gradient(ellipse at center, #5a3417 0%, #3a1e0a 60%, #2a1306 100%);
+		}
+
+		/* ===== The open book ===== */
+		#book-wrap {
+			position: relative;
+			width: 940px;
+			max-width: 98vw;
+			margin: 0 auto 26px;
+			perspective: 2600px;
+			user-select: none;
+		}
+
+		#book {
+			position: relative;
+			width: 940px;
+			max-width: 100%;
+			height: 620px;
+			margin: 0 auto;
+			transform-style: preserve-3d;
+			border-radius: 10px 16px 16px 10px;
+			box-shadow:
+				0 30px 70px rgba(0, 0, 0, 0.65),
+				0 4px 14px rgba(0, 0, 0, 0.5),
+				inset 0 0 40px rgba(0, 0, 0, 0.25);
+		}
+
+		/* rope holding the book together in the middle of the open pages */
+		#book-rope {
+			position: absolute;
+			left: 50%;
+			top: 0;
+			bottom: 0;
+			width: 24px;
+			transform: translateX(-50%);
+			z-index: 25;
+			pointer-events: none;
+			border-radius: 6px;
+			background:
+				radial-gradient(ellipse at 28% 50%, rgba(255, 233, 200, 0.4), rgba(255, 233, 200, 0) 55%),
+				repeating-linear-gradient(45deg,
+					rgba(138, 90, 44, 0.9) 0, rgba(138, 90, 44, 0.9) 6px,
+					rgba(107, 66, 25, 0.9) 6px, rgba(107, 66, 25, 0.9) 12px),
+				repeating-linear-gradient(-45deg,
+					rgba(122, 77, 36, 0.8) 0, rgba(122, 77, 36, 0.8) 6px,
+					rgba(146, 98, 47, 0.8) 6px, rgba(146, 98, 47, 0.8) 12px);
+			box-shadow:
+				inset 0 0 8px rgba(0, 0, 0, 0.5),
+				0 0 8px rgba(0, 0, 0, 0.35);
+		}
+
+		/* wooden knobs where the rope enters the pages */
+		#book-rope::before,
+		#book-rope::after {
+			content: "";
+			position: absolute;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 38px;
+			height: 15px;
+			border-radius: 50%;
+			background: linear-gradient(180deg, #9a6a35, #5d3a1a);
+			box-shadow:
+				inset 0 -4px 6px rgba(0, 0, 0, 0.5),
+				0 2px 5px rgba(0, 0, 0, 0.45);
+		}
+
+		#book-rope::before {
+			top: -8px;
+		}
+
+		#book-rope::after {
+			bottom: -8px;
+		}
+
+		/* wooden table under the book */
+		#table {
+			position: absolute;
+			left: 50%;
+			bottom: -34px;
+			transform: translateX(-50%);
+			width: 108%;
+			height: 44px;
+			background:
+				repeating-linear-gradient(90deg,
+					#8a5a2c 0, #8a5a2c 5px,
+					#7a4d24 5px, #7a4d24 6px);
+			border-radius: 6px;
+			box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+			pointer-events: none;
+			z-index: -1;
+		}
+
+		/* ===== Page structure ===== */
+		.page {
+			position: absolute;
+			top: 0;
+			height: 100%;
+			width: 50%;
+			transform-style: preserve-3d;
+			pointer-events: auto;
+		}
+
+		.page.left {
+			left: 0;
+		}
+
+		.page.right {
+			right: 0;
+		}
+
+		.page .face {
+			position: absolute;
+			inset: 0;
+			backface-visibility: hidden;
+			overflow: hidden;
+			border-radius: 6px;
+		}
+
+		.page .front {
+			background:
+				repeating-linear-gradient(0deg, rgba(0,0,0,0.035) 0, rgba(0,0,0,0.035) 1px, transparent 1px, transparent 3px),
+				linear-gradient(90deg,
+					var(--paper-light) 0%,
+					var(--paper) 6%,
+					var(--paper) 94%,
+					var(--paper-light) 100%);
+			box-shadow: inset 0 0 30px rgba(100, 60, 20, 0.15);
+		}
+
+		.page .back {
+			transform: rotateY(180deg);
+			background:
+				repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 3px),
+				linear-gradient(90deg,
+					var(--paper-mid) 0%,
+					var(--paper) 10%,
+					var(--paper) 90%,
+					var(--paper-mid) 100%);
+			box-shadow: inset 0 0 30px rgba(100, 60, 20, 0.18);
+		}
+
+		/* spine / inner gutter */
+		.page.left .front::after,
+		.page.right .front::before {
+			content: none;
+		}
+
+		/* ===== Page content ===== */
+		.page .content {
+			position: absolute;
+			inset: 0;
+			padding: 30px 40px;
+			overflow-y: auto;
+			color: var(--ink);
+			text-align: left;
+			font-size: 0.99rem;
+			line-height: 1.62;
+			-webkit-text-size-adjust: 100%;
+		}
+
+		.page.left .content {
+			padding-right: 34px;
+			border-radius: 6px 0 0 6px;
+		}
+
+		.page.right .content {
+			padding-left: 34px;
+			border-radius: 0 6px 6px 0;
+		}
+
+		.page .content h2 {
+			color: var(--accent);
+			font-size: 1.35rem;
+			font-weight: 800;
+			border-bottom: 2px solid rgba(140, 90, 40, 0.4);
+			padding-bottom: 6px;
+			margin-bottom: 12px;
+			font-family: Georgia, serif;
+		}
+
+		.page .content h3 {
+			color: var(--ink-soft);
+			font-size: 1.05rem;
+			margin-top: 12px;
+			font-family: Georgia, serif;
+		}
+
+		.page .topic-title {
+			color: var(--accent);
+			font-size: 1.2rem;
+			font-weight: 800;
+			border-bottom: 2px solid rgba(140, 90, 40, 0.4);
+			padding-bottom: 6px;
+			margin-bottom: 10px;
+			font-family: Georgia, serif;
+		}
+
+		.page pre {
+			background: rgba(70, 45, 25, 0.14);
+			color: #3d2412;
+			padding: 13px 16px;
+			border-radius: 8px;
+			overflow-x: auto;
+			font-size: 0.82rem;
+			line-height: 1.5;
+			border: 1px solid rgba(140, 90, 40, 0.3);
+			font-family: Consolas, Menlo, monospace;
+		}
+
+		.page ul {
+			padding-left: 20px;
+		}
+
+		.page .page-number {
+			position: absolute;
+			bottom: 12px;
+			left: 0;
+			right: 0;
+			text-align: center;
+			color: var(--ink-soft);
+			font-size: 0.8rem;
+			pointer-events: none;
+			opacity: 0.85;
+		}
+
+		.editable-hint {
+			position: absolute;
+			top: 10px;
+			right: 14px;
+			font-size: 0.68rem;
+			color: rgba(90, 60, 30, 0.65);
+			letter-spacing: 0.5px;
+			text-transform: uppercase;
+			pointer-events: none;
+		}
+
+		.extra-note {
+			margin-top: 8px;
+			padding-top: 8px;
+			border-top: 1px dashed rgba(120, 80, 35, 0.4);
+		}
+
+		/* ===== PC screen with coding sample ===== */
+		.code-screen {
+			margin-top: 12px;
+			border-radius: 12px;
+			background: #1b1b22;
+			border: 1px solid rgba(255,255,255,0.12);
+			box-shadow: 0 10px 24px rgba(0,0,0,0.45);
+			overflow: hidden;
+			font-family: Consolas, Menlo, 'Courier New', monospace;
+		}
+
+		.code-screen .screen-bar {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			padding: 8px 12px;
+			background: #2a2a33;
+			border-bottom: 1px solid rgba(255,255,255,0.08);
+		}
+
+		.code-screen .screen-dot {
+			width: 11px;
+			height: 11px;
+			border-radius: 50%;
+		}
+
+		.code-screen .screen-dot.red { background: #ff5f57; }
+		.code-screen .screen-dot.yellow { background: #febc2e; }
+		.code-screen .screen-dot.green { background: #28c840; }
+
+		.code-screen .screen-title {
+			margin-left: 8px;
+			color: #9a9aa5;
+			font-size: 0.72rem;
+			font-weight: 700;
+			letter-spacing: 0.3px;
+		}
+
+		.code-screen .screen-status {
+			margin-left: auto;
+			color: #28c840;
+			font-size: 0.7rem;
+			font-weight: 700;
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+
+		.code-screen .screen-status::before {
+			content: "";
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: #28c840;
+			animation: blink 1.2s infinite;
+		}
+
+		@keyframes blink {
+			0%, 100% { opacity: 1; }
+			50% { opacity: 0.25; }
+		}
+
+		.code-screen .editor-tabs {
+			display: flex;
+			gap: 4px;
+			padding: 6px 12px 0;
+			background: #23232b;
+			border-bottom: 1px solid rgba(255,255,255,0.07);
+			font-size: 0.72rem;
+		}
+
+		.code-screen .editor-tab {
+			padding: 5px 10px;
+			border-radius: 6px 6px 0 0;
+			color: #9a9aa5;
+			background: #23232b;
+		}
+
+		.code-screen .editor-tab.active {
+			background: #1b1b22;
+			color: #e6e6eb;
+		}
+
+		.code-screen pre {
+			margin: 0;
+			padding: 14px 16px;
+			background: #1b1b22;
+			color: #d8e0e8;
+			font-size: 0.8rem;
+			line-height: 1.55;
+			overflow-x: auto;
+			border: none;
+			border-radius: 0;
+			tab-size: 4;
+		}
+
+		.code-screen .screen-footer {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 7px 14px;
+			background: #2a2a33;
+			border-top: 1px solid rgba(255,255,255,0.08);
+			color: #7d7d88;
+			font-size: 0.7rem;
+		}
+
+		.code-screen .screen-footer .run-line {
+			color: #a8f0c0;
+		}
+
+		/* ===== Configuration diagram ===== */
+		.config-diagram {
+			margin-top: 12px;
+			border-radius: 12px;
+			background: rgba(90, 60, 30, 0.14);
+			border: 1px dashed rgba(140, 90, 40, 0.45);
+			padding: 12px 14px;
+		}
+
+		.config-diagram .diagram-title {
+			font-size: 0.85rem;
+			font-weight: 800;
+			color: var(--accent);
+			margin-bottom: 8px;
+			font-family: Georgia, serif;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.config-diagram .diagram-boxes {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			flex-wrap: wrap;
+		}
+
+		.config-diagram .dbox {
+			border: 1px solid rgba(90, 60, 30, 0.5);
+			border-radius: 8px;
+			background: rgba(240, 217, 181, 0.5);
+			padding: 6px 9px;
+			font-size: 0.78rem;
+			font-weight: 700;
+			color: var(--ink);
+			text-align: center;
+			min-width: 60px;
+			font-family: Consolas, Menlo, monospace;
+		}
+
+		.config-diagram .dbox .dbox-sub {
+			display: block;
+			font-weight: 400;
+			font-size: 0.65rem;
+			color: var(--ink-soft);
+			font-family: Georgia, serif;
+		}
+
+		.config-diagram .darrow {
+			color: var(--accent);
+			font-size: 1.1rem;
+			font-weight: 800;
+		}
+
+		.page .module-name {
+			font-weight: 800;
+			color: var(--ink);
+			font-size: 0.95rem;
+			border-bottom: 1px solid rgba(140, 90, 40, 0.4);
+			padding-bottom: 4px;
+			margin-bottom: 6px;
+		}
+
+		.toc-list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		.toc-list li {
+			padding: 6px 0;
+			border-bottom: 1px dotted rgba(120, 80, 35, 0.5);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.toc-list li a {
+			color: var(--ink);
+			text-decoration: none;
+			font-weight: 600;
+		}
+
+		.toc-list li a:hover {
+			color: var(--accent);
+		}
+
+		.toc-list li .page-ref {
+			color: var(--ink-soft);
+			font-size: 0.8rem;
+		}
+
+		/* ===== Cover ===== */
+		.page-cover {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+		}
+
+		.cover-back {
+			background: linear-gradient(135deg, var(--cover-a), var(--cover-b));
+			color: #f0d9b5;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			padding: 30px;
+		}
+
+		.cover-back .cover-title {
+			font-size: 2.2rem;
+			font-weight: 800;
+			letter-spacing: 1px;
+			margin-bottom: 8px;
+			font-family: Georgia, serif;
+			text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+		}
+
+		.cover-back .cover-subtitle {
+			font-size: 1rem;
+			color: #d9b98a;
+			margin-bottom: 26px;
+		}
+
+		.cover-back .cover-meta {
+			border-top: 2px solid rgba(240, 217, 181, 0.3);
+			padding-top: 16px;
+			font-size: 0.92rem;
+			line-height: 2;
+		}
+
+		.cover-back .cover-meta strong {
+			color: #f39c12;
+			margin-right: 8px;
+		}
+
+		/* front cover (closed book first page) */
+		.cover-front {
+			background: linear-gradient(135deg, var(--cover-a), var(--cover-b));
+			color: #f0d9b5;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			padding: 34px;
+			border-radius: 10px 3px 3px 10px;
+			box-shadow: inset 0 0 60px rgba(0,0,0,0.55);
+		}
+
+		.cover-front .cover-title {
+			font-size: 2.6rem;
+			font-weight: 800;
+			letter-spacing: 1px;
+			margin-bottom: 8px;
+			font-family: Georgia, serif;
+			text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+		}
+
+		.cover-front .cover-subtitle {
+			font-size: 1.1rem;
+			color: #d9b98a;
+			margin-bottom: 30px;
+		}
+
+		.cover-front .cover-meta {
+			border-top: 2px solid rgba(240, 217, 181, 0.3);
+			padding-top: 18px;
+			font-size: 1rem;
+			line-height: 2;
+		}
+
+		.cover-front .cover-meta strong {
+			color: #f39c12;
+			margin-right: 8px;
+		}
+
+		/* ===== Controls ===== */
+		.book-controls {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 16px;
+			margin: 10px auto 40px;
+		}
+
+		.book-controls .nav-btn {
+			background: var(--accent);
+			color: #fff;
+			border: none;
+			padding: 12px 26px;
+			border-radius: 30px;
+			font-weight: 700;
+			font-size: 1rem;
+			cursor: pointer;
+			transition: transform 0.15s, background 0.2s;
+			box-shadow: 0 5px 14px rgba(0,0,0,0.4);
+		}
+
+		.book-controls .nav-btn:hover:not(:disabled) {
+			transform: translateY(-2px);
+			background: #8a3413;
+		}
+
+		.book-controls .home-btn {
+			background: #3d1c07;
+		}
+
+		.book-controls .home-btn:hover:not(:disabled) {
+			background: #2a1306;
+		}
+
+		.book-controls .print-btn {
+			background: #6b7f32;
+		}
+
+		.book-controls .print-btn:hover:not(:disabled) {
+			background: #54611f;
+		}
+
+		.book-controls .nav-btn:disabled {
+			background: #7a6a4f;
+			cursor: default;
+			transform: none;
+		}
+
+		.book-controls .page-indicator {
+			font-weight: 700;
+			color: #f0d9b5;
+			min-width: 150px;
+			text-align: center;
+			text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+		}
+
+		.save-note {
+			position: fixed;
+			bottom: 18px;
+			right: 18px;
+			background: #7fa642;
+			color: #fff;
+			border: none;
+			padding: 12px 20px;
+			border-radius: 30px;
+			font-weight: 700;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+			cursor: pointer;
+			z-index: 200;
+		}
+
+		.editable-badge {
+			display: inline-block;
+			background: #d08a2e;
+			color: #fff;
+			font-size: 0.7rem;
+			font-weight: 700;
+			border-radius: 4px;
+			padding: 2px 7px;
+			vertical-align: middle;
+			margin-left: 8px;
+		}
+
+		.flip-hint {
+			position: absolute;
+			top: 12px;
+			left: 14px;
+			font-size: 0.7rem;
+			color: rgba(240,217,181,0.75);
+			letter-spacing: 1px;
+			text-transform: uppercase;
+			pointer-events: none;
+		}
+
+		.voice-divider {
+			color: #8a6a3a;
+			font-weight: 700;
+			opacity: 0.6;
+		}
+
+		/* page being turned - lifts slightly and casts a shadow on what's beneath */
+		.page.turning .front,
+		.page.turning .back {
+			box-shadow: 0 0 0 rgba(0,0,0,0);
+			transition: box-shadow 0.4s ease;
+		}
+
+		.page.turning {
+			will-change: transform;
+		}
+
+		.page.turning .front {
+			box-shadow: -70px 14px 60px rgba(0,0,0,0.45);
+		}
+
+		.page.turning.backward .back {
+			box-shadow: 70px 14px 60px rgba(0,0,0,0.45);
+		}
+
+		@media (max-width: 992px) {
+			.reader-header {
+				padding: 10px 0;
+			}
+
+			.reader-header .navbar-brand {
+				font-size: 1.1rem;
+			}
+
+			.book-controls .nav-btn {
+				padding: 10px 20px;
+				font-size: 0.92rem;
+			}
+
+			.book-controls .page-indicator {
+				min-width: 110px;
+			}
+		}
+
+		@media (max-width: 768px) {
+			#book-shell {
+				padding: 26px 8px 44px;
+			}
+
+			#book {
+				height: 78vh;
+			}
+
+			.page .content {
+				padding: 18px 20px;
+				font-size: 0.88rem;
+				line-height: 1.55;
+			}
+
+			.cover-front .cover-title,
+			.cover-back .cover-title {
+				font-size: 1.8rem;
+			}
+
+			.cover-front,
+			.cover-back {
+				padding: 22px;
+			}
+
+			.code-screen pre {
+				font-size: 0.72rem;
+			}
+
+			.config-diagram .dbox {
+				padding: 5px 7px;
+				font-size: 0.7rem;
+				min-width: 48px;
+			}
+
+			.save-note {
+				padding: 10px 16px;
+				font-size: 0.85rem;
+				bottom: 12px;
+				right: 12px;
+			}
+		}
+
+		/* Phones: single-page reading + compact voice bar */
+		@media (max-width: 639px) {
+			html,
+			body {
+				overflow-x: hidden;
+			}
+
+			#book-shell {
+				padding: 14px 6px 40px;
+			}
+
+			#book-wrap {
+				max-width: 100vw;
+			}
+
+			#book {
+				width: 100%;
+				height: 82vh;
+			}
+
+			/* Single page takes the full width of the book */
+			.page {
+				width: 100%;
+				left: 0;
+				right: auto;
+			}
+
+			/* no rope in single-page mode - it would cross the text */
+			#book-rope {
+				display: none;
+			}
+
+			.page.right {
+				right: auto;
+			}
+
+			.page .content {
+				padding: 14px 18px;
+				font-size: 0.86rem;
+				line-height: 1.55;
+			}
+
+			.page .content h2 {
+				font-size: 1.1rem;
+			}
+
+			.page .topic-title {
+				font-size: 1rem;
+			}
+
+			.page pre {
+				font-size: 0.72rem;
+				padding: 10px 12px;
+			}
+
+			.cover-front .cover-title,
+			.cover-back .cover-title {
+				font-size: 1.5rem;
+			}
+
+			.cover-front .cover-subtitle,
+			.cover-back .cover-subtitle {
+				font-size: 0.9rem;
+			}
+
+			.cover-front .cover-meta,
+			.cover-back .cover-meta {
+				font-size: 0.85rem;
+			}
+
+			.voice-bar {
+				padding: 8px 0;
+			}
+
+			.voice-bar .voice-inner {
+				gap: 8px;
+			}
+
+			.voice-bar select {
+				padding: 6px 8px;
+				font-size: 0.8rem;
+				max-width: 100%;
+			}
+
+			.voice-btn {
+				padding: 8px 12px;
+				font-size: 0.82rem;
+			}
+
+			.voice-speed input {
+				width: 70px;
+			}
+
+			.voice-status {
+				min-width: 0;
+				font-size: 0.75rem;
+			}
+
+			.reader-header .container {
+				justify-content: center;
+				text-align: center;
+			}
+
+			.reader-header .navbar-brand {
+				font-size: 1rem;
+			}
+
+			.reader-header .navbar-brand img {
+				max-height: 34px;
+			}
+
+			.book-select-wrap label {
+				display: none;
+			}
+
+			.book-controls {
+				gap: 10px;
+				margin-bottom: 26px;
+			}
+
+			.book-controls .nav-btn {
+				padding: 9px 16px;
+				font-size: 0.88rem;
+			}
+
+			.flip-hint {
+				display: none;
+			}
+
+			.save-note {
+				bottom: 10px;
+				right: 10px;
+				font-size: 0.8rem;
+				padding: 9px 14px;
+			}
+
+			.code-screen pre {
+				font-size: 0.66rem;
+				padding: 10px 10px;
+			}
+
+			.code-screen .screen-title {
+				font-size: 0.62rem;
+			}
+
+			.config-diagram {
+				padding: 8px 8px;
+			}
+
+			.config-diagram .dbox {
+				min-width: 40px;
+				font-size: 0.64rem;
+				padding: 4px 5px;
+			}
+
+			.config-diagram .darrow {
+				font-size: 0.9rem;
+			}
+		}
+	</style>
+</head>
+
+<body>
+
+	<header class="reader-header">
+		<div class="container d-flex flex-wrap align-items-center justify-content-between gap-3">
+			<a href="index.html" class="navbar-brand d-flex align-items-center">
+				<img src="images/main-logo-nobg-cropped.png" alt="logo">
+				<span>Books Reader</span>
+			</a>
+			<div class="book-select-wrap d-flex align-items-center">
+				<label for="book-select">Book:</label>
+				<select id="book-select"></select>
+				<button id="install-app" class="install-btn" type="button">&#11015; Install App</button>
+			</div>
+		</div>
+	</header>
+
+	<div class="voice-bar">
+		<div class="voice-inner">
+			<span class="voice-label">&#128266; Read aloud:</span>
+			<select id="voice-lang" aria-label="Choose language"></select>
+			<span class="voice-divider">|</span>
+			<select id="voice-voice" aria-label="Choose voice"></select>
+			<button class="voice-btn play-btn" id="voice-play" type="button">&#9654; Play</button>
+			<button class="voice-btn stop-btn" id="voice-stop" type="button">&#9632; Stop</button>
+			<span class="voice-status" id="voice-status">Ready</span>
+			<span class="voice-speed">
+				<label for="voice-rate">Speed</label>
+				<input type="range" id="voice-rate" min="0.5" max="1.8" step="0.1" value="1">
+			</span>
+		</div>
+	</div>
+
+	<section id="book-shell">
+		<div id="book-wrap">
+			<div id="table"></div>
+			<div id="book">
+				<div id="book-rope"></div>
+			</div>
+		</div>
+		<div class="flip-hint">Use the Next button to turn the page</div>
+	</section>
+
+	<div class="book-controls">
+		<a class="nav-btn home-btn" href="index.html" title="Back to home page">&larr; Home</a>
+		<a class="nav-btn print-btn" href="#" id="print-book" title="Print this book">&raquo; Print</a>
+		<span class="page-indicator" id="page-indicator">Page 1</span>
+		<button class="nav-btn" id="next-page" type="button">Next &raquo;</button>
+	</div>
+
+	<button class="save-note" id="save-note" type="button">Save my edits</button>
+
+	<script src="js/jquery-1.11.0.min.js"></script>
+	<script src="js/bookdata-0.js"></script>
+	<script src="js/bookdata-1.js"></script>
+	<script src="js/bookdata-2.js"></script>
+	<script src="js/bookdata-3.js"></script>
+	<script src="js/bookdata-4.js"></script>
+	<script src="js/bookdata-5.js"></script>
+
+	<script>
+		(function() {
+			"use strict";
+
+			var DATA = window.BOOKDATA;
+			var BOOKS = DATA.books;
+			var modules = DATA.modules;
+			var notes = DATA.notes;
+
+			var currentBookIndex = 0;
+			var currentPage = 0;   // logical page index shown on the RIGHT half
+			var bookEl;
+			var maxPage = 0;
+			var flipping = false;
+			var allSheets = [];
+			var leftEl = null;
+			var rightEl = null;
+
+			/* Narrow screens (phones) read one single page at a time instead of a
+			   two-page spread, so the text stays big and readable. */
+			var narrowMode = false;
+			try {
+				var narrowMQ = window.matchMedia('(max-width: 639px)');
+				narrowMode = narrowMQ.matches;
+				if (narrowMQ.addEventListener) {
+					narrowMQ.addEventListener('change', function(e) {
+						narrowMode = e.matches;
+						rebuildSpread();
+						updateIndicator();
+					});
+				}
+			} catch (err) { narrowMode = false; }
+
+			/* ----- Book selector ----- */
+			function buildBookSelector() {
+				var sel = document.getElementById('book-select');
+				BOOKS.forEach(function(book, i) {
+					var opt = document.createElement('option');
+					opt.value = i;
+					opt.textContent = book.title;
+					sel.appendChild(opt);
+				});
+				sel.addEventListener('change', function() {
+					loadBook(parseInt(sel.value, 10));
+				});
+			}
+
+			/* ----- Rendering a single page's front content ----- */
+			function pageIntro(book, pageIndex) {
+				if (pageIndex === 0) return renderFrontCover(book);
+				if (pageIndex === 1) return renderContents(book);
+				return renderBody(book, pageIndex - 2);
+			}
+
+			function renderFrontCover(book) {
+				return '<div class="cover-front" style="height:100%">' +
+					'<div class="flip-hint">AlioStore</div>' +
+					'<div class="cover-title">' + book.title + '</div>' +
+					'<div class="cover-subtitle">' + book.intro + '</div>' +
+					'<div class="cover-meta">' +
+					'<div><strong>Author</strong> ' + book.author + ' <span class="editable-badge">editable</span></div>' +
+					'<div><strong>Editor</strong> ' + book.editor + '</div>' +
+					'<div><strong>Writer</strong> ' + book.writer + '</div>' +
+					'<div><strong>Chapters</strong> 80 modules guide</div>' +
+					'</div>' +
+					'<div class="page-number">Cover</div>' +
+					'</div>';
+			}
+
+			function renderContents(book) {
+				var title = book.title;
+				var toc = '<h2>Table of Contents</h2>';
+				var slot = 0;
+				modules.forEach(function(moduleInfo, m) {
+					toc += '<div class="toc-module"><div class="module-name">' + moduleInfo.m + '</div><ul class="toc-list">';
+					moduleInfo.t.forEach(function(topic, t) {
+						var gotoPage = slot + 2;
+						toc += '<li><a href="#" data-goto="' + gotoPage + '">' +
+							(m + 1) + '.' + (t + 1) + ' ' +
+							topic[1].split('{L}').join(title) +
+							'</a><span class="page-ref">' + (gotoPage + 1) + '</span></li>';
+						slot += 1;
+					});
+					toc += '</ul></div>';
+				});
+				toc += '<div class="page-number">Contents</div>';
+				return toc;
+			}
+
+			function renderBody(book, slot) {
+				var snip = (DATA.snips && DATA.snips[book.id]) || {};
+				var flat = [];
+				modules.forEach(function(moduleInfo, m) {
+					moduleInfo.t.forEach(function(topic, t) {
+						flat.push({ m: m, t: t, moduleInfo: moduleInfo, topic: topic });
+					});
+				});
+				var item = flat[slot];
+				if (!item) return '';
+
+				var m = item.m, t = item.t;
+				var topic = item.topic;
+				var uid = topic[0];
+				var label = topic[1].split('{L}').join(book.title);
+				var snippetKey = topic[2];
+				var code = snip[snippetKey] || '';
+
+				var html = '';
+				html += '<div class="topic-title">' + (m + 1) + '.' + (t + 1) + ' ' + label + '</div>';
+				html += '<div class="reading">' + (notes[uid] || '').split('{L}').join(book.title) + '</div>';
+
+				// Additional deeper note
+				var extraNote = (DATA.extra && DATA.extra[uid]) || '';
+				if (extraNote) {
+					html += '<div class="reading extra-note">' + extraNote.split('{L}').join(book.title) + '</div>';
+				}
+
+				// PC screen with coding sample
+				if (code) {
+					html += '<div class="code-screen">';
+					html += '<div class="screen-bar">';
+					html += '<span class="screen-dot red"></span>';
+					html += '<span class="screen-dot yellow"></span>';
+					html += '<span class="screen-dot green"></span>';
+					html += '<span class="screen-title">' + fileFor(snippetKey) + ' &mdash; ' + book.title + '</span>';
+					html += '<span class="screen-status">running</span>';
+					html += '</div>';
+					html += '<div class="editor-tabs"><span class="editor-tab active">' + fileFor(snippetKey) + '</span><span class="editor-tab">Run</span></div>';
+					html += '<pre><code>' + escapeHtml(code) + '</code></pre>';
+					html += '<div class="screen-footer"><span>' + book.title + ' console</span><span class="run-line">&#9654; output ready</span></div>';
+					html += '</div>';
+				}
+
+				// Configuration / flow diagram
+				var diagram = diagramFor(book.title, snippetKey, uid);
+				if (diagram) {
+					html += '<div class="config-diagram">';
+					html += '<div class="diagram-title">' + '&#128736; Configuration &amp; Flow' + '</div>';
+					html += '<div class="diagram-boxes">' + diagram + '</div>';
+					html += '</div>';
+				}
+
+				html += '<div class="page-number">Page ' + (slot + 2) + '</div>';
+				html += '<div class="editable-hint">click to edit</div>';
+				return html;
+			}
+
+			function escapeHtml(str) {
+				return String(str)
+					.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;');
+			}
+
+			/* Map a snippet key to a friendly file name shown on the screen */
+			function fileFor(key) {
+				var map = {
+					hello: "main", vars: "variables", types: "data-types",
+					ops: "operators", strs: "strings", nums: "numbers",
+					if: "conditionals", loop: "loops", switch: "switch",
+					func: "functions", class: "objects", arr: "collections",
+					map: "dictionary", file: "file-io", json: "data.json",
+					input: "user-input", env: "config", time: "datetime",
+					try: "errors", hash: "security", sys: "system",
+					gpio: "board", btn: "buttons", web: "http", alg: "algorithms",
+					test: "tester"
+				};
+				return (map[key] || "sample") + (key === "json" ? "" : ".code");
+			}
+
+			/* Build a small configuration / flow diagram from the snippet category */
+			function diagramFor(bookTitle, key, uid) {
+				var box = function(label, sub) {
+					return '<span class="dbox">' + label + (sub ? '<span class="dbox-sub">' + sub + '</span>' : '') + '</span>';
+				};
+				var arr = '<span class="darrow">&#8594;</span>';
+				var categories = {
+					hello: box('Source', 'main') + arr + box('Run', 'interpreter') + arr + box('Output', 'console'),
+					file: box('Input', 'read') + arr + box('Process', bookTitle) + arr + box('Output', 'write file'),
+					json: box('Object', 'in-memory') + arr + box('Serialize', 'JSON') + arr + box('Parse', 'object'),
+					input: box('User', 'type') + arr + box('Read', 'input()') + arr + box('Convert', 'validate'),
+					if: box('Condition', 'check') + arr + box('True', 'branch') + arr + box('False', 'branch'),
+					loop: box('Start', 'counter') + arr + box('Loop', 'repeat') + arr + box('Stop', 'condition'),
+					func: box('Caller', 'arguments') + arr + box('Function', 'process') + arr + box('Return', 'value'),
+					class: box('Class', 'blueprint') + arr + box('Object', 'instance') + arr + box('Method', 'action'),
+					map: box('Key', 'name') + arr + box('Lookup', 'dictionary') + arr + box('Value', 'result'),
+					arr: box('Create', 'collection') + arr + box('Iterate', bookTitle) + arr + box('Result', 'items'),
+					try: box('Try', 'run code') + arr + box('Error?', 'check') + arr + box('Catch', 'handle'),
+					hash: box('Input', 'data') + arr + box('Hash', 'one-way') + arr + box('Digest', 'fingerprint'),
+					sys: box('Program', bookTitle) + arr + box('OS', 'kernel') + arr + box('Hardware', 'CPU/IO'),
+					gpio: box('Pin', 'GPIO') + arr + box('Signal', 'in/out') + arr + box('Device', 'LED/sensor'),
+					btn: box('Press', 'event') + arr + box('Debounce', 'settle') + arr + box('Action', 'react'),
+					web: box('Client', 'browser') + arr + box('HTTP', 'request') + arr + box('Server', 'response')
+				};
+				var nodes = categories[key] || box('Input', 'data') + arr + box('Process', bookTitle) + arr + box('Output', 'result');
+				return nodes;
+			}
+
+			/* ----- Build the paper sheets -----
+			   Real-book model: every logical page is a 50%-wide sheet.
+			   A spread always shows two sheets side by side:
+			     LEFT  sheet -> logical page L  (its FRONT face)
+			     RIGHT sheet -> logical page R  (its FRONT face)
+			   where R = L + 1 and L is even.
+			   Sheet index 0 = front cover (left), 1 = contents (right),
+			   2,3,4,... = body pages.
+			   Flipping next rotates the right sheet 180deg around its spine edge
+			   so its BACK face (logical page L) lands on the left, and a hidden
+			   sheet appears on the right showing logical page L+2. This reads like
+			   a real book opening two sides and flipping when you turn the page. */
+			function buildBook(book) {
+				bookEl.innerHTML = '';
+
+				var topicCount = 0;
+				modules.forEach(function(mod) { topicCount += mod.t.length; });
+				// logical pages: 0 = cover, 1 = contents, 2..topicCount+1 = body
+				var n = topicCount + 2;
+				maxPage = n - 1;                 // highest logical page index
+				allSheets = [];
+
+				for (var i = 0; i < n; i++) {
+					var p = document.createElement('div');
+					p.className = 'page' + (i % 2 === 0 ? ' left' : ' right');
+					p.dataset.idx = i;
+
+					var front = document.createElement('div');
+					front.className = 'face front';
+					front.setAttribute('contenteditable', (i >= 2) ? 'true' : 'false');
+					var fc = document.createElement('div');
+					fc.className = 'content';
+					fc.innerHTML = pageIntro(book, i);
+					front.appendChild(fc);
+
+					var back = document.createElement('div');
+					back.className = 'face back';
+					var bc = document.createElement('div');
+					bc.className = 'content';
+					bc.innerHTML = pageIntro(book, i);
+					back.appendChild(bc);
+
+					p.appendChild(front);
+					p.appendChild(back);
+					bookEl.appendChild(p);
+					allSheets.push(p);
+				}
+
+				currentPage = 0;
+
+				// rope running down the middle of the open book
+				var rope = document.createElement('div');
+				rope.id = 'book-rope';
+				bookEl.appendChild(rope);
+
+				rebuildSpread();
+				updateIndicator();
+			}
+
+			function rebuildSpread() {
+				if (!allSheets.length) return;
+				var n = allSheets.length;
+
+				allSheets.forEach(function(s) {
+					s.style.display = 'none';
+					s.style.transition = 'none';
+					s.style.transform = 'none';
+				});
+
+				if (narrowMode) {
+					// Single-page view on phones: show only the current page.
+					if (currentPage >= 0 && currentPage < n) {
+						rightEl = allSheets[currentPage];
+						rightEl.style.display = '';
+						rightEl.style.zIndex = 10;
+					}
+					leftEl = null;
+					return;
+				}
+
+				// currentPage is the logical page shown on the RIGHT half.
+				// The left half shows the even page that starts the spread.
+				var leftIdx = currentPage - (currentPage % 2); // even
+				var rightIdx = leftIdx + 1;
+
+				if (leftIdx >= 0 && leftIdx < n) {
+					leftEl = allSheets[leftIdx];
+					leftEl.style.display = '';
+					leftEl.style.zIndex = 10;
+				} else {
+					leftEl = null;
+				}
+
+				if (rightIdx < n) {
+					rightEl = allSheets[rightIdx];
+					rightEl.style.display = '';
+					rightEl.style.zIndex = 10;
+				} else {
+					rightEl = null;
+				}
+			}
+
+			function flipNext() {
+				VOICE.stopOnFlip();
+				if (flipping) return;
+				if (currentPage >= maxPage) return;
+
+				var turning;
+				var nextIdx;
+				if (narrowMode) {
+					turning = allSheets[currentPage];
+					nextIdx = currentPage + 1;
+				} else {
+					turning = rightEl;
+					nextIdx = currentPage + 2;
+				}
+				if (!turning) return;
+				if (nextIdx > maxPage) nextIdx = maxPage;
+
+				flipping = true;
+				document.getElementById('next-page').disabled = true;
+
+				// Reveal the upcoming sheet underneath (hidden behind the turning
+				// page until it lands).
+				if (nextIdx < allSheets.length) {
+					var nextSheet = allSheets[nextIdx];
+					nextSheet.style.display = '';
+					nextSheet.style.transition = 'none';
+					nextSheet.style.transform = 'none';
+					nextSheet.style.zIndex = 5;
+				}
+
+				// The turning sheet is bound at the spine; its inner (left) edge is
+				// the hinge. Fold it -180deg over the spine so it lands on the left
+				// half, exactly like turning a page of a book whose pages stay
+				// attached.
+				turning.style.transition = 'none';
+				turning.style.transformOrigin = 'left center';
+				turning.style.zIndex = 30;
+				turning.style.transform = 'rotateY(0deg)';
+				turning.classList.add('turning');
+				void turning.offsetWidth;
+				turning.style.transition = 'transform 720ms cubic-bezier(.45,0,.2,1)';
+				turning.style.transform = 'rotateY(-180deg)';
+
+				setTimeout(function() {
+					turning.classList.remove('turning');
+					turning.style.transition = 'none';
+					turning.style.transform = 'none';
+					turning.style.display = 'none';
+					currentPage = nextIdx;
+					if (currentPage > maxPage) currentPage = maxPage;
+					rebuildSpread();
+					flipping = false;
+					updateIndicator();
+				}, 800);
+			}
+
+			function updateIndicator() {
+				var n = currentPage;
+				var label = (n === 0) ? 'Cover' : (n === 1) ? 'Contents' : ('Page ' + (n));
+				document.getElementById('page-indicator').textContent =
+					label + ' / ' + (maxPage + 1);
+				document.getElementById('next-page').disabled = (currentPage >= maxPage);
+			}
+
+			/* ----- Edits persistence ----- */
+			function persistedKey(bookId) {
+				return 'alistore_book_' + bookId;
+			}
+
+			function restoreEdits(bookId) {
+				try {
+					var saved = JSON.parse(localStorage.getItem(persistedKey(bookId)) || '{}');
+					Object.keys(saved).forEach(function(idx) {
+						var el = bookEl.querySelectorAll('.page .content')[parseInt(idx, 10)];
+						if (el && el.parentElement.getAttribute('contenteditable') === 'true') {
+							el.innerHTML = saved[idx];
+						}
+					});
+				} catch (err) { /* ignore */ }
+			}
+
+			function persistEdits() {
+				var book = BOOKS[currentBookIndex];
+				var saved = {};
+				var contents = bookEl.querySelectorAll('.page .content');
+				for (var i = 0; i < contents.length; i++) {
+					if (contents[i].parentElement.getAttribute('contenteditable') === 'true') {
+						saved[i] = contents[i].innerHTML;
+					}
+				}
+				try {
+					localStorage.setItem(persistedKey(book.id), JSON.stringify(saved));
+				} catch (err) { /* ignore */ }
+			}
+
+			/* ----- Load a book ----- */
+			function loadBook(index) {
+				currentBookIndex = index;
+				currentPage = 0;
+				var book = BOOKS[index];
+				buildBook(book);
+				restoreEdits(book.id);
+				updateIndicator();
+			}
+
+			/* ----- Wire up ----- */
+			document.addEventListener('keydown', function(e) {
+				if (e.target && (e.target.getAttribute('contenteditable') === 'true')) return;
+				if (e.key === 'ArrowRight' || e.key === 'PageDown') nextPage();
+			});
+
+			function nextPage() {
+				flipNext();
+			}
+
+			/* ----- Voice / Text-to-Speech reader ----- */
+			var VOICE = (function() {
+				var langSel, voiceSel, playBtn, stopBtn, statusEl, rateInput;
+				var isSpeaking = false;
+				var isPaused = false;
+				var autoContinue = false;
+				var currentSentences = [];
+				var currentIndex = 0;
+				var currentSheetEl = null;
+				var hl = { timer: null, start: 0, pausedAt: null };
+				/* all voices loaded from the OS */
+				var allVoices = [];
+
+				/* Languages offered, with a queryable name fragment for voice matching */
+				var LANGUAGES = [
+					{ label: "English", code: "en-US", match: ["en"] },
+					{ label: "French", code: "fr-FR", match: ["fr"] },
+					{ label: "Arabic", code: "ar-SA", match: ["ar"] },
+					{ label: "Russian", code: "ru-RU", match: ["ru"] },
+					{ label: "Spanish", code: "es-ES", match: ["es"] },
+					{ label: "Mandarin (Chinese)", code: "cmn-CN", match: ["zh", "cmn"] },
+					{ label: "Hindi", code: "hi-IN", match: ["hi"] },
+					{ label: "Portuguese", code: "pt-PT", match: ["pt"] },
+					{ label: "Tagalog", code: "fil-PH", match: ["fil", "tl"] }
+				];
+
+				function init() {
+					langSel = document.getElementById('voice-lang');
+					voiceSel = document.getElementById('voice-voice');
+					playBtn = document.getElementById('voice-play');
+					stopBtn = document.getElementById('voice-stop');
+					statusEl = document.getElementById('voice-status');
+					rateInput = document.getElementById('voice-rate');
+
+					LANGUAGES.forEach(function(l) {
+						var opt = document.createElement('option');
+						opt.value = l.code;
+						opt.textContent = l.label;
+						langSel.appendChild(opt);
+					});
+
+					if (!('speechSynthesis' in window)) {
+						statusEl.textContent = 'Not supported';
+						playBtn.disabled = stopBtn.disabled = true;
+						voiceSel.disabled = true;
+						return;
+					}
+
+					// load voices (Chrome loads them async)
+					var refreshVoices = function() {
+						allVoices = window.speechSynthesis.getVoices() || [];
+						populateVoices();
+					};
+					if (window.speechSynthesis.onvoiceschanged !== undefined) {
+						window.speechSynthesis.onvoiceschanged = refreshVoices;
+					}
+					refreshVoices();
+					langSel.addEventListener('change', populateVoices);
+
+					playBtn.addEventListener('click', play);
+					stopBtn.addEventListener('click', stop);
+					updateButtons();
+
+					// auto-advance when the page speech finishes
+					var activeUtterance = null;
+					window.__voiceHandlers = {
+						onUtterance: function(u) { activeUtterance = u; },
+						onEnd: function() {
+							activeUtterance = null;
+							isSpeaking = false;
+							isPaused = false;
+							clearHighlight();
+							if (autoContinue) {
+								setTimeout(function() {
+									if (currentPage < maxPage) {
+										nextPage();
+										setTimeout(play, 350);
+									} else {
+										statusEl.textContent = 'Finished';
+									}
+								}, 300);
+							} else {
+								statusEl.textContent = 'Done';
+								updateButtons();
+							}
+						}
+					};
+				}
+
+				function selectedLanguage() {
+					for (var i = 0; i < LANGUAGES.length; i++) {
+						if (LANGUAGES[i].code === langSel.value) return LANGUAGES[i];
+					}
+					return LANGUAGES[0];
+				}
+
+				/* Guess whether a voice sounds male or female from its name */
+				function voiceGender(name) {
+					name = (name || '').toLowerCase();
+					var male = ['male', 'man', 'david', 'daniel', 'george', 'tomas', 'alex', 'brian', 'fred',
+						'bill', 'jack', 'james', 'mark', 'oliver', 'ryan', 'steven', 'felipe', 'pedro', 'jorge',
+						'quinn', 'rishi', 'nico', 'google us english', 'google uk english', 'maged', 'tarek'];
+					var female = ['female', 'woman', 'samantha', 'victoria', 'kate', 'susan', 'zira', 'aria',
+						'jenny', 'joanna', 'salli', 'kimberly', 'zoe', 'luciana', 'maria', 'paulina', 'guy',
+						'marie', 'helena', 'lektor', 'google français', 'meiria', 'xiaoxiao', 'huihui',
+						'niao', 'yuliana', 'salma'];
+					var femaleBoost = ['a', 'e', 'i', 'o', 'u', 'y', 'ah', 'ia', 'na', 'ri', 'ly'];
+					for (var i = 0; i < male.length; i++) if (name.indexOf(male[i]) > -1) return 'male';
+					for (var i2 = 0; i2 < female.length; i2++) if (name.indexOf(female[i2]) > -1) return 'female';
+					// heuristic: names ending with a feminine vowel sound are often female
+					if (/[aeiouy]ah$|[ia][nlr]$|lia$|ria$|na$|isa$|anne$|ette$/.test(name)) return 'female';
+					return 'auto';
+				}
+
+				/* A stable key for a voice identity */
+				function voiceKey(voice, langCode) {
+					if (voice) return (voice.voiceURI || voice.name || voice.lang || '') + '|' + (voice.lang || '');
+					return 'auto|' + langCode;
+				}
+
+				/* Voice identities that match the selected language */
+				function matchingVoices(lang) {
+					var out = [];
+					allVoices.forEach(function(v) {
+						var vl = (v.lang || '').toLowerCase();
+						if (vl === lang.code.toLowerCase()) { out.push(v); return; }
+						var hay = (v.lang + ' ' + v.name).toLowerCase();
+						for (var m = 0; m < lang.match.length; m++) {
+							if (hay.indexOf(lang.match[m].toLowerCase()) > -1) {
+								out.push(v);
+								break;
+							}
+						}
+					});
+					return out;
+				}
+
+				/* Fill the voice dropdown, grouped by quality:
+				   High quality (neural / online / well-known voices) first,
+				   then Standard, then Basic/legacy. Each option shows its
+				   language and a male/female marker so choices line up. */
+				function populateVoices() {
+					if (!voiceSel) return;
+					var lang = selectedLanguage();
+					var matches = matchingVoices(lang);
+
+					// remember what was selected so we can restore it
+					var prev = voiceSel.value;
+
+					voiceSel.innerHTML = '';
+
+					var addGroup = function(label) {
+						var g = document.createElement('optgroup');
+						g.label = label;
+						voiceSel.appendChild(g);
+						return g;
+					};
+					var addOpt = function(g, text, val) {
+						var o = document.createElement('option');
+						o.textContent = text;
+						o.value = val;
+						if (g) g.appendChild(o);
+						else voiceSel.appendChild(o);
+						return o;
+					};
+					var genderMark = function(v) {
+						var g = voiceGender(v.name);
+						if (g === 'male') return ' \u2642';
+						if (g === 'female') return ' \u2640';
+						return '';
+					};
+					var listOpts = function(g, arr, prefix, markDefault) {
+						arr.slice().sort(function(a, b) {
+							if (!!a.default !== !!b.default) return a.default ? -1 : 1;
+							return clarityScore(b) - clarityScore(a);
+						}).forEach(function(v) {
+							var suffix = (markDefault && v.default) ? ' (default)' : '';
+							addOpt(g, (prefix || '') + v.name + ' (' + v.lang + ')' + suffix + genderMark(v),
+								voiceKey(v, lang.code));
+						});
+					};
+
+					// "Auto" uses the best guess for the selected language
+					addOpt(null, 'Auto (' + lang.label + ')', 'auto|' + lang.code);
+
+					var high = matches.filter(function(v) { return voiceTier(v) === 'high'; });
+					var standard = matches.filter(function(v) { return voiceTier(v) === 'standard'; });
+					var basic = matches.filter(function(v) { return voiceTier(v) === 'basic'; });
+
+					if (high.length) listOpts(addGroup('High quality'), high, '\u2605 ', true);
+					if (standard.length) listOpts(addGroup('Standard quality'), standard, '', true);
+					if (basic.length) listOpts(addGroup('Basic / legacy'), basic, '', true);
+
+					// restore previous selection if still present
+					if (prev) {
+						var found = false;
+						for (var i = 0; i < voiceSel.options.length; i++) {
+							if (voiceSel.options[i].value === prev) { found = true; break; }
+						}
+						if (found) voiceSel.value = prev;
+					}
+				}
+
+				/* Rank voices from clearest / most natural to roughest. */
+				function sortByClarity(voices) {
+					return voices.slice().sort(function(a, b) {
+						return clarityScore(b) - clarityScore(a);
+					});
+				}
+
+				function clarityScore(v) {
+					var name = (v.name || '').toLowerCase();
+					var n = 0;
+					['neural', 'premium', 'enhanced', 'natural', 'online',
+						'google', 'microsoft', 'azure', 'watson', 'gemini'].forEach(function(k) {
+						if (name.indexOf(k) > -1) n += 5;
+					});
+					['aria', 'jenny', 'joanna', 'salli', 'zira', 'samantha', 'david', 'mark',
+						'daniel', 'xiaoxiao', 'ivy', 'sonia', 'libby'].forEach(function(k) {
+						if (name.indexOf(k) > -1) n += 2;
+					});
+					if (v.default) n += 2;
+					if (v.localService === false) n += 1;   // networked voices tend to be higher quality
+					['cortana', 'hidden', 'test', 'robot', 'sample'].forEach(function(bad) {
+						if (name.indexOf(bad) > -1) n -= 5;
+					});
+					return n;
+				}
+
+				/* Quality tier a voice belongs to */
+				function voiceTier(v) {
+					var s = clarityScore(v);
+					if (s >= 4) return 'high';
+					if (s >= 1) return 'standard';
+					return 'basic';
+				}
+
+				/* Resolve the chosen dropdown value to an actual SpeechSynthesisVoice */
+				function chosenVoice(lang) {
+					var val = voiceSel ? voiceSel.value : '';
+					var matches = matchingVoices(lang);
+					var gender;
+					if (val && val.indexOf('|') > -1) {
+						if (val.indexOf('male|') === 0) gender = 'male';
+						else if (val.indexOf('female|') === 0) gender = 'female';
+					}
+					// explicit voice identity match
+					if (val && val.indexOf('|') > -1 && val.indexOf('male|') !== 0 && val.indexOf('female|') !== 0) {
+						for (var i = 0; i < matches.length; i++) {
+							if (voiceKey(matches[i], lang.code) === val) return matches[i];
+						}
+					}
+					// gender preference — pick the clearest voice of that gender
+					var ranked = sortByClarity(matches);
+					if (gender === 'male') {
+						for (var m = 0; m < ranked.length; m++) {
+							if (voiceGender(ranked[m].name) === 'male') return ranked[m];
+						}
+					} else if (gender === 'female') {
+						for (var f = 0; f < ranked.length; f++) {
+							if (voiceGender(ranked[f].name) === 'female') return ranked[f];
+						}
+					}
+					// auto: pick the clearest matching voice, else the default voice
+					if (ranked.length) return ranked[0];
+					if (allVoices.length) {
+						var dflt = null;
+						for (var d = 0; d < allVoices.length; d++) {
+							if (allVoices[d].default) { dflt = allVoices[d]; break; }
+						}
+						return dflt || null;
+					}
+					return null;
+				}
+
+				function getSheetElement(pageIdx) {
+					var n = allSheets.length;
+					var leftIdx = pageIdx - (pageIdx % 2);
+					var rightIdx = leftIdx + 1;
+					if (pageIdx === leftIdx && leftIdx >= 0 && leftIdx < n) return allSheets[leftIdx];
+					if (pageIdx === rightIdx && rightIdx < n) return allSheets[rightIdx];
+					return null;
+				}
+
+				function pageTextContent(book, pageIdx) {
+					if (pageIdx === 0) return book.title + '. ' + book.intro;
+					if (pageIdx === 1) return 'Table of contents. ' + book.title + ' study guide.';
+					var uid = topicUidFor(pageIdx);
+					var text = (notes[uid] || '') + ' ' + ((DATA.extra && DATA.extra[uid]) || '');
+					// strip HTML tags
+					var div = document.createElement('div');
+					div.innerHTML = text;
+					var raw = div.textContent || '';
+					return raw.split('{L}').join(book.title).replace(/\s+/g, ' ').trim();
+				}
+
+				function topicUidFor(pageIdx) {
+					var slot = pageIdx - 2;
+					var flat = [];
+					modules.forEach(function(moduleInfo) {
+						moduleInfo.t.forEach(function(topic) { flat.push(topic[0]); });
+					});
+					return flat[slot] || '';
+				}
+
+				function splitSentences(text) {
+					if (!text) return [];
+					return text.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g) || [text];
+				}
+
+				/* Rough estimate of how long (ms) a voice will take to read the text */
+				function estimateDuration(text, rate) {
+					var words = String(text || '').trim().split(/\s+/).length;
+					if (!words) return 0;
+					rate = rate || 1;
+					// typical speaking is ~2.5-3 words per second at 1x
+					var wps = 2.8 * rate;
+					return Math.round((words / wps) * 1000);
+				}
+			
+				function play() {
+					if (!('speechSynthesis' in window)) return;
+					if (isPaused && window.speechSynthesis.paused) {
+						window.speechSynthesis.resume();
+						isPaused = false;
+						statusEl.textContent = 'Reading...';
+						updateButtons();
+						return;
+					}
+					if (isSpeaking) {
+						// toggle: playing -> pause
+						pause();
+						return;
+					}
+
+					var book = BOOKS[currentBookIndex];
+					var lang = selectedLanguage();
+					var utteranceText = pageTextContent(book, currentPage);
+
+					if (!utteranceText) {
+						statusEl.textContent = 'Nothing to read';
+						return;
+					}
+
+					currentSheetEl = getSheetElement(currentPage);
+					currentSentences = splitSentences(utteranceText);
+					currentIndex = 0;
+
+					statusEl.textContent = 'Reading... ' + lang.label;
+					isSpeaking = true;
+					isPaused = false;
+					updateButtons();
+
+					// Speak the whole page as ONE smooth utterance for clear,
+					// natural (uninterrupted) sound. Sentence highlighting is
+					// advanced over time so it stays in sync.
+					var utter = new SpeechSynthesisUtterance(utteranceText);
+					utter.voice = chosenVoice(lang);
+					if (utter.voice) utter.lang = utter.voice.lang || lang.code; else utter.lang = lang.code;
+					utter.pitch = 1.0;
+					utter.volume = 1.0;
+					utter.rate = parseFloat(rateInput.value) || 1;
+
+					var est = estimateDuration(utteranceText, utter.rate);
+
+					var beginHighlighting = function() {
+						hl.start = Date.now();
+						hl.pausedAt = null;
+						hl.timer = setInterval(function() {
+							if (!isSpeaking) { clearInterval(hl.timer); hl.timer = null; return; }
+							var elapsed = Date.now() - hl.start;
+							var frac = (est > 0) ? elapsed / est : 0;
+							currentIndex = Math.floor(frac * currentSentences.length);
+							if (currentIndex >= currentSentences.length) currentIndex = currentSentences.length - 1;
+							highlightCurrent();
+						}, 180);
+						highlightCurrent();
+					};
+
+					var stopHighlight = function() {
+						if (hl.timer) { clearInterval(hl.timer); hl.timer = null; }
+					};
+
+					utter.onstart = function() { beginHighlighting(); };
+					utter.onend = function() {
+						stopHighlight();
+						isSpeaking = false;
+						isPaused = false;
+						clearHighlight();
+						window.__voiceHandlers.onEnd();
+					};
+					utter.onerror = function() {
+						stopHighlight();
+						isSpeaking = false;
+						isPaused = false;
+						clearHighlight();
+						statusEl.textContent = 'Stopped';
+						updateButtons();
+					};
+
+					window.__voiceHandlers.onUtterance(utter);
+					window.speechSynthesis.speak(utter);
+				}
+
+				function highlightCurrent() {
+					if (!currentSentences.length) return;
+					highlightSentence(currentSheetEl, currentSentences[currentIndex], currentIndex);
+				}
+			
+				function highlightSentence(sheet, sentenceText, idx) {
+					clearHighlight();
+					if (!sheet) return;
+					var content = sheet.querySelector('.content');
+					if (!content) return;
+					var nodes = [];
+					var walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, null, false);
+					var n;
+					while ((n = walker.nextNode())) nodes.push(n);
+					var targetText = sentenceText.trim();
+					for (var i = 0; i < nodes.length; i++) {
+						var t = (nodes[i].textContent || '').trim();
+						if (t && targetText && (t.indexOf(targetText) > -1 || targetText.indexOf(t) > -1)) {
+							var p = nodes[i].parentElement;
+							while (p && p !== content && !/^(P|LI|DIV|H3|PRE|TD)$/i.test(p.tagName)) p = p.parentElement;
+							if (p && p !== content) {
+								p.classList.add('current-sentence');
+								try { nodes[i].parentElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+							}
+							break;
+						}
+					}
+				}
+
+				function clearHighlight() {
+					var els = document.querySelectorAll('.current-sentence');
+					for (var i = 0; i < els.length; i++) els[i].classList.remove('current-sentence');
+				}
+
+				function pause() {
+					if (!('speechSynthesis' in window)) return;
+					if (isSpeaking && !isPaused) {
+						window.speechSynthesis.pause();
+						isPaused = true;
+						if (hl.timer) { clearInterval(hl.timer); hl.timer = null; hl.pausedAt = Date.now(); }
+						statusEl.textContent = 'Paused';
+						updateButtons();
+					} else if (isPaused) {
+						window.speechSynthesis.resume();
+						isPaused = false;
+						// keep the timeline in sync: shift start by the paused duration
+						if (hl.pausedAt) {
+							hl.start = Date.now() - (hl.pausedAt - hl.start);
+							hl.pausedAt = null;
+							hl.timer = setInterval(function() {
+								if (!isSpeaking || isPaused) return;
+								var est = estimateDuration(
+									currentSentences.join(' '),
+									parseFloat((rateInput && rateInput.value) || 1)
+								);
+								var elapsed = Date.now() - hl.start;
+								var frac = (est > 0) ? elapsed / est : 0;
+								currentIndex = Math.floor(frac * currentSentences.length);
+								if (currentIndex >= currentSentences.length) currentIndex = currentSentences.length - 1;
+								highlightCurrent();
+							}, 180);
+						}
+						statusEl.textContent = 'Reading...';
+						updateButtons();
+					}
+				}
+
+				function stop() {
+					if (!('speechSynthesis' in window)) return;
+					if (hl.timer) { clearInterval(hl.timer); hl.timer = null; }
+					hl.pausedAt = null;
+					window.speechSynthesis.cancel();
+					isSpeaking = false;
+					isPaused = false;
+					clearHighlight();
+					statusEl.textContent = 'Ready';
+					updateButtons();
+				}
+
+				function updateButtons() {
+					if (!playBtn) return;
+					if (isSpeaking && !isPaused) {
+						// playing -> the play button becomes a Pause toggle
+						playBtn.textContent = '\u23F8 Pause';
+						playBtn.classList.add('playing');
+						stopBtn.disabled = false;
+					} else if (isPaused) {
+						playBtn.textContent = '\u25B6 Resume';
+						playBtn.classList.remove('playing');
+						stopBtn.disabled = false;
+					} else {
+						playBtn.textContent = '\u25B6 Play';
+						playBtn.classList.remove('playing');
+						stopBtn.disabled = true;
+					}
+				}
+
+				function setAutoContinue(v) {
+					autoContinue = v;
+				}
+
+				function stopOnFlip() {
+					// stop reading if the user manually flips the page
+					if (isSpeaking && !autoContinue) {
+						stop();
+					}
+				}
+
+				return { init: init, stopOnFlip: stopOnFlip, setAutoContinue: setAutoContinue, stop: stop };
+			})();
+
+			document.addEventListener('DOMContentLoaded', function() {
+				bookEl = document.getElementById('book');
+
+				document.getElementById('next-page').addEventListener('click', nextPage);
+
+				// click on the pages (other than a TOC entry) does not turn pages —
+				// only the Next button does
+				bookEl.addEventListener('click', function(e) {
+					if (e.target.closest && e.target.closest('.toc-list')) return;
+					if (e.target.getAttribute && e.target.getAttribute('data-goto')) {
+						e.preventDefault();
+						var target = parseInt(e.target.getAttribute('data-goto'), 10);
+						currentPage = target;
+						rebuildSpread();
+						return;
+					}
+				});
+
+				document.getElementById('save-note').addEventListener('click', function() {
+					persistEdits();
+					var btn = this;
+					var original = btn.textContent;
+					btn.textContent = 'Saved!';
+					setTimeout(function() { btn.textContent = original; }, 1400);
+				});
+
+				document.getElementById('print-book').addEventListener('click', function(e) {
+					e.preventDefault();
+					window.print();
+				});
+
+				buildBookSelector();
+				VOICE.init();
+				loadBook(0);
+
+				var requested = location.search.match(/[?&]book=([^&]+)/);
+				if (requested) {
+					var idx = BOOKS.findIndex(function(b) {
+						return b.id === decodeURIComponent(requested[1]);
+					});
+					if (idx > -1) {
+						document.getElementById('book-select').value = idx;
+						loadBook(idx);
+					}
+				}
+			});
+
+		})();
+	</script>
+
+	<script>
+		(function () {
+			var btn = document.getElementById('install-app');
+			if (!btn) return;
+			var deferred = null;
+			var isApple = /iphone|ipad|ipod/i.test(navigator.userAgent);
+			window.addEventListener('beforeinstallprompt', function (e) {
+				e.preventDefault();
+				deferred = e;
+			});
+			btn.addEventListener('click', function () {
+				if (deferred) {
+					deferred.prompt();
+					deferred.userChoice.then(function () {
+						deferred = null;
+					});
+				} else if (isApple) {
+					alert('Tap the Share button in your browser, then choose "Add to Home Screen" to install AlioStore.');
+				} else {
+					alert('Open this page in your phone\'s browser (Chrome/Safari), tap the menu or Share icon, and choose "Add to Home Screen" / "Install App".');
+				}
+			});
+		})();
+	</script>
+
+	<script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', function () {
+				navigator.serviceWorker.register('sw.js').catch(function () {});
+			});
+		}
+	</script>
+
+</body>
+
+</html>

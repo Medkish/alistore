@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>AlioStore - OnlineBooks</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="author" content="">
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<meta name="theme-color" content="#3d1c07">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<link rel="manifest" href="manifest.json">
+	<link rel="apple-touch-icon" href="icons/icon-180.png">
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+
+	<link rel="stylesheet" type="text/css" href="css/normalize.css">
+	<link rel="stylesheet" type="text/css" href="icomoon/icomoon.css">
+	<link rel="stylesheet" type="text/css" href="css/vendor.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+	<style>
+		.banner-books {
+			padding: 50px 0;
+		}
+
+		.banner-book {
+			width: 100%;
+			max-width: 100%;
+			text-align: center;
+		}
+
+		.banner-books .slick-arrow {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			z-index: 5;
+			border: none;
+			background: rgba(44, 62, 80, 0.85);
+			color: #ffffff;
+			width: 44px;
+			height: 44px;
+			border-radius: 50%;
+			font-size: 0;
+			cursor: pointer;
+		}
+
+		.banner-books .slick-arrow:before {
+			font-family: inherit;
+			font-size: 18px;
+			line-height: 44px;
+		}
+
+		.banner-books .slick-prev {
+			left: 0;
+		}
+
+		.banner-books .slick-prev:before {
+			content: "‹";
+		}
+
+		.banner-books .slick-next {
+			right: 0;
+		}
+
+		.banner-books .slick-next:before {
+			content: "›";
+		}
+
+		.banner-books .slick-dots {
+			bottom: -10px;
+		}
+
+		@keyframes bannerBookIn {
+			0% {
+				opacity: 0;
+				transform: scale(0.6) translateY(30px);
+			}
+			100% {
+				opacity: 1;
+				transform: scale(1) translateY(0);
+			}
+		}
+
+		@keyframes bannerTextIn {
+			0% {
+				opacity: 0;
+				transform: translateY(25px);
+			}
+			100% {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.banner-books .slick-active .product-item {
+			animation: bannerBookIn 0.8s ease forwards;
+		}
+
+		.banner-books .slick-active h3 {
+			animation: bannerTextIn 0.8s ease 0.25s both;
+		}
+
+		.banner-books .slick-active .item-price {
+			animation: bannerTextIn 0.8s ease 0.4s both;
+		}
+
+		.banner-books .slick-active .book-review {
+			animation: bannerTextIn 0.8s ease 0.55s both;
+} 
+
+		.banner-book .product-style {
+			position: relative;
+			display: block;
+		}
+
+		.banner-book img.product-item {
+			width: 100%;
+			max-width: 340px;
+			height: auto;
+			display: block;
+			margin: 0 auto;
+			border-radius: 10px;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+		}
+
+		.banner-book h3 {
+			margin: 0 0 14px;
+			font-size: 1.4rem;
+			font-weight: 700;
+			color: #2c3e50;
+			letter-spacing: 0.5px;
+		}
+
+		.banner-book .item-price {
+			font-size: 1.2rem;
+			font-weight: 700;
+			color: #c0392b;
+		}
+	</style>
+
+	<style>
+		.product-style a {
+			display: block;
+			text-decoration: none;
+		}
+
+		.product-style a img {
+			transition: transform 0.25s ease;
+		}
+
+		.product-style a:hover img {
+			transform: scale(1.04);
+		}
+	</style>
+
+	<style>
+		.top-content .row {
+			position: relative;
+		}
+
+		.search-bar {
+			position: absolute;
+			display: flex;
+			align-items: center;
+			left: calc(16.6667% + 0.75rem);
+			top: 50%;
+			transform: translateY(-50%);
+			z-index: 5;
+			margin-left: 0;
+		}
+
+		.search-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			color: #2c3e50;
+			text-decoration: none;
+			transition: background 0.2s;
+		}
+
+		.search-button:hover {
+			background: rgba(0, 0, 0, 0.06);
+		}
+
+		.search-button .icon {
+			font-size: 18px;
+		}
+
+		.search-box {
+			display: none;
+			position: absolute;
+			top: calc(100% + 8px);
+			right: 0;
+			z-index: 50;
+			min-width: 240px;
+		}
+
+		#header-wrap.show .search-box {
+			display: block;
+		}
+
+		.search-field {
+			width: 100%;
+			padding: 10px 46px 10px 18px;
+			border: 1px solid #d5d5d5;
+			border-radius: 24px;
+			background: #ffffff;
+			color: #333333;
+			font-size: 15px;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+		}
+
+		.search-field:focus {
+			outline: none;
+			border-color: #c0392b;
+		}
+
+		.install-app-btn {
+			border: none;
+			background: #c0392b;
+			color: #fff;
+			padding: 9px 16px;
+			border-radius: 20px;
+			font-weight: 700;
+			font-size: 0.82rem;
+			cursor: pointer;
+			vertical-align: middle;
+			white-space: nowrap;
+			display: inline-block;
+		}
+
+		.install-app-btn:active {
+			transform: scale(0.96);
+		}
+
+		/* Phone (<576px): icon opens a dropdown search */
+		@media (max-width: 575.98px) {
+			.search-box {
+				width: calc(100vw - 48px);
+			}
+		}
+
+		/* Pads / tablets (>=768px): inline search input */
+		@media (min-width: 768px) {
+			.search-box {
+				display: inline-block;
+				position: static;
+				min-width: 0;
+			}
+
+			.search-field {
+				width: 240px;
+			}
+		}
+
+		/* Laptops (>=992px) */
+		@media (min-width: 992px) {
+			.search-field {
+				width: 300px;
+			}
+		}
+
+		/* Desktops (>=1200px) */
+		@media (min-width: 1200px) {
+			.search-field {
+				width: 340px;
+			}
+		}
+	</style>
+
+	<style>
+		.account-links {
+			text-align: right;
+			padding: 10px 8px 2px;
+			border-top: 1px solid rgba(0, 0, 0, 0.08);
+			margin-top: 8px;
+		}
+
+		.account-link {
+			display: inline-block;
+			padding: 6px 10px;
+			color: #2c3e50;
+			font-weight: 600;
+			text-decoration: none;
+			font-size: 14px;
+		}
+
+		.account-link:hover {
+			color: #c0392b;
+		}
+
+		.account-sep {
+			color: #c0392b;
+			font-weight: 700;
+		}
+	</style>
+
+	<style>
+		.book-review {
+			display: inline-block;
+			margin-top: 8px;
+			color: #b8860b;
+			font-size: 0.85rem;
+			font-weight: 600;
+			text-decoration: none;
+			white-space: nowrap;
+		}
+
+		.book-review:hover {
+			color: #8a6708;
+		}
+
+		.products-thumb img.single-image {
+			max-width: 100%;
+			height: auto;
+			display: block;
+			border-radius: 10px;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+		}
+
+		.products-content .item-rating {
+			margin-top: 10px;
+			margin-bottom: 4px;
+			color: #f39c12;
+			font-size: 1rem;
+			letter-spacing: 2px;
+		}
+
+		.products-content .rating-count {
+			color: #7f8c8d;
+			font-size: 0.85rem;
+			font-weight: 600;
+			letter-spacing: 0;
+			margin-left: 8px;
+		}
+
+		.bestseller-actions {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			margin-top: 20px;
+			flex-wrap: wrap;
+		}
+
+		.bestseller-actions .book-review {
+			margin-top: 0;
+		}
+
+		.bestseller-actions .btn-accent-arrow {
+			text-transform: capitalize;
+			font-weight: 700;
+			color: #c0392b;
+			font-size: 0.95rem;
+			text-decoration: none;
+		}
+
+		.bestseller-actions .btn-accent-arrow:hover {
+			color: #96281b;
+		}
+	</style>
+
+	<style>
+		#quotation .inner-content {
+			text-align: center;
+			max-width: 760px;
+			margin: 0 auto;
+			padding: 0 20px;
+		}
+
+		#quotation .section-title {
+			margin-bottom: 24px;
+		}
+
+		#quotation blockquote {
+			margin: 0;
+			padding: 30px 34px;
+			background: #ffffff;
+			border-left: 6px solid #c0392b;
+			border-radius: 10px;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+		}
+
+		#quotation blockquote q {
+			display: block;
+			font-size: 1.35rem;
+			line-height: 1.7;
+			color: #2c3e50;
+			font-weight: 600;
+			font-style: italic;
+		}
+
+		#quotation blockquote .author-name {
+			display: inline-block;
+			margin-top: 18px;
+			padding-top: 14px;
+			border-top: 1px solid rgba(0, 0, 0, 0.1);
+			text-transform: uppercase;
+			letter-spacing: 2px;
+			font-size: 0.9rem;
+			font-weight: 700;
+			color: #c0392b;
+		}
+	</style>
+
+<style>
+		/* ---------- Global responsive safety ---------- */
+		html,
+		body {
+			overflow-x: hidden;
+		}
+
+		.single-image,
+		img.product-item,
+		img.post-image,
+		img.footer-logo,
+		.main-logo img {
+			max-width: 100%;
+			height: auto;
+		}
+
+		/* ====== Small tablets (<= 991px) ====== */
+		@media (max-width: 991.98px) {
+			.banner-books {
+				padding: 30px 0;
+			}
+
+			#quotation blockquote {
+				padding: 24px 22px;
+			}
+
+			#quotation blockquote q {
+				font-size: 1.2rem;
+			}
+		}
+
+		/* ====== Phones (<= 575px) ====== */
+		@media (max-width: 575.98px) {
+			#billboard {
+				padding: 20px 0 40px;
+			}
+
+			.banner-book img.product-item {
+				max-width: 220px;
+			}
+
+			.banner-book h3 {
+				font-size: 1.15rem;
+			}
+
+			.banner-book .item-price {
+				font-size: 1rem;
+			}
+
+			#client-holder {
+				padding: 36px 0 8px;
+			}
+
+			.logo-wrap .grid {
+				gap: 16px;
+				justify-content: center;
+			}
+
+			.logo-wrap .grid img {
+				max-height: 42px;
+			}
+
+			.section-header {
+				margin-bottom: 30px;
+			}
+
+			div.product-item {
+				padding: 10px;
+			}
+
+			div.product-item figcaption {
+				padding-top: 10px;
+			}
+
+			div.product-item figcaption h3 {
+				font-size: 1rem;
+			}
+
+			.bestseller-actions {
+				gap: 8px;
+			}
+
+			.bestseller-actions .btn-accent-arrow {
+				padding: 10px 20px;
+				font-size: 0.88rem;
+			}
+
+			/* Bestsellers tabs become a swipeable pill strip */
+			#popular-books ul.tabs {
+				flex-wrap: nowrap;
+				overflow-x: auto;
+				justify-content: flex-start;
+				padding: 4px 12px 10px;
+				margin: 0 -12px 30px;
+				-webkit-overflow-scrolling: touch;
+				scrollbar-width: none;
+			}
+
+			#popular-books ul.tabs::-webkit-scrollbar {
+				display: none;
+			}
+
+			#popular-books .tab {
+				padding: 8px 16px;
+				font-size: 0.85rem;
+				white-space: nowrap;
+				flex: 0 0 auto;
+			}
+
+			#quotation blockquote {
+				padding: 18px 16px;
+			}
+
+			#quotation blockquote q {
+				font-size: 1.05rem;
+				line-height: 1.6;
+			}
+
+			#subscribe {
+				padding: 44px 0;
+			}
+
+			#subscribe form input {
+				min-width: 0;
+				width: 100%;
+			}
+
+			#subscribe form .btn-subscribe {
+				width: 100%;
+				justify-content: center;
+			}
+
+			#download-app {
+				padding: 44px 0;
+			}
+
+			#download-app figure .single-image {
+				max-width: 220px;
+			}
+
+			.google-app {
+				justify-content: center;
+			}
+
+			.google-app img {
+				height: 44px;
+			}
+
+			#latest-blog {
+				padding-top: 2rem;
+			}
+
+			.btn-accent-arrow {
+				padding: 11px 22px;
+				font-size: 0.9rem;
+			}
+		}
+	</style>
+
+</head>
+
+<body data-bs-spy="scroll" data-bs-target="#header" tabindex="0">
+
+	<div id="header-wrap">
+
+		<div class="top-content">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="social-links">
+							<ul>
+								<li>
+									<a href="#"><i class="icon icon-facebook"></i></a>
+								</li>
+								<li>
+									<a href="#"><i class="icon icon-twitter"></i></a>
+								</li>
+								<li>
+									<a href="#"><i class="icon icon-youtube-play"></i></a>
+								</li>
+								<li>
+									<a href="#"><i class="icon icon-behance-square"></i></a>
+								</li>
+							</ul>
+						</div><!--social-links-->
+					</div>
+					<div class="col-md-6">
+						<div class="right-element">
+							<a href="#" class="user-account for-buy"><i
+									class="icon icon-user"></i><span>Account</span></a>
+							<a href="#" class="cart for-buy"><i class="icon icon-clipboard"></i><span>Cart:(0
+									$)</span></a>
+							<a href="#" class="my-orders for-buy"><i class="icon icon-notes"></i><span>My
+									Orders</span></a>
+							<button id="install-app" class="install-app-btn" type="button">&#11015; Install App</button>
+
+							<div class="action-menu">
+
+								<div class="search-bar">
+									<a href="#" class="search-button search-toggle" data-selector="#header-wrap">
+										<i class="icon icon-search"></i>
+									</a>
+									<form role="search" method="get" class="search-box">
+										<input class="search-field text search-input" placeholder="Search"
+											type="search">
+									</form>
+								</div>
+							</div>
+
+						</div><!--top-right-->
+					</div>
+
+				</div>
+			</div>
+		</div><!--top-content-->
+
+		<header id="header">
+			<div class="container-fluid">
+				<div class="row">
+
+					<div class="col-md-2">
+						<div class="main-logo">
+							<a href="index.html"><img src="images/main-logo-nobg-cropped.png" alt="logo"></a>
+						</div>
+
+					</div>
+
+					<div class="col-md-10">
+
+						<nav id="navbar">
+							<div class="main-menu stellarnav">
+								<ul class="menu-list">
+									<li class="menu-item active"><a href="#home">Home</a></li>
+									<li class="menu-item has-sub">
+										<a href="#pages" class="nav-link">Pages</a>
+
+										<ul>
+											<li class="active"><a href="index.html">Home</a></li>
+											<li><a href="index.html">About</a></li>
+											<li><a href="index.html">Styles</a></li>
+											<li><a href="index.html">Blog</a></li>
+											<li><a href="index.html">Post Single</a></li>
+											<li><a href="books-reader.html">Our Store</a></li>
+											<li><a href="index.html">Product Single</a></li>
+											<li><a href="index.html">Contact</a></li>
+											<li><a href="index.html">Thank You</a></li>
+										</ul>
+
+									</li>
+									<li class="menu-item"><a href="#featured-books" class="nav-link">Featured</a></li>
+									<li class="menu-item"><a href="#popular-books" class="nav-link">Bestsellers</a></li>
+									<li class="menu-item"><a href="#special-offer" class="nav-link">Special Offers</a></li>
+									<li class="menu-item"><a href="#latest-blog" class="nav-link">Articles</a></li>
+									<li class="menu-item"><a href="#download-app" class="nav-link">Download App</a></li>
+								</ul>
+
+								<div class="account-links">
+									<a href="#" class="account-link">Login</a>
+									<span class="account-sep">/</span>
+									<a href="#" class="account-link">Register</a>
+								</div>
+
+								<div class="hamburger">
+									<span class="bar"></span>
+									<span class="bar"></span>
+									<span class="bar"></span>
+								</div>
+
+							</div>
+						</nav>
+
+					</div>
+
+				</div>
+			</div>
+		</header>
+
+	</div><!--header-wrap-->
+
+	<section id="billboard">
+
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+
+					<div class="banner-books">
+<div class="banner-book">
+							<h3>Python</h3>
+							<figure class="product-style">
+								<img src="images/programming1.jpeg" alt="Python book cover" class="product-item">
+							</figure>
+							<figcaption>
+								<div class="item-price">AED 45.00</div>
+							<a href="#" class="book-review">&#9733; Reviews</a>
+							</figcaption>
+						</div>
+
+<div class="banner-book">
+							<h3>JavaScript</h3>
+							<figure class="product-style">
+								<img src="images/programming2.jpeg" alt="JavaScript book cover" class="product-item">
+							</figure>
+							<figcaption>
+								<div class="item-price">AED 40.00</div>
+							<a href="#" class="book-review">&#9733; Reviews</a>
+							</figcaption>
+						</div>
+
+<div class="banner-book">
+							<h3>Java</h3>
+							<figure class="product-style">
+								<img src="images/programming3.jpeg" alt="Java book cover" class="product-item">
+							</figure>
+							<figcaption>
+								<div class="item-price">AED 50.00</div>
+							<a href="#" class="book-review">&#9733; Reviews</a>
+							</figcaption>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+	</section>
+
+	<section id="client-holder" data-aos="fade-up">
+		<div class="container">
+			<div class="row">
+				<div class="inner-content">
+					<div class="logo-wrap">
+						<div class="grid">
+							<a href="#"><img src="images/client-image1.png" alt="client"></a>
+							<a href="#"><img src="images/client-image2.png" alt="client"></a>
+							<a href="#"><img src="images/client-image3.png" alt="client"></a>
+							<a href="#"><img src="images/client-image4.png" alt="client"></a>
+							<a href="#"><img src="images/client-image5.png" alt="client"></a>
+						</div>
+					</div><!--image-holder-->
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="featured-books" class="py-5 my-5">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+
+					<div class="section-header align-center">
+						<div class="title">
+							<span>Handpicked for you</span>
+						</div>
+						<h2 class="section-title">Featured Books</h2>
+					</div>
+
+					<div class="product-list" data-aos="fade-up">
+						<div class="row">
+
+							<div class="col-md-3">
+								<div class="product-item">
+									<figure class="product-style">
+										<img src="images/programming4.jpeg" alt="Books" class="product-item">
+									</figure>
+									<figcaption>
+										<h3>Python</h3>
+										<span>Armor Ramsey</span>
+										<div class="item-price">$ 40.00</div>
+									<a href="#" class="book-review">&#9733; Reviews</a>
+									</figcaption>
+								</div>
+							</div>
+
+							<div class="col-md-3">
+								<div class="product-item">
+									<figure class="product-style">
+										<img src="images/programming5.jpeg" alt="Books" class="product-item">
+									</figure>
+									<figcaption>
+										<h3>JavaScript</h3>
+										<span>Armor Ramsey</span>
+										<div class="item-price">$ 38.00</div>
+									<a href="#" class="book-review">&#9733; Reviews</a>
+									</figcaption>
+								</div>
+							</div>
+
+							<div class="col-md-3">
+								<div class="product-item">
+									<figure class="product-style">
+										<img src="images/programming6.jpeg" alt="Books" class="product-item">
+									</figure>
+									<figcaption>
+										<h3>Java</h3>
+										<span>Armor Ramsey</span>
+										<div class="item-price">$ 45.00</div>
+									<a href="#" class="book-review">&#9733; Reviews</a>
+									</figcaption>
+								</div>
+							</div>
+
+							<div class="col-md-3">
+								<div class="product-item">
+									<figure class="product-style">
+										<img src="images/programming1.jpeg" alt="Books" class="product-item">
+									</figure>
+									<figcaption>
+										<h3>C++</h3>
+										<span>Armor Ramsey</span>
+										<div class="item-price">$ 35.00</div>
+									<a href="#" class="book-review">&#9733; Reviews</a>
+									</figcaption>
+								</div>
+							</div>
+
+						</div><!--ft-books-slider-->
+					</div><!--grid-->
+
+
+				</div><!--inner-content-->
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+
+					<div class="btn-wrap align-right">
+						<a href="#" class="btn-accent-arrow">View all products <i
+								class="icon icon-ns-arrow-right"></i></a>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="best-selling" class="leaf-pattern-overlay">
+		<div class="corner-pattern-overlay"></div>
+		<div class="container">
+			<div class="row justify-content-center">
+
+				<div class="col-md-8">
+
+					<div class="row">
+
+						<div class="col-md-6">
+							<figure class="products-thumb">
+								<img src="images/programming2.jpeg" alt="book" class="single-image">
+							</figure>
+						</div>
+
+						<div class="col-md-6">
+							<div class="product-entry">
+								<h2 class="section-title divider">Bestseller of the Month</h2>
+
+								<div class="products-content">
+									<div class="author-name">By Alio</div>
+									<h3 class="item-title">Rust</h3>
+									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu feugiat amet,
+										libero ipsum enim pharetra hac.</p>
+									<div class="item-rating"><span>★★★★★</span><span class="rating-count">4.9
+											(512 reviews)</span></div>
+									<div class="item-price">AED 45.00</div>
+									<div class="bestseller-actions">
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										<a href="#" class="btn-accent-arrow">shop it now <i
+												class="icon icon-ns-arrow-right"></i></a>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+					<!-- / row -->
+
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+	<section id="popular-books" class="bookshelf py-5 my-5">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+
+					<div class="section-header align-center">
+						<div class="title">
+							<span>Trending now</span>
+						</div>
+						<h2 class="section-title">Bestsellers</h2>
+					</div>
+
+					<ul class="tabs">
+						<li data-tab-target="#all-genre" class="active tab">All</li>
+						<li data-tab-target="#business" class="tab">Business</li>
+						<li data-tab-target="#technology" class="tab">Technology</li>
+						<li data-tab-target="#romantic" class="tab">Romance</li>
+						<li data-tab-target="#adventure" class="tab">Adventure</li>
+						<li data-tab-target="#fictional" class="tab">Fiction</li>
+					</ul>
+
+					<div class="tab-content">
+						<div id="all-genre" data-tab-content class="active">
+							<div class="row">
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming3.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Ruby</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming4.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>C++</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 35.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming5.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Swift</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming6.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Kotlin</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+							</div>
+							<div class="row">
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming1.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>PHP</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming2.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>JavaScript</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming3.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Go</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming4.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Python</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+							</div>
+
+						</div>
+						<div id="business" data-tab-content>
+							<div class="row">
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming5.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>PHP</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming6.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>JavaScript</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming1.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Go</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming2.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Python</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+						<div id="technology" data-tab-content>
+							<div class="row">
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming3.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>PHP</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming4.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>JavaScript</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming5.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Go</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming6.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Python</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div id="romantic" data-tab-content>
+							<div class="row">
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming1.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>PHP</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming2.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>JavaScript</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming3.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Go</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming4.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Python</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div id="adventure" data-tab-content>
+							<div class="row">
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming5.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Go</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming6.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Python</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div id="fictional" data-tab-content>
+							<div class="row">
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming1.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Go</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+
+								<div class="col-md-3">
+									<div class="product-item">
+										<figure class="product-style">
+											<img src="images/programming2.jpeg" alt="Books" class="product-item">
+										</figure>
+										<figcaption>
+											<h3>Python</h3>
+											<span>Armor Ramsey</span>
+											<div class="item-price">$ 40.00</div>
+										<a href="#" class="book-review">&#9733; Reviews</a>
+										</figcaption>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+				</div><!--inner-tabs-->
+
+			</div>
+		</div>
+	</section>
+
+	<section id="quotation" class="align-center pb-5 mb-5">
+		<div class="inner-content">
+			<h2 class="section-title divider">Quote of the day</h2>
+			<blockquote data-aos="fade-up">
+				<q>“The more that you read, the more things you will know. The more that you learn, the more places
+					you’ll go.”</q>
+				<div class="author-name">Dr. Seuss</div>
+			</blockquote>
+		</div>
+	</section>
+
+	<section id="special-offer" class="bookshelf pb-5 mb-5">
+
+		<div class="section-header align-center">
+			<div class="title">
+				<span>Limited-time offers</span>
+			</div>
+			<h2 class="section-title">Special Offers</h2>
+		</div>
+
+		<div class="container">
+			<div class="row">
+				<div class="inner-content">
+					<div class="product-list" data-aos="fade-up">
+						<div class="grid product-grid">
+							<div class="product-item">
+								<figure class="product-style">
+									<img src="images/programming3.jpeg" alt="Books" class="product-item">
+								</figure>
+								<figcaption>
+									<h3>Python</h3>
+									<span>Armor Ramsey</span>
+									<div class="item-price">
+										<span class="prev-price">$ 50.00</span>$ 40.00
+									</div>
+<a href="#" class="book-review">&#9733; Reviews</a>
+							</figcaption>
+								</div>
+
+							<div class="product-item">
+								<figure class="product-style">
+									<img src="images/programming4.jpeg" alt="Books" class="product-item">
+								</figure>
+								<figcaption>
+									<h3>JavaScript</h3>
+									<span>Armor Ramsey</span>
+									<div class="item-price">
+										<span class="prev-price">$ 30.00</span>$ 38.00
+									</div>
+<a href="#" class="book-review">&#9733; Reviews</a>
+							</figcaption>
+								</div>
+
+							<div class="product-item">
+								<figure class="product-style">
+									<img src="images/programming5.jpeg" alt="Books" class="product-item">
+								</figure>
+								<figcaption>
+									<h3>Java</h3>
+									<span>Armor Ramsey</span>
+									<div class="item-price">
+										<span class="prev-price">$ 35.00</span>$ 45.00
+									</div>
+<a href="#" class="book-review">&#9733; Reviews</a>
+							</figcaption>
+								</div>
+
+							<div class="product-item">
+								<figure class="product-style">
+									<img src="images/programming6.jpeg" alt="Books" class="product-item">
+								</figure>
+								<figcaption>
+									<h3>C++</h3>
+									<span>Armor Ramsey</span>
+									<div class="item-price">
+										<span class="prev-price">$ 25.00</span>$ 35.00
+									</div>
+<a href="#" class="book-review">&#9733; Reviews</a>
+							</figcaption>
+								</div>
+
+							<div class="product-item">
+								<figure class="product-style">
+									<img src="images/programming1.jpeg" alt="Books" class="product-item">
+								</figure>
+								<figcaption>
+									<h3>Python</h3>
+									<span>Armor Ramsey</span>
+									<div class="item-price">$ 40.00</div>
+								<a href="#" class="book-review">&#9733; Reviews</a>
+								</figcaption>
+							</div>
+						</div><!--grid-->
+					</div>
+				</div><!--inner-content-->
+			</div>
+		</div>
+	</section>
+
+	<section id="subscribe">
+		<div class="container">
+			<div class="row justify-content-center">
+
+				<div class="col-md-8">
+					<div class="row">
+
+						<div class="col-md-6">
+
+							<div class="title-element">
+								<h2 class="section-title divider">Subscribe to our newsletter</h2>
+							</div>
+
+						</div>
+						<div class="col-md-6">
+
+							<div class="subscribe-content" data-aos="fade-up">
+								<p>Sed eu feugiat amet, libero ipsum enim pharetra hac dolor sit amet, consectetur. Elit
+									adipiscing enim pharetra hac.</p>
+								<form id="form">
+									<input type="text" name="email" placeholder="Enter your email addresss here">
+									<button class="btn-subscribe">
+										<span>send</span>
+										<i class="icon icon-send"></i>
+									</button>
+								</form>
+							</div>
+
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</section>
+
+	<section id="latest-blog" class="py-5 my-5">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+
+					<div class="section-header align-center">
+						<div class="title">
+							<span>Read our articles</span>
+						</div>
+						<h2 class="section-title">Latest Articles</h2>
+					</div>
+
+					<div class="row">
+
+						<div class="col-md-4">
+
+							<article class="column" data-aos="fade-up">
+
+								<figure>
+									<a href="#" class="image-hvr-effect">
+										<img src="images/post-img1.jpg" alt="post" class="post-image">
+									</a>
+								</figure>
+
+								<div class="post-item">
+									<div class="meta-date">Mar 30, 2021</div>
+									<h3><a href="#">Reading books always makes the moments happy</a></h3>
+
+									<div class="links-element">
+										<div class="categories">inspiration</div>
+										<div class="social-links">
+											<ul>
+												<li>
+													<a href="#"><i class="icon icon-facebook"></i></a>
+												</li>
+												<li>
+													<a href="#"><i class="icon icon-twitter"></i></a>
+												</li>
+												<li>
+													<a href="#"><i class="icon icon-behance-square"></i></a>
+												</li>
+											</ul>
+										</div>
+									</div><!--links-element-->
+
+								</div>
+							</article>
+
+						</div>
+						<div class="col-md-4">
+
+							<article class="column" data-aos="fade-up" data-aos-delay="200">
+								<figure>
+									<a href="#" class="image-hvr-effect">
+										<img src="images/post-img2.jpg" alt="post" class="post-image">
+									</a>
+								</figure>
+								<div class="post-item">
+									<div class="meta-date">Mar 29, 2021</div>
+									<h3><a href="#">Reading books always makes the moments happy</a></h3>
+
+									<div class="links-element">
+										<div class="categories">inspiration</div>
+										<div class="social-links">
+											<ul>
+												<li>
+													<a href="#"><i class="icon icon-facebook"></i></a>
+												</li>
+												<li>
+													<a href="#"><i class="icon icon-twitter"></i></a>
+												</li>
+												<li>
+													<a href="#"><i class="icon icon-behance-square"></i></a>
+												</li>
+											</ul>
+										</div>
+									</div><!--links-element-->
+
+								</div>
+							</article>
+
+						</div>
+						<div class="col-md-4">
+
+							<article class="column" data-aos="fade-up" data-aos-delay="400">
+								<figure>
+									<a href="#" class="image-hvr-effect">
+										<img src="images/post-img3.jpg" alt="post" class="post-image">
+									</a>
+								</figure>
+								<div class="post-item">
+									<div class="meta-date">Feb 27, 2021</div>
+									<h3><a href="#">Reading books always makes the moments happy</a></h3>
+
+									<div class="links-element">
+										<div class="categories">inspiration</div>
+										<div class="social-links">
+											<ul>
+												<li>
+													<a href="#"><i class="icon icon-facebook"></i></a>
+												</li>
+												<li>
+													<a href="#"><i class="icon icon-twitter"></i></a>
+												</li>
+												<li>
+													<a href="#"><i class="icon icon-behance-square"></i></a>
+												</li>
+											</ul>
+										</div>
+									</div><!--links-element-->
+
+								</div>
+							</article>
+
+						</div>
+
+					</div>
+
+					<div class="row">
+
+						<div class="btn-wrap align-center">
+							<a href="#" class="btn btn-outline-accent btn-accent-arrow" tabindex="0">Read All Articles<i
+									class="icon icon-ns-arrow-right"></i></a>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="download-app" class="leaf-pattern-overlay">
+		<div class="corner-pattern-overlay"></div>
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-8">
+					<div class="row">
+
+						<div class="col-md-5">
+							<figure>
+								<img src="images/device.png" alt="phone" class="single-image">
+							</figure>
+						</div>
+
+						<div class="col-md-7">
+							<div class="app-info">
+								<h2 class="section-title divider">Download our app now !</h2>
+								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sagittis sed ptibus
+									liberolectus nonet psryroin. Amet sed lorem posuere sit iaculis amet, ac urna.
+									Adipiscing fames semper erat ac in suspendisse iaculis.</p>
+								<div class="google-app">
+									<img src="images/google-play.jpg" alt="google play">
+									<img src="images/app-store.jpg" alt="app store">
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<footer id="footer">
+		<div class="container">
+			<div class="row">
+
+				<div class="col-md-4">
+
+					<div class="footer-item">
+						<div class="company-brand">
+							<img src="images/main-logo-nobg-cropped.png" alt="logo" class="footer-logo">
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sagittis sed ptibus liberolectus
+								nonet psryroin. Amet sed lorem posuere sit iaculis amet, ac urna. Adipiscing fames
+								semper erat ac in suspendisse iaculis.</p>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="col-md-2">
+
+					<div class="footer-menu">
+						<h5>About Us</h5>
+						<ul class="menu-list">
+							<li class="menu-item">
+								<a href="#">vision</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">articles </a>
+							</li>
+							<li class="menu-item">
+								<a href="#">careers</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">service terms</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">donate</a>
+							</li>
+						</ul>
+					</div>
+
+				</div>
+				<div class="col-md-2">
+
+					<div class="footer-menu">
+						<h5>Discover</h5>
+						<ul class="menu-list">
+							<li class="menu-item">
+								<a href="#">Home</a>
+							</li>
+							<li class="menu-item">
+								<a href="books-reader.html">Books</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">Authors</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">Subjects</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">Advanced Search</a>
+							</li>
+						</ul>
+					</div>
+
+				</div>
+				<div class="col-md-2">
+
+					<div class="footer-menu">
+						<h5>My account</h5>
+						<ul class="menu-list">
+							<li class="menu-item">
+								<a href="#">Sign In</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">View Cart</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">My Wishtlist</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">Track My Order</a>
+							</li>
+						</ul>
+					</div>
+
+				</div>
+				<div class="col-md-2">
+
+					<div class="footer-menu">
+						<h5>Help</h5>
+						<ul class="menu-list">
+							<li class="menu-item">
+								<a href="#">Help center</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">Report a problem</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">Suggesting edits</a>
+							</li>
+							<li class="menu-item">
+								<a href="#">Contact us</a>
+							</li>
+						</ul>
+					</div>
+
+				</div>
+
+			</div>
+			<!-- / row -->
+
+		</div>
+	</footer>
+
+	<div id="footer-bottom">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+
+					<div class="copyright">
+						<div class="row">
+
+							<div class="col-md-6">
+								<p>© 2022 All rights reserved. Free HTML Template by <a
+										href="https://www.templatesjungle.com/" target="_blank">TemplatesJungle</a></p>
+							</div>
+
+							<div class="col-md-6">
+								<div class="social-links align-right">
+									<ul>
+										<li>
+											<a href="#"><i class="icon icon-facebook"></i></a>
+										</li>
+										<li>
+											<a href="#"><i class="icon icon-twitter"></i></a>
+										</li>
+										<li>
+											<a href="#"><i class="icon icon-youtube-play"></i></a>
+										</li>
+										<li>
+											<a href="#"><i class="icon icon-behance-square"></i></a>
+										</li>
+									</ul>
+								</div>
+							</div>
+
+						</div>
+					</div><!--grid-->
+
+				</div><!--footer-bottom-content-->
+			</div>
+		</div>
+	</div>
+
+	<script src="js/jquery-1.11.0.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+		crossorigin="anonymous"></script>
+	<script src="js/plugins.js"></script>
+	<script src="js/script.js"></script>
+
+	<script>
+		(function() {
+			"use strict";
+
+			var titleToId = {
+				"Python": "python",
+				"JavaScript": "javascript",
+				"Java": "java",
+				"C++": "cpp",
+				"Ruby": "ruby",
+				"Swift": "swift",
+				"Kotlin": "kotlin",
+				"PHP": "php",
+				"Go": "go",
+				"Rust": "rust"
+			};
+
+			document.querySelectorAll('figure.product-style').forEach(function(fig) {
+				var container = fig.parentElement;
+				if (!container) return;
+				var titleEl = container.querySelector('h3');
+				if (!titleEl) return;
+				var id = titleToId[titleEl.textContent.trim()];
+				if (!id) return;
+				var img = fig.querySelector('img');
+				if (!img) return;
+
+				var link = document.createElement('a');
+				link.href = 'books-reader.html?book=' + id;
+				link.title = 'Open ' + titleEl.textContent.trim() + ' book';
+				fig.appendChild(link);
+				link.appendChild(img);
+			});
+
+			var bestSellingThumb = document.querySelector('#best-selling figure.products-thumb');
+			var bestSellingTitle = document.querySelector('#best-selling .item-title');
+			if (bestSellingThumb && bestSellingTitle) {
+				var id = titleToId[bestSellingTitle.textContent.trim()];
+				var img = bestSellingThumb.querySelector('img');
+				if (id && img) {
+					var link = document.createElement('a');
+					link.href = 'books-reader.html?book=' + id;
+					link.title = 'Open Rust book';
+					bestSellingThumb.appendChild(link);
+					link.appendChild(img);
+				}
+			}
+		})();
+	</script>
+
+	<script>
+		(function () {
+			var btn = document.getElementById('install-app');
+			if (!btn) return;
+			var deferred = null;
+			var isApple = /iphone|ipad|ipod/i.test(navigator.userAgent);
+			window.addEventListener('beforeinstallprompt', function (e) {
+				e.preventDefault();
+				deferred = e;
+			});
+			btn.addEventListener('click', function () {
+				if (deferred) {
+					deferred.prompt();
+					deferred.userChoice.then(function () {
+						deferred = null;
+					});
+				} else if (isApple) {
+					alert('Tap the Share button in your browser, then choose "Add to Home Screen" to install AlioStore.');
+				} else {
+					alert('Open this page in your phone\'s browser (Chrome/Safari), tap the menu or Share icon, and choose "Add to Home Screen" / "Install App".');
+				}
+			});
+		})();
+	</script>
+
+	<script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', function () {
+				navigator.serviceWorker.register('sw.js').catch(function () {});
+			});
+		}
+	</script>
+
+</body>
+
+</html>
