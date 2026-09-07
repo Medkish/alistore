@@ -230,6 +230,17 @@ h1, h2, h3, h4, h5 {
 	justify-content: flex-end;
 }
 
+/* Brand name in the white header bar */
+.brand-head-text {
+	padding: 8px 0;
+}
+
+@media (max-width: 767.98px) {
+	.brand-head-text {
+		justify-content: center;
+	}
+}
+
 /* Standard shopping-app top bar: logo + search + tools */
 .top-content .search-bar.top-search {
 	position: static;
