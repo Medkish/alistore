@@ -113,6 +113,81 @@ h1, h2, h3, h4, h5 {
 	font-size: 16px;
 }
 
+/* ---------- Top bar left (welcome + login/register) ---------- */
+.top-bar-left {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	min-height: 48px;
+	flex-wrap: wrap;
+}
+
+.welcome-text {
+	margin: 0;
+	color: #aab7bd;
+	font-weight: 500;
+}
+
+.welcome-text strong {
+	color: #ffffff;
+	font-weight: 700;
+}
+
+.top-content .account-links {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 0;
+}
+
+.top-content .account-links .account-link {
+	color: #ffffff;
+	font-weight: 600;
+	text-decoration: none;
+	transition: color 0.2s;
+}
+
+.top-content .account-links .account-link:hover {
+	color: #e0877d;
+}
+
+.top-content .account-links .account-sep {
+	color: #5b6469;
+}
+
+/* ---------- Brand name ---------- */
+.brand-link {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	text-decoration: none;
+}
+
+.brand-link:hover {
+	text-decoration: none;
+}
+
+.brand-name {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.15;
+	color: var(--dark);
+	font-weight: 800;
+	font-size: 1.35rem;
+}
+
+.brand-tag {
+	font-size: 0.68rem;
+	font-weight: 700;
+	color: var(--accent);
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+.main-logo .brand-link img {
+	max-height: 54px;
+}
+
 /* ---------- Header / navigation ---------- */
 #header {
 	background: #ffffff;
@@ -834,6 +909,10 @@ ul.tabs {
 }
 
 @media (max-width: 767.98px) {
+	.top-bar-left {
+		justify-content: center;
+	}
+
 	.top-content .social-links {
 		display: flex;
 		justify-content: center;
@@ -855,5 +934,24 @@ ul.tabs {
 
 	.google-app {
 		justify-content: center;
+	}
+
+	.brand-name {
+		font-size: 1.15rem;
+	}
+
+	.main-logo .brand-link img {
+		max-height: 44px;
+	}
+}
+
+@media (max-width: 991.98px) {
+	.right-element {
+		gap: 14px;
+	}
+
+	.main-menu > .menu-list > .menu-item > a {
+		font-size: 0.88rem;
+		padding: 9px 10px;
 	}
 }
