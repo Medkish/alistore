@@ -1,5 +1,5 @@
 /* AlioStore service worker - live, network-first cache */
-var CACHE_NAME = 'alistore-v4';
+var CACHE_NAME = 'alistore-v5';
 var CORE_ASSETS = [
   './',
   './index.html',
