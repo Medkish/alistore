@@ -119,6 +119,12 @@
       once: true,
     })
 
+    jQuery('.stellarnav').stellarNav({
+      theme: 'plain',
+      closingDelay: 250,
+      // mobileMode: false,
+    });
+
   }); // End of a document
 
 
