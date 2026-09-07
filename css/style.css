@@ -218,6 +218,14 @@ h1, h2, h3, h4, h5 {
 	padding: 10px 0 4px;
 }
 
+.top-logo .brand-link img {
+	max-height: 40px;
+}
+
+.top-logo .brand-name {
+	font-size: 1.1rem;
+}
+
 .top-account-links {
 	justify-content: flex-end;
 }
