@@ -9,8 +9,8 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "portrait-primary",
-  "background_color": "#3d1c07",
-  "theme_color": "#3d1c07",
+  "background_color": "#142a56",
+  "theme_color": "#142a56",
   "categories": ["books", "education", "productivity"],
   "prefer_related_applications": false,
   "shortcuts": [

@@ -1,5 +1,5 @@
-/* AlioStore service worker - offline cache */
-var CACHE_NAME = 'alistore-v3';
+/* AlioStore service worker - live, network-first cache */
+var CACHE_NAME = 'alistore-v4';
 var CORE_ASSETS = [
   './',
   './index.html',
@@ -52,8 +52,7 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  /* Pages (navigations): always try the network first so updates
-     show up immediately; fall back to cache when offline. */
+  /* Pages (navigations): network first so updates show up immediately. */
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request).then(function (response) {
@@ -73,32 +72,19 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  /* Static assets: cache-first with background refresh */
+  /* Static assets: network first (live updates), cached fallback when offline */
   event.respondWith(
-    caches.match(request).then(function (cached) {
-      if (cached) {
-        fetch(request).then(function (response) {
-          if (response && response.ok) {
-            var copy = response.clone();
-            caches.open(CACHE_NAME).then(function (cache) {
-              cache.put(request, copy);
-            });
-          }
-        }).catch(function () {});
-        return cached;
+    fetch(request).then(function (response) {
+      if (response && response.ok &&
+          (response.type === 'basic' || response.type === 'cors')) {
+        var copy = response.clone();
+        caches.open(CACHE_NAME).then(function (cache) {
+          cache.put(request, copy);
+        });
       }
-      return fetch(request).then(function (response) {
-        if (response && response.ok &&
-            (response.type === 'basic' || response.type === 'cors')) {
-          var copy = response.clone();
-          caches.open(CACHE_NAME).then(function (cache) {
-            cache.put(request, copy);
-          });
-        }
-        return response;
-      }).catch(function () {
-        return caches.match('./index.html');
-      });
+      return response;
+    }).catch(function () {
+      return caches.match(request);
     })
   );
 });
