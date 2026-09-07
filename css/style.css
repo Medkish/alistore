@@ -800,6 +800,13 @@ ul.tabs {
 	color: #ffffff;
 }
 
+#footer-bottom .social-links a.fb:hover { background: #1877f2; }
+#footer-bottom .social-links a.tw:hover { background: #1da1f2; }
+#footer-bottom .social-links a.yt:hover { background: #ff0000; }
+#footer-bottom .social-links a.bh:hover { background: #1769ff; }
+#footer-bottom .social-links a.pt:hover { background: #e60023; }
+#footer-bottom .social-links a.tg:hover { background: #229ed9; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 991.98px) {
 	.main-menu > .menu-list:not(.responsive) {
