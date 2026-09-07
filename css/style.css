@@ -155,6 +155,31 @@ h1, h2, h3, h4, h5 {
 	color: #5b6469;
 }
 
+/* Moved into the white header bar */
+#header .welcome-text {
+	color: #5b6469;
+}
+
+#header .welcome-text strong {
+	color: var(--dark);
+}
+
+#header .account-links .account-link {
+	color: var(--dark);
+}
+
+#header .account-links .account-link:hover {
+	color: var(--accent);
+}
+
+#header .for-buy {
+	color: var(--dark);
+}
+
+#header .for-buy:hover {
+	color: var(--accent);
+}
+
 /* ---------- Brand name ---------- */
 .brand-link {
 	display: flex;
@@ -186,6 +211,17 @@ h1, h2, h3, h4, h5 {
 
 .main-logo .brand-link img {
 	max-height: 54px;
+}
+
+/* Logo sits on the dark top bar */
+.top-logo {
+	display: flex;
+	justify-content: center;
+	padding: 10px 0 4px;
+}
+
+.top-logo .brand-name {
+	color: #ffffff;
 }
 
 /* ---------- Dropdown menu ---------- */
