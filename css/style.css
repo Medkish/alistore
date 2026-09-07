@@ -180,6 +180,13 @@ h1, h2, h3, h4, h5 {
 	color: var(--accent);
 }
 
+#header .install-app {
+	border: 1px solid var(--accent);
+	border-radius: 20px;
+	padding: 4px 12px;
+	background: #fff8dd;
+}
+
 /* ---------- Brand name ---------- */
 .brand-link {
 	display: flex;

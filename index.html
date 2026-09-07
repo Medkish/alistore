@@ -12,12 +12,22 @@
 	<meta name="author" content="">
 	<meta name="keywords" content="books, online books, programming, ebooks, AlioStore, reader, learn to code">
 	<meta name="description" content="AlioStore is your online bookstore for programming and tech. Browse, read and listen to books on any device - install it as an app.">
-	<meta name="theme-color" content="#3d1c07">
+	<meta name="theme-color" content="#142a56">
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<link rel="icon" href="icons/icon-192.png" type="image/png">
 	<link rel="manifest" href="manifest.json">
 	<link rel="apple-touch-icon" href="icons/icon-180.png">
+	<script>
+		window.alioDeferredInstall = null;
+		window.addEventListener('beforeinstallprompt', function (e) {
+			e.preventDefault();
+			window.alioDeferredInstall = e;
+		});
+		window.addEventListener('appinstalled', function () {
+			window.alioDeferredInstall = null;
+		});
+	</script>
 	<meta property="og:type" content="website">
 	<meta property="og:title" content="AlioStore - Online Books &amp; Programming Resources">
 	<meta property="og:description" content="Browse, read and listen to programming books on any device. Install AlioStore as an app on your phone.">
@@ -624,6 +634,7 @@
 
 					<div class="col-md-6">
 						<div class="right-element header-actions">
+							<a href="#" class="for-buy install-app" id="install-btn" style="display:none"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg><span>Install App</span></a>
 							<a href="#" class="for-buy user-account" data-open="account"><i class="icon icon-user"></i><span>Account</span></a>
 
 							<nav id="navbar">
@@ -1774,6 +1785,38 @@
 				}).catch(function () {});
 			});
 		}
+
+		(function () {
+			var installBtn = document.getElementById('install-btn');
+			if (!installBtn) { return; }
+			var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+			var isStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+			if (isStandalone) { return; }
+
+			var canInstall = function () { return window.alioDeferredInstall || isIOS; };
+			installBtn.style.display = canInstall();
+			if (window.alioDeferredInstall) { installBtn.style.display = ''; }
+
+			window.addEventListener('beforeinstallprompt', function () {
+				if (installBtn) { installBtn.style.display = ''; }
+			});
+			window.addEventListener('appinstalled', function () {
+				if (installBtn) { installBtn.style.display = 'none'; }
+			});
+
+			installBtn.addEventListener('click', function (e) {
+				e.preventDefault();
+				if (window.alioDeferredInstall) {
+					window.alioDeferredInstall.prompt();
+					return;
+				}
+				if (isIOS) {
+					alert('Install AlioStore on your home screen:\n\n1) Tap the Share button in Safari\n2) Choose "Add to Home Screen"\n3) Tap Add');
+				} else {
+					alert('To install AlioStore:\n\nOpen your browser menu and tap "Install app" or "Add to Home Screen".');
+				}
+			});
+		})();
 	</script>
 
 	<!-- Login / Register / Account -->
