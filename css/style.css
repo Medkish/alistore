@@ -1265,3 +1265,124 @@ ul.tabs {
 		padding: 9px 10px;
 	}
 }
+/* ---------- Sticky page: no side-to-side movement ---------- */
+html {
+	overflow-x: hidden;
+}
+
+/* ---------- App panels / modals ---------- */
+.modal-content {
+	border: none;
+	border-radius: 16px;
+	overflow: hidden;
+}
+
+.form-note {
+	color: #7f8c8d;
+	font-size: 0.88rem;
+}
+
+.form-note a {
+	color: var(--accent-dark);
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.account-avatar {
+	font-size: 2.4rem;
+}
+
+.account-hello {
+	font-size: 1rem;
+}
+
+.acc-outline {
+	background: #0d1b3e !important;
+	color: #ffc400 !important;
+}
+
+.cart-count {
+	background: var(--accent);
+	color: #0d1b3e;
+	font-size: 0.7rem;
+	font-weight: 800;
+	min-width: 18px;
+	height: 18px;
+	border-radius: 999px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 5px;
+}
+
+.cart-item-row {
+	padding: 12px 0;
+	border-bottom: 1px solid var(--line);
+}
+
+.cart-total-row {
+	padding: 14px 0;
+	border-top: 2px solid var(--line);
+}
+
+.orders-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.order-card {
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	padding: 14px;
+}
+
+.order-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 6px;
+}
+
+.order-status {
+	background: rgba(255, 196, 0, 0.2);
+	color: var(--accent-dark);
+	font-size: 0.75rem;
+	font-weight: 700;
+	padding: 3px 10px;
+	border-radius: 999px;
+}
+
+.order-line {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+.donate-amounts {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 16px;
+}
+
+.amount-btn {
+	flex: 1;
+	background: #ffffff;
+	border: 2px solid var(--line);
+	border-radius: 10px;
+	padding: 10px;
+	font-weight: 700;
+	color: var(--dark);
+	cursor: pointer;
+	transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.amount-btn:hover {
+	border-color: var(--accent);
+}
+
+.amount-btn.selected {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: #0d1b3e;
+}

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -80,7 +80,7 @@
 		}
 
 		.banner-books .slick-prev:before {
-			content: "‹";
+			content: "â€¹";
 		}
 
 		.banner-books .slick-next {
@@ -88,7 +88,7 @@
 		}
 
 		.banner-books .slick-next:before {
-			content: "›";
+			content: "â€º";
 		}
 
 		.banner-books .slick-dots {
@@ -600,12 +600,12 @@
 					<div class="col-lg-4 col-md-4 col-12 order-2 order-md-3">
 						<div class="top-tools">
 							<div class="account-links top-account-links">
-								<a href="#" class="account-link">Login</a>
+								<a href="#" class="account-link" id="login-link" data-open="login">Login</a>
 								<span class="account-sep">/</span>
-								<a href="#" class="account-link">Register</a>
+								<a href="#" class="account-link" id="register-link" data-open="register">Register</a>
 							</div>
-							<a href="#" class="for-buy cart"><i class="icon icon-clipboard"></i><span>Cart (0$)</span></a>
-							<a href="#" class="for-buy my-orders"><i class="icon icon-notes"></i><span>My Orders</span></a>
+							<a href="#" class="for-buy cart" data-open="cart"><i class="icon icon-clipboard"></i><span id="cart-text">Cart (0$)</span><span class="cart-count" id="cart-count">0</span></a>
+							<a href="#" class="for-buy my-orders" data-open="orders"><i class="icon icon-notes"></i><span>My Orders</span></a>
 						</div>
 					</div>
 				</div>
@@ -624,7 +624,7 @@
 
 					<div class="col-md-6">
 						<div class="right-element header-actions">
-							<a href="#" class="for-buy user-account"><i class="icon icon-user"></i><span>Account</span></a>
+							<a href="#" class="for-buy user-account" data-open="account"><i class="icon icon-user"></i><span>Account</span></a>
 
 							<nav id="navbar">
 								<div class="main-menu">
@@ -662,7 +662,7 @@
 						<div class="hero-actions">
 							<a href="books-reader.html" class="btn-flash btn-flash-primary">Start your language subscriptions</a>
 							<a href="#featured-books" class="btn-flash btn-flash-outline">Buy the Book First</a>
-							<a href="#special-offer" class="btn-flash btn-flash-ghost">Donate Instead</a>
+							<button type="button" class="btn-flash btn-flash-ghost" data-open="donate">Donate Instead</button>
 						</div>
 					</div>
 				</div>
@@ -820,7 +820,7 @@
 									<h3 class="item-title">Rust</h3>
 									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu feugiat amet,
 										libero ipsum enim pharetra hac.</p>
-									<div class="item-rating"><span>★★★★★</span><span class="rating-count">4.9
+									<div class="item-rating"><span>â˜…â˜…â˜…â˜…â˜…</span><span class="rating-count">4.9
 											(512 reviews)</span></div>
 									<div class="item-price">AED 45.00</div>
 									<div class="bestseller-actions">
@@ -1242,8 +1242,8 @@
 		<div class="inner-content">
 			<h2 class="section-title divider">Quote of the day</h2>
 			<blockquote data-aos="fade-up">
-				<q>“The more that you read, the more things you will know. The more that you learn, the more places
-					you’ll go.”</q>
+				<q>â€œThe more that you read, the more things you will know. The more that you learn, the more places
+					youâ€™ll go.â€</q>
 				<div class="author-name">Dr. Seuss</div>
 			</blockquote>
 		</div>
@@ -1621,7 +1621,7 @@
 						<div class="row">
 
 							<div class="col-md-6">
-								<p>© 2022 All rights reserved. Free HTML Template by <a
+								<p>Â© 2022 All rights reserved. Free HTML Template by <a
 										href="https://www.templatesjungle.com/" target="_blank">TemplatesJungle</a></p>
 							</div>
 
@@ -1721,6 +1721,297 @@
 				navigator.serviceWorker.register('sw.js').catch(function () {});
 			});
 		}
+	</script>
+
+	<!-- Login / Register / Account -->
+	<div class="modal fade" id="authorize-modal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="authorize-title">Login</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+
+					<div id="auth-pane-login">
+						<form id="login-form">
+							<div class="mb-3">
+								<label class="form-label" for="login-email">Email</label>
+								<input type="email" class="form-control" id="login-email" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="login-pass">Password</label>
+								<input type="password" class="form-control" id="login-pass" required>
+							</div>
+							<button type="submit" class="btn-flash btn-flash-primary w-100">Login</button>
+						</form>
+						<p class="text-center mt-3 form-note">New here? <a href="#" id="go-register">Create an account</a></p>
+					</div>
+
+					<div id="auth-pane-register" style="display:none">
+						<form id="register-form">
+							<div class="mb-3">
+								<label class="form-label" for="reg-name">Full name</label>
+								<input type="text" class="form-control" id="reg-name" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="reg-email">Email</label>
+								<input type="email" class="form-control" id="reg-email" required>
+							</div>
+							<div class="mb-3">
+								<label class="form-label" for="reg-pass">Password</label>
+								<input type="password" class="form-control" id="reg-pass" required>
+							</div>
+							<button type="submit" class="btn-flash btn-flash-primary w-100">Register</button>
+						</form>
+						<p class="text-center mt-3 form-note">Already have an account? <a href="#" id="go-login">Login</a></p>
+					</div>
+
+					<div id="auth-pane-account" style="display:none">
+						<div class="text-center account-avatar">&#128100;</div>
+						<p class="text-center account-hello">Signed in as <strong id="account-email">&#8212;</strong></p>
+						<p class="text-center form-note" id="account-name-note"></p>
+						<button type="button" class="btn-flash btn-flash-outline w-100 acc-outline" id="sign-out-btn">Sign out</button>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Cart -->
+	<div class="modal fade" id="cart-modal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Your Cart</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div id="cart-items"></div>
+					<div class="d-flex justify-content-between align-items-center fw-bold cart-total-row">
+						<span>Total</span>
+						<span id="cart-modal-total">AED 0.00</span>
+					</div>
+					<button type="button" class="btn-flash btn-flash-primary w-100" id="checkout-btn">Checkout</button>
+					<p class="text-center mt-3 form-note"><a href="#featured-books" data-bs-dismiss="modal">Continue shopping</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Orders -->
+	<div class="modal fade" id="orders-modal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">My Orders</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div id="orders-list" class="orders-list"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Donate -->
+	<div class="modal fade" id="donate-modal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Donate Instead</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p class="form-note">Your support funds authors, learners, and open communities.</p>
+					<div class="donate-amounts">
+						<button type="button" class="amount-btn" data-amount="10">AED 10</button>
+						<button type="button" class="amount-btn selected" data-amount="25">AED 25</button>
+						<button type="button" class="amount-btn" data-amount="50">AED 50</button>
+					</div>
+					<div class="mb-3">
+						<label class="form-label" for="donate-custom">Custom amount (AED)</label>
+						<input type="number" class="form-control" id="donate-custom" min="1" placeholder="AED">
+					</div>
+					<button type="button" class="btn-flash btn-flash-primary w-100" id="donate-btn">Donate</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		(function () {
+			var STORAGE_USER = 'alistore_user';
+			var getUser = function () {
+				try { return JSON.parse(localStorage.getItem(STORAGE_USER)); } catch (e) { return null; }
+			};
+			var setUser = function (user) { localStorage.setItem(STORAGE_USER, JSON.stringify(user)); };
+
+			var authorizeEl = document.getElementById('authorize-modal');
+			var loginLink = document.getElementById('login-link');
+			var registerLink = document.getElementById('register-link');
+			var cartText = document.getElementById('cart-text');
+			var cartCount = document.getElementById('cart-count');
+
+			if (!authorizeEl || !window.bootstrap) { return; }
+
+			var authorizeModal = bootstrap.Modal.getOrCreateInstance(authorizeEl);
+
+			function showPane(pane, title) {
+				['login', 'register', 'account'].forEach(function (p) {
+					document.getElementById('auth-pane-' + p).style.display = (p === pane) ? 'block' : 'none';
+				});
+				document.getElementById('authorize-title').textContent = title;
+				if (pane === 'account') {
+					var user = getUser();
+					if (user) {
+						document.getElementById('account-email').textContent = user.email;
+						document.getElementById('account-name-note').textContent = 'Welcome, ' + user.name;
+					}
+				}
+			}
+
+			document.body.addEventListener('click', function (e) {
+				var trigger = e.target.closest('[data-open]');
+				if (!trigger) { return; }
+				e.preventDefault();
+				var what = trigger.getAttribute('data-open');
+
+				if (what === 'login' || what === 'register' || what === 'account') {
+					var user = getUser();
+					if (what === 'account' && user) { showPane('account', 'My Account'); }
+					else if (what === 'account') { showPane('login', 'Login'); }
+					else { showPane(what, what.charAt(0).toUpperCase() + what.slice(1)); }
+					authorizeModal.show();
+					return;
+				}
+
+				var target = document.getElementById(what + '-modal');
+				if (target) { bootstrap.Modal.getOrCreateInstance(target).show(); }
+			});
+
+			function afterAuth(user) {
+				setUser(user);
+				if (loginLink) { loginLink.textContent = 'Hello, ' + user.name.split(' ')[0]; }
+				registerLink.style.display = 'none';
+				authorizeModal.hide();
+			}
+
+			var loginForm = document.getElementById('login-form');
+			var regForm = document.getElementById('register-form');
+			if (loginForm) { loginForm.addEventListener('submit', function (e) {
+				e.preventDefault();
+				var email = document.getElementById('login-email').value;
+				afterAuth({ name: email.split('@')[0], email: email });
+			}); }
+			if (regForm) { regForm.addEventListener('submit', function (e) {
+				e.preventDefault();
+				var name = document.getElementById('reg-name').value || 'Reader';
+				var email = document.getElementById('reg-email').value;
+				afterAuth({ name: name, email: email });
+			}); }
+
+			document.getElementById('go-register').addEventListener('click', function (e) {
+				e.preventDefault(); showPane('register', 'Register');
+			});
+			document.getElementById('go-login').addEventListener('click', function (e) {
+				e.preventDefault(); showPane('login', 'Login');
+			});
+			document.getElementById('sign-out-btn').addEventListener('click', function () {
+				localStorage.removeItem(STORAGE_USER);
+				if (loginLink) { loginLink.textContent = 'Login'; }
+				registerLink.style.display = '';
+				authorizeModal.hide();
+				showPane('login', 'Login');
+			});
+
+			var user = getUser();
+			if (user && loginLink) {
+				loginLink.textContent = 'Hello, ' + user.name.split(' ')[0];
+				registerLink.style.display = 'none';
+			}
+
+			// Cart / orders logic
+			var cartItems = [
+				{ name: 'Python', qty: 1, price: 45 },
+				{ name: 'JavaScript', qty: 1, price: 40 }
+			];
+			var orderGroups = [];
+
+			function formatAED(n) { return 'AED ' + n.toFixed(2); }
+
+			function renderCart() {
+				var wrap = document.getElementById('cart-items');
+				var totalEl = document.getElementById('cart-modal-total');
+				wrap.innerHTML = '';
+				var total = 0;
+				cartItems.forEach(function (it) {
+					total += it.qty * it.price;
+					var row = document.createElement('div');
+					row.className = 'd-flex justify-content-between align-items-center cart-item-row';
+					row.innerHTML = '<div><strong>' + it.name + '</strong><br><small class="text-muted">' + it.qty + ' &times; ' + formatAED(it.price) + '</small></div><span>' + formatAED(it.qty * it.price) + '</span>';
+					wrap.appendChild(row);
+				});
+				if (!cartItems.length) {
+					wrap.innerHTML = '<p class="text-center text-muted" id="empty-cart">Your cart is empty.</p>';
+				}
+				totalEl.textContent = formatAED(total);
+				if (cartCount) { cartCount.textContent = cartItems.length; }
+				if (cartText) { cartText.textContent = 'Cart (' + total + '$)'; }
+			}
+
+			function renderOrders() {
+				var wrap = document.getElementById('orders-list');
+				wrap.innerHTML = '';
+				if (!orderGroups.length) {
+					wrap.innerHTML = '<p class="text-center text-muted">No orders yet. Checkout from your cart to place one.</p>';
+					return;
+				}
+				orderGroups.forEach(function (order, i) {
+					var card = document.createElement('div');
+					card.className = 'order-card';
+					card.innerHTML = '<div class="order-head"><strong>Order #' + (1001 + i) + '</strong><span class="order-status">Delivered</span></div>' +
+						'<p class="order-line">' + order.map(function (it) { return it.name + ' &times; ' + it.qty; }).join(', ') + '<br>' +
+						'<strong>' + formatAED(order.reduce(function (s, it) { return s + it.qty * it.price; }, 0)) + '</strong></p>';
+					wrap.appendChild(card);
+				});
+			}
+
+			document.getElementById('checkout-btn').addEventListener('click', function () {
+				if (!cartItems.length) { return; }
+				orderGroups.push(cartItems.slice());
+				cartItems = [];
+				renderCart();
+				renderOrders();
+				bootstrap.Modal.getOrCreateInstance(document.getElementById('cart-modal')).hide();
+				bootstrap.Modal.getOrCreateInstance(document.getElementById('orders-modal')).show();
+			});
+
+			renderCart();
+			renderOrders();
+
+			// Donate
+			var selectedAmount = 25;
+			var customInput = document.getElementById('donate-custom');
+			var donateBtn = document.getElementById('donate-btn');
+			[].forEach.call(document.querySelectorAll('.amount-btn'), function (btn) {
+				btn.addEventListener('click', function () {
+					[].forEach.call(document.querySelectorAll('.amount-btn'), function (b) { b.classList.remove('selected'); });
+					btn.classList.add('selected');
+					selectedAmount = parseInt(btn.getAttribute('data-amount'), 10);
+					customInput.value = '';
+				});
+			});
+			customInput.addEventListener('input', function () {
+				[].forEach.call(document.querySelectorAll('.amount-btn'), function (b) { b.classList.remove('selected'); });
+				selectedAmount = parseInt(customInput.value, 10) || 0;
+			});
+			donateBtn.addEventListener('click', function () {
+				alert('Thank you for your generous donation of AED ' + selectedAmount + '!');
+				bootstrap.Modal.getOrCreateInstance(document.getElementById('donate-modal')).hide();
+			});
+		})();
 	</script>
 
 </body>
