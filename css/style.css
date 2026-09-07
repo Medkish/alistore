@@ -241,7 +241,36 @@ h1, h2, h3, h4, h5 {
 	}
 }
 
-/* Standard shopping-app top bar: logo + search + tools */
+/* Sticky header: top bar (welcome/search/login/cart/orders) + white bar stay on scroll */
+#header-wrap {
+	position: sticky;
+	top: 0;
+	z-index: 1050;
+}
+
+/* Compact the sticky header once scrolled so content is more visible */
+#header-wrap.scrolled .top-content {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+#header-wrap.scrolled #header {
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+#header-wrap.scrolled .top-content .account-links,
+#header-wrap.scrolled .top-content .right-element {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+@media (min-width: 768px) {
+	#header-wrap.scrolled .top-content .search-bar.top-search,
+	#header-wrap.scrolled .top-content .top-tools {
+		padding: 4px 0;
+	}
+}
+
+/* ---------- Standard shopping-app top bar: logo + search + tools ---------- */
 .top-content .search-bar.top-search {
 	position: static;
 	left: auto;
@@ -384,6 +413,17 @@ h1, h2, h3, h4, h5 {
 #header {
 	background: #ffffff;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Anchor sections land below the sticky header */
+section[id] {
+	scroll-margin-top: 150px;
+}
+
+@media (max-width: 767.98px) {
+	section[id] {
+		scroll-margin-top: 210px;
+	}
 }
 
 #header .container-fluid {
