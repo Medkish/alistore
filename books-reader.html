@@ -5,11 +5,26 @@
 	<title>AlioStore - Books Reader</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Read and listen to AlioStore books with a built-in text-to-speech reader. Works offline once installed as an app.">
+	<meta name="apple-mobile-web-app-title" content="AlioStore Reader">
 	<meta name="theme-color" content="#3d1c07">
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<link rel="icon" href="icons/icon-192.png" type="image/png">
 	<link rel="manifest" href="manifest.json">
 	<link rel="apple-touch-icon" href="icons/icon-180.png">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="AlioStore - Books Reader">
+	<meta property="og:description" content="Read and listen to AlioStore books with a built-in text-to-speech reader.">
+	<meta property="og:image" content="https://medkish.github.io/alistore/icons/icon-512.png">
+	<meta property="og:url" content="https://medkish.github.io/alistore/books-reader.html">
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:title" content="AlioStore - Books Reader">
+	<meta name="twitter:description" content="Read and listen to AlioStore books with a built-in text-to-speech reader.">
+	<meta name="twitter:image" content="https://medkish.github.io/alistore/icons/icon-512.png">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="css/normalize.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
@@ -29,8 +44,13 @@
 
 		body {
 			background: #4a2c1a;
-			font-family: Georgia, 'Times New Roman', serif;
+			font-family: 'Inter', system-ui, -apple-system, Arial, sans-serif;
 			overflow-x: hidden;
+		}
+
+		.page,
+		.page * {
+			font-family: Georgia, 'Times New Roman', serif;
 		}
 
 		.reader-header {
@@ -1063,6 +1083,40 @@
 
 			.config-diagram .darrow {
 				font-size: 0.9rem;
+			}
+		}
+
+		@media (max-width: 420px) {
+			.book-select-wrap {
+				gap: 6px;
+			}
+
+			.book-select-wrap select {
+				max-width: 110px;
+				padding: 5px 6px;
+				font-size: 0.78rem;
+			}
+
+			.install-btn {
+				font-size: 0.72rem;
+				padding: 6px 10px;
+			}
+
+			.voice-bar .voice-inner {
+				flex-wrap: wrap;
+				gap: 6px;
+			}
+
+			.voice-divider {
+				display: none;
+			}
+
+			.voice-bar select {
+				max-width: 90px;
+			}
+
+			.voice-speed {
+				margin-left: auto;
 			}
 		}
 	</style>
@@ -2106,6 +2160,11 @@
 
 		})();
 	</script>
+
+	<footer class="reader-footer" style="background:#31170c;color:#8b6d52;text-align:center;padding:18px 12px;font-size:.78rem;margin-top:12px;">
+		<a href="index.html" style="color:#c0392b;text-decoration:none;font-weight:600;margin-right:8px;">&#8592; Back to Store</a>
+		<span style="opacity:.65">&copy; 2025 AlioStore</span>
+	</footer>
 
 	<script>
 		(function () {

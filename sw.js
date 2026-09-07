@@ -1,12 +1,26 @@
 /* AlioStore service worker - offline cache */
-var CACHE_NAME = 'alistore-v1';
+var CACHE_NAME = 'alistore-v2';
 var CORE_ASSETS = [
   './',
   './index.html',
+  './books-reader.html',
   './css/normalize.css',
   './css/style.css',
   './css/vendor.css',
-  './icons/icon-192.png'
+  './icomoon/icomoon.css',
+  './js/jquery-1.11.0.min.js',
+  './js/plugins.js',
+  './js/script.js',
+  './js/bookdata-0.js',
+  './js/bookdata-1.js',
+  './js/bookdata-2.js',
+  './js/bookdata-3.js',
+  './js/bookdata-4.js',
+  './js/bookdata-5.js',
+  './icons/icon-180.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './manifest.json'
 ];
 
 self.addEventListener('install', function (event) {

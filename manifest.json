@@ -1,31 +1,39 @@
 {
-  "name": "AlioStore - Online Books Store",
+  "name": "AlioStore - Online Books & Programming Resources",
   "short_name": "AlioStore",
-  "description": "Browse and read programming books anywhere, with a built-in read-aloud voice reader.",
+  "id": "https://medkish.github.io/alistore/",
+  "description": "Your online bookstore for programming and tech. Browse, read and listen to books on any device.",
+  "lang": "en",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "portrait-primary",
   "background_color": "#3d1c07",
   "theme_color": "#3d1c07",
-  "icons": [
+  "categories": ["books", "education", "productivity"],
+  "prefer_related_applications": false,
+  "shortcuts": [
     {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "name": "Browse Books",
+      "short_name": "Books",
+      "url": "./index.html",
+      "icons": [
+        { "src": "icons/icon-192.png", "sizes": "192x192" }
+      ]
     },
     {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "name": "Read a Book",
+      "short_name": "Reader",
+      "url": "./books-reader.html",
+      "icons": [
+        { "src": "icons/icon-192.png", "sizes": "192x192" }
+      ]
     }
+  ],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
