@@ -2212,31 +2212,109 @@
 			}
 
 			// Cart / orders logic
-			var cartItems = [
-				{ name: 'Python', qty: 1, price: 45 },
-				{ name: 'JavaScript', qty: 1, price: 40 }
-			];
+			var cartItems = [];
 			var orderGroups = [];
 
 			function formatAED(n) { return 'AED ' + n.toFixed(2); }
+
+			function parsePrice(txt) {
+				return parseFloat(String(txt).replace(/[^\d.]/g, '')) || 0;
+			}
+
+			function cartItem(name) {
+				for (var i = 0; i < cartItems.length; i++) {
+					if (cartItems[i].name === name) { return cartItems[i]; }
+				}
+				return null;
+			}
+
+			function setQty(name, qty, price) {
+				var item = cartItem(name);
+				if (qty <= 0) {
+					cartItems = cartItems.filter(function (i) { return i.name !== name; });
+				} else if (item) {
+					item.qty = qty;
+				} else {
+					cartItems.push({ name: name, qty: 1, price: price || 0 });
+				}
+				renderCart();
+				renderOrders();
+				syncControls();
+			}
+
+			function syncControls() {
+				[].forEach.call(document.querySelectorAll('.cart-ctl'), function (ctl) {
+					var addBtn = ctl.querySelector('.add-cart-btn');
+					var stepper = ctl.querySelector('.qty-stepper');
+					var val = ctl.querySelector('.qty-val');
+					if (!addBtn || !stepper) { return; }
+					var item = cartItem(addBtn.getAttribute('data-name'));
+					if (item) {
+						addBtn.style.display = 'none';
+						stepper.style.display = 'inline-flex';
+						if (val) { val.textContent = item.qty; }
+					} else {
+						addBtn.style.display = 'inline-flex';
+						stepper.style.display = 'none';
+					}
+				});
+			}
+
+			function attachCartCtl(host, name, price) {
+				if (!host) { return; }
+				var ctl = document.createElement('div');
+				ctl.className = 'cart-ctl';
+				ctl.innerHTML = '<button type="button" class="add-cart-btn" data-name="' + name + '" data-price="' + price + '">Add to Cart</button>' +
+					'<span class="qty-stepper">' +
+					'<button type="button" class="qty-btn qty-dec" data-name="' + name + '">&minus;</button>' +
+					'<span class="qty-val">1</span>' +
+					'<button type="button" class="qty-btn qty-inc" data-name="' + name + '">+</button>' +
+					'</span>';
+				host.appendChild(ctl);
+			}
+
+			// Add buttons on every book card
+			[].forEach.call(document.querySelectorAll('.product-item > figcaption'), function (fig) {
+				var nameEl = fig.querySelector('h3');
+				var priceEl = fig.querySelector('.item-price');
+				if (!nameEl || !priceEl) { return; }
+				attachCartCtl(fig, nameEl.textContent.trim(), parsePrice(priceEl.textContent));
+			});
+
+			// Bestseller of the Month (Rust)
+			(function () {
+				var titleEl = document.querySelector('#best-selling .item-title');
+				var priceEl = document.querySelector('#best-selling .item-price');
+				var bestActions = document.querySelector('#best-selling .bestseller-actions');
+				if (titleEl && priceEl && bestActions) {
+					attachCartCtl(bestActions, titleEl.textContent.trim(), parsePrice(priceEl.textContent));
+				}
+			})();
 
 			function renderCart() {
 				var wrap = document.getElementById('cart-items');
 				var totalEl = document.getElementById('cart-modal-total');
 				wrap.innerHTML = '';
 				var total = 0;
+				var count = 0;
 				cartItems.forEach(function (it) {
 					total += it.qty * it.price;
+					count += it.qty;
 					var row = document.createElement('div');
-					row.className = 'd-flex justify-content-between align-items-center cart-item-row';
-					row.innerHTML = '<div><strong>' + it.name + '</strong><br><small class="text-muted">' + it.qty + ' &times; ' + formatAED(it.price) + '</small></div><span>' + formatAED(it.qty * it.price) + '</span>';
+					row.className = 'cart-item-row';
+					row.innerHTML = '<div class="cart-item-info"><strong>' + it.name + '</strong><br><small class="text-muted">' + formatAED(it.price) + ' each</small>' +
+						'<button type="button" class="cart-remove" data-name="' + it.name + '">Remove</button></div>' +
+						'<div class="cart-qty"><button type="button" class="qty-btn cart-dec" data-name="' + it.name + '">&minus;</button>' +
+						'<span class="qty-val">' + it.qty + '</span>' +
+						'<button type="button" class="qty-btn cart-inc" data-name="' + it.name + '">+</button></div>' +
+						'<span class="cart-line-total">' + formatAED(it.qty * it.price) + '</span>';
 					wrap.appendChild(row);
 				});
 				if (!cartItems.length) {
-					wrap.innerHTML = '<p class="text-center text-muted" id="empty-cart">Your cart is empty.</p>';
+					wrap.innerHTML = '<p class="text-center text-muted" id="empty-cart">Your cart is empty. Add a book to get started.</p>';
 				}
 				totalEl.textContent = formatAED(total);
-				if (cartCount) { cartCount.textContent = cartItems.length; }
+				if (cartCount) { cartCount.textContent = count; }
 				if (cartText) { cartText.textContent = 'Cart (' + total + '$)'; }
 			}
 
@@ -2257,18 +2335,57 @@
 				});
 			}
 
+			// Card / cart controls (delegated)
+			document.body.addEventListener('click', function (e) {
+				var addBtn = e.target.closest('.add-cart-btn');
+				if (addBtn) {
+					e.preventDefault();
+					var name = addBtn.getAttribute('data-name');
+					var price = parseFloat(addBtn.getAttribute('data-price')) || 0;
+					var item = cartItem(name);
+					setQty(name, (item ? item.qty : 0) + 1, price);
+					return;
+				}
+
+				var inc = e.target.closest('.qty-inc,.cart-inc');
+				if (inc) {
+					e.preventDefault();
+					var n1 = inc.getAttribute('data-name');
+					var it1 = cartItem(n1);
+					if (it1) { setQty(n1, it1.qty + 1, it1.price); }
+					return;
+				}
+
+				var dec = e.target.closest('.qty-dec,.cart-dec');
+				if (dec) {
+					e.preventDefault();
+					var n2 = dec.getAttribute('data-name');
+					var it2 = cartItem(n2);
+					if (it2) { setQty(n2, it2.qty - 1, it2.price); }
+					return;
+				}
+
+				var rem = e.target.closest('.cart-remove');
+				if (rem) {
+					e.preventDefault();
+					setQty(rem.getAttribute('data-name'), 0);
+				}
+			});
+
 			document.getElementById('checkout-btn').addEventListener('click', function () {
 				if (!cartItems.length) { return; }
 				orderGroups.push(cartItems.slice());
 				cartItems = [];
 				renderCart();
 				renderOrders();
+				syncControls();
 				bootstrap.Modal.getOrCreateInstance(document.getElementById('cart-modal')).hide();
 				bootstrap.Modal.getOrCreateInstance(document.getElementById('orders-modal')).show();
 			});
 
 			renderCart();
 			renderOrders();
+			syncControls();
 
 			// Donate
 			var selectedAmount = 25;
