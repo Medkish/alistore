@@ -580,18 +580,33 @@
 
 <div class="top-content">
 			<div class="container-fluid">
-				<div class="row align-items-center justify-content-between">
-					<div class="col-auto">
+				<div class="row align-items-center">
+					<div class="col-lg-2 col-md-3 col-12">
 						<a href="index.html" class="brand-link top-logo">
 							<img src="images/main-logo-nobg-cropped.png" alt="AlioStore logo">
 							<span class="brand-name">AlioStore<span class="brand-tag">Online Books</span></span>
 						</a>
 					</div>
-					<div class="col-auto">
-						<div class="account-links top-account-links">
-							<a href="#" class="account-link">Login</a>
-							<span class="account-sep">/</span>
-							<a href="#" class="account-link">Register</a>
+					<div class="col-lg-6 col-md-6 col-12 order-2 order-md-3 order-lg-2">
+						<div class="search-bar top-search">
+							<a href="#" class="search-button search-toggle" data-selector="#header-wrap">
+								<i class="icon icon-search"></i>
+							</a>
+							<form role="search" method="get" class="search-box">
+								<input class="search-field text search-input" placeholder="Search for books..."
+									type="search">
+							</form>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-3 col-12 order-1 order-md-2 order-lg-3">
+						<div class="top-tools">
+							<div class="account-links top-account-links">
+								<a href="#" class="account-link">Login</a>
+								<span class="account-sep">/</span>
+								<a href="#" class="account-link">Register</a>
+							</div>
+							<a href="#" class="for-buy cart"><i class="icon icon-clipboard"></i><span>Cart (0$)</span></a>
+							<a href="#" class="for-buy my-orders"><i class="icon icon-notes"></i><span>My Orders</span></a>
 						</div>
 					</div>
 				</div>
@@ -602,30 +617,15 @@
 			<div class="container-fluid">
 				<div class="row align-items-center">
 
-					<div class="col-md-6">
+					<div class="col-md-8">
 						<div class="top-bar-left header-bar-left">
 							<p class="welcome-text">Welcome to <strong>AlioStore</strong></p>
+							<a href="#" class="for-buy user-account"><i class="icon icon-user"></i><span>Account</span></a>
 						</div>
 					</div>
 
-					<div class="col-md-6">
+					<div class="col-md-4">
 						<div class="right-element header-actions">
-							<a href="#" class="for-buy user-account"><i class="icon icon-user"></i><span>Account</span></a>
-							<a href="#" class="for-buy cart"><i class="icon icon-clipboard"></i><span>Cart (0$)</span></a>
-							<a href="#" class="for-buy my-orders"><i class="icon icon-notes"></i><span>My Orders</span></a>
-
-							<div class="action-menu">
-								<div class="search-bar">
-									<a href="#" class="search-button search-toggle" data-selector="#header-wrap">
-										<i class="icon icon-search"></i>
-									</a>
-									<form role="search" method="get" class="search-box">
-										<input class="search-field text search-input" placeholder="Search"
-											type="search">
-									</form>
-								</div>
-							</div>
-
 							<nav id="navbar">
 								<div class="main-menu">
 									<div class="dropdown" id="site-dropdown">
@@ -641,7 +641,6 @@
 									</div>
 								</div>
 							</nav>
-
 						</div><!--top-right-->
 					</div>
 

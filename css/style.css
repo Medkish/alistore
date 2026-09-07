@@ -222,6 +222,63 @@ h1, h2, h3, h4, h5 {
 	justify-content: flex-end;
 }
 
+/* Standard shopping-app top bar: logo + search + tools */
+.top-content .search-bar.top-search {
+	position: static;
+	left: auto;
+	top: auto;
+	transform: none;
+	margin-left: 0;
+	justify-content: center;
+	gap: 8px;
+	padding: 8px 0;
+}
+
+.top-content .search-button {
+	color: #ffffff;
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.top-content .search-button:hover {
+	background: rgba(255, 255, 255, 0.24);
+}
+
+.top-content .search-box {
+	min-width: 0;
+	width: 100%;
+	max-width: 480px;
+}
+
+.top-content .search-field {
+	width: 100%;
+}
+
+.top-tools {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 18px;
+	flex-wrap: wrap;
+	padding: 8px 0;
+}
+
+.top-tools .top-account-links {
+	margin-top: 0;
+	border-top: none;
+	padding: 0;
+}
+
+@media (max-width: 767.98px) {
+	.top-tools {
+		justify-content: center;
+		padding-bottom: 10px;
+	}
+
+	.top-tools .top-account-links {
+		padding-bottom: 2px;
+	}
+}
+
 .top-logo .brand-name {
 	color: #ffffff;
 }
