@@ -59,17 +59,6 @@
       }
     });
 
-    $('.banner-books').slick({
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 4000,
-        speed: 900,
-        cssEase: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
-        dots: true,
-        arrows: true,
-    });
-
     $('.main-slider').slick({
         autoplay: false,
         autoplaySpeed: 4000,
