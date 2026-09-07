@@ -661,7 +661,7 @@
 						<p class="hero-text">Pick a language, subscribe to learn, and your reads help fund authors, learners, and open communities around the world.</p>
 						<div class="hero-actions">
 							<a href="books-reader.html" class="btn-flash btn-flash-primary">Start your language subscriptions</a>
-							<a href="#featured-books" class="btn-flash btn-flash-outline">Buy the Book First</a>
+							<button type="button" class="btn-flash btn-flash-outline" data-open="buy">Buy the Book First</button>
 							<button type="button" class="btn-flash btn-flash-ghost" data-open="donate">Donate Instead</button>
 						</div>
 					</div>
@@ -1896,6 +1896,66 @@
 		</div>
 	</div>
 
+	<!-- Choose where to buy -->
+	<div class="modal fade" id="buy-modal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Choose Where To Buy</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div id="buy-step-options">
+						<p class="form-note">Pick your preferred bookstore below. Every purchase helps support Alio &amp; Palma Cooperative&#8217;s storytelling and mission-aligned Programming work.</p>
+
+						<button type="button" class="buy-option" data-store="Kamara &amp; Tessie">
+							<div class="buy-option-inner">
+								<div class="buy-option-item"><i class="icon icon-notes"></i></div>
+								<div class="buy-option-text">
+									<strong>Kamara &amp; Tessie</strong>
+									<span>Paperback preview copy</span>
+									<span class="buy-option-detail">AED 45.00 &#183; Dubai pickup available</span>
+								</div>
+								<span class="buy-option-go">Choose &#8594;</span>
+							</div>
+						</button>
+
+						<button type="button" class="buy-option" data-store="Amazon UAE">
+							<div class="buy-option-inner">
+								<div class="buy-option-item"><i class="icon icon-arrow-right-circle"></i></div>
+								<div class="buy-option-text">
+									<strong>Amazon UAE</strong>
+									<span>Delivered across the Emirates</span>
+									<span class="buy-option-detail">AED 48.00 &#183; Free delivery over AED 60</span>
+								</div>
+								<span class="buy-option-go">Choose &#8594;</span>
+							</div>
+						</button>
+
+						<button type="button" class="buy-option" data-store="Amazon US Signed Direct Edition">
+							<div class="buy-option-inner">
+								<div class="buy-option-item"><i class="icon icon-currency-dollar"></i></div>
+								<div class="buy-option-text">
+									<strong>Amazon US Signed Direct Edition</strong>
+									<span>Hand-signed by the authors</span>
+									<span class="buy-option-detail">USD 24.99 &#183; Ships worldwide</span>
+								</div>
+								<span class="buy-option-go">Choose &#8594;</span>
+							</div>
+						</button>
+
+					</div>
+					<div id="buy-step-done" style="display:none" class="text-center">
+						<div class="donate-success-icon">&#10003;</div>
+						<h5 class="mt-3 mb-1">Opening <span id="buy-done-store"></span></h5>
+						<p class="form-note">We are taking you there to complete your order. Every purchase supports Alio &amp; Palma Cooperative&#8217;s storytelling and mission-aligned Programming work.</p>
+						<button type="button" class="btn-flash btn-flash-primary w-100" data-bs-dismiss="modal">Done</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<script>
 		(function () {
 			var STORAGE_USER = 'alistore_user';
@@ -2153,6 +2213,35 @@
 			});
 			document.getElementById('donate-paypay-btn').addEventListener('click', completeDonation);
 			document.getElementById('donate-cash-btn').addEventListener('click', completeDonation);
+
+			// Buy the book - choose a store
+			var buyOptions = document.getElementById('buy-step-options');
+			var buyDone = document.getElementById('buy-step-done');
+			[].forEach.call(document.querySelectorAll('.buy-option'), function (opt) {
+				opt.addEventListener('click', function () {
+					var store = opt.getAttribute('data-store').replace(/&amp;/g, '&');
+					document.getElementById('buy-done-store').textContent = store;
+					buyOptions.style.display = 'none';
+					buyDone.style.display = 'block';
+				});
+			});
+
+			// Reset multi-step panels each time they close
+			['donate-modal', 'buy-modal'].forEach(function (id) {
+				var el = document.getElementById(id);
+				if (el) {
+					el.addEventListener('hidden.bs.modal', function () {
+						if (id === 'donate-modal') {
+							amountStep.style.display = 'block';
+							payStep.style.display = 'none';
+							doneStep.style.display = 'none';
+						} else {
+							buyOptions.style.display = 'block';
+							buyDone.style.display = 'none';
+						}
+					});
+				}
+			});
 		})();
 	</script>
 

@@ -1442,3 +1442,77 @@ html {
 	line-height: 56px;
 	box-shadow: 0 0 0 8px rgba(255, 196, 0, 0.2);
 }
+
+/* ---------- Choose where to buy ---------- */
+.buy-option {
+	display: block;
+	width: 100%;
+	text-align: left;
+	background: #ffffff;
+	border: 2px solid var(--line);
+	border-radius: 14px;
+	padding: 0;
+	margin-bottom: 12px;
+	cursor: pointer;
+	transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.buy-option:hover {
+	border-color: var(--accent);
+	box-shadow: 0 10px 26px rgba(13, 27, 62, 0.1);
+	transform: translateY(-2px);
+}
+
+.buy-option-inner {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 16px;
+	color: var(--dark);
+}
+
+.buy-option-item {
+	width: 44px;
+	height: 44px;
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 196, 0, 0.18);
+	border-radius: 12px;
+}
+
+.buy-option-item .icon {
+	font-size: 1.3rem;
+	color: var(--accent-dark);
+}
+
+.buy-option-text {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+	flex: 1;
+	text-align: left;
+}
+
+.buy-option-text strong {
+	font-size: 1rem;
+}
+
+.buy-option-text span {
+	color: var(--muted);
+	font-size: 0.82rem;
+}
+
+.buy-option-detail {
+	color: var(--accent-dark) !important;
+	font-weight: 600;
+}
+
+.buy-option-go {
+	flex: none;
+	font-weight: 800;
+	font-size: 0.85rem;
+	color: var(--accent-dark);
+}
