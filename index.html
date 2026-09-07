@@ -1794,7 +1794,7 @@
 						<span id="cart-modal-total">AED 0.00</span>
 					</div>
 					<button type="button" class="btn-flash btn-flash-primary w-100" id="checkout-btn">Checkout</button>
-					<p class="text-center mt-3 form-note"><a href="#featured-books" data-bs-dismiss="modal">Continue shopping</a></p>
+					<p class="text-center mt-3 form-note"><a href="#featured-books" id="continue-shopping">Continue shopping</a></p>
 				</div>
 			</div>
 		</div>
@@ -2242,6 +2242,21 @@
 					});
 				}
 			});
+
+			// Continue shopping: close cart and go to featured books
+			var continueBtn = document.getElementById('continue-shopping');
+			if (continueBtn) {
+				continueBtn.addEventListener('click', function (e) {
+					e.preventDefault();
+					bootstrap.Modal.getOrCreateInstance(document.getElementById('cart-modal')).hide();
+					var target = document.getElementById('featured-books');
+					if (target) {
+						setTimeout(function () {
+							target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+						}, 320);
+					}
+				});
+			}
 		})();
 	</script>
 
