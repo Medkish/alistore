@@ -660,7 +660,7 @@
 						<h1 class="hero-title">A reader-powered path for <span class="hero-highlight">Programming Languages</span> that fund change</h1>
 						<p class="hero-text">Pick a language, subscribe to learn, and your reads help fund authors, learners, and open communities around the world.</p>
 						<div class="hero-actions">
-							<a href="books-reader.html" class="btn-flash btn-flash-primary">Start your language subscriptions</a>
+							<button type="button" class="btn-flash btn-flash-primary" data-open="subscribe">Start your language subscriptions</button>
 							<button type="button" class="btn-flash btn-flash-outline" data-open="buy">Buy the Book First</button>
 							<button type="button" class="btn-flash btn-flash-ghost" data-open="donate">Donate Instead</button>
 						</div>
@@ -1970,6 +1970,103 @@
 		</div>
 	</div>
 
+	<!-- Language subscription -->
+	<div class="modal fade" id="subscribe-modal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Start a Language Subscription</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+
+					<div class="sub-steps">
+						<span class="sub-step active" data-step="1">1. Languages</span>
+						<span class="sub-step" data-step="2">2. Plan</span>
+						<span class="sub-step" data-step="3">3. Details</span>
+					</div>
+
+					<div id="sub-step-langs">
+						<p class="form-note">Choose one or more programming languages to learn.</p>
+						<div class="lang-grid">
+							<button type="button" class="lang-pill" data-lang="Python">Python</button>
+							<button type="button" class="lang-pill" data-lang="JavaScript">JavaScript</button>
+							<button type="button" class="lang-pill" data-lang="Java">Java</button>
+							<button type="button" class="lang-pill" data-lang="Rust">Rust</button>
+							<button type="button" class="lang-pill" data-lang="Go">Go</button>
+							<button type="button" class="lang-pill" data-lang="SQL">SQL</button>
+						</div>
+						<button type="button" class="btn-flash btn-flash-primary w-100 mt-3" id="sub-langs-next">Continue</button>
+					</div>
+
+					<div id="sub-step-plan" style="display:none">
+						<p class="form-note">Pick a plan for <strong id="sub-lang-summary"></strong>.</p>
+						<div class="plan-cards">
+							<button type="button" class="plan-card selected" data-plan="Monthly" data-price="15">
+								<strong>Monthly</strong>
+								<span>AED 15 / month</span>
+								<span class="plan-note">Learn at your own pace</span>
+							</button>
+							<button type="button" class="plan-card" data-plan="Yearly" data-price="120">
+								<strong>Yearly</strong>
+								<span>AED 120 / year</span>
+								<span class="plan-note">Save 33% &#183; 2 months free</span>
+							</button>
+						</div>
+						<p class="form-note text-center" id="sub-plan-summary">Monthly &#183; AED 15 / month</p>
+						<button type="button" class="btn-flash btn-flash-primary w-100" id="sub-plan-next">Proceed to payment</button>
+						<p class="text-center mt-3 form-note"><a href="#" class="sub-back" data-from="plan">Back to languages</a></p>
+					</div>
+
+					<div id="sub-step-pay" style="display:none">
+						<p class="donate-summary" id="sub-pay-summary">Python &#183; Monthly &#183; AED 15 / month</p>
+						<div class="mb-3">
+							<label class="form-label" for="sub-name">Full name</label>
+							<input type="text" class="form-control" id="sub-name" placeholder="Full name">
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="sub-email">Email</label>
+							<input type="email" class="form-control" id="sub-email" placeholder="you@email.com">
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="sub-mobile">Mobile number</label>
+							<input type="tel" class="form-control" id="sub-mobile" placeholder="+971 5x xxx xxxx">
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="sub-card-name">Name on card</label>
+							<input type="text" class="form-control" id="sub-card-name" placeholder="Full name">
+						</div>
+						<div class="mb-3">
+							<label class="form-label" for="sub-card-number">Card number</label>
+							<input type="text" class="form-control card-input" id="sub-card-number" inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456">
+						</div>
+						<div class="row g-2 mb-3">
+							<div class="col-6">
+								<label class="form-label" for="sub-card-expiry">Expiry</label>
+								<input type="text" class="form-control card-input" id="sub-card-expiry" inputmode="numeric" maxlength="5" placeholder="MM/YY">
+							</div>
+							<div class="col-6">
+								<label class="form-label" for="sub-card-cvc">CVC</label>
+								<input type="text" class="form-control card-input" id="sub-card-cvc" inputmode="numeric" maxlength="4" placeholder="123">
+							</div>
+						</div>
+						<button type="button" class="btn-flash btn-flash-primary w-100" id="subscribe-pay-btn">Subscribe AED 15</button>
+						<p class="text-center mt-3 form-note"><a href="#" class="sub-back" data-from="pay">Back to plan</a></p>
+					</div>
+
+					<div id="sub-step-done" style="display:none" class="text-center">
+						<div class="donate-success-icon">&#10003;</div>
+						<h5 class="mt-3 mb-1">You&#8217;re subscribed!</h5>
+						<p class="form-note" id="sub-done-langs"></p>
+						<p class="form-note">Subscription: <strong id="sub-done-plan"></strong><br>Reference: <strong id="sub-done-ref">ALI-SUB-0000</strong><br>Next billing: <strong id="sub-done-date"></strong></p>
+						<button type="button" class="btn-flash btn-flash-primary w-100" data-bs-dismiss="modal">Done</button>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<script>
 		(function () {
 			var STORAGE_USER = 'alistore_user';
@@ -2281,7 +2378,7 @@
 			});
 
 			// Reset multi-step panels each time they close
-			['donate-modal', 'buy-modal'].forEach(function (id) {
+			['donate-modal', 'buy-modal', 'subscribe-modal'].forEach(function (id) {
 				var el = document.getElementById(id);
 				if (el) {
 					el.addEventListener('hidden.bs.modal', function () {
@@ -2289,9 +2386,22 @@
 							amountStep.style.display = 'block';
 							payStep.style.display = 'none';
 							doneStep.style.display = 'none';
-						} else {
+						} else if (id === 'buy-modal') {
 							buyOptions.style.display = 'block';
 							buyDone.style.display = 'none';
+						} else {
+							subLangs.clear();
+							[].forEach.call(document.querySelectorAll('.lang-pill'), function (p) { p.classList.remove('selected'); });
+							[].forEach.call(document.querySelectorAll('.plan-card'), function (c) { c.classList.remove('selected'); });
+							[].forEach.call(document.querySelectorAll('.plan-card'), function (c) {
+								if (c.getAttribute('data-plan') === 'Monthly') { c.classList.add('selected'); }
+							});
+							subPlan = 'Monthly'; subPrice = 15; subPeriodLabel = 'month';
+							subStepLangs.style.display = 'block';
+							subStepPlan.style.display = 'none';
+							subStepPay.style.display = 'none';
+							subStepDone.style.display = 'none';
+							subShowStep(1);
 						}
 					});
 				}
@@ -2311,6 +2421,120 @@
 					}
 				});
 			}
+
+			// Subscription flow
+			var subLangs = new Set();
+			var subStepLangs = document.getElementById('sub-step-langs');
+			var subStepPlan = document.getElementById('sub-step-plan');
+			var subStepPay = document.getElementById('sub-step-pay');
+			var subStepDone = document.getElementById('sub-step-done');
+			var subSteps = [].slice.call(document.querySelectorAll('.sub-steps .sub-step'));
+			var subPlan = 'Monthly';
+			var subPrice = 15;
+			var subPeriodLabel = 'month';
+
+			function subShowStep(n) {
+				subSteps.forEach(function (s) { s.classList.toggle('active', parseInt(s.getAttribute('data-step'), 10) <= n); });
+			}
+
+			// 1. Languages
+			[].forEach.call(document.querySelectorAll('.lang-pill'), function (pill) {
+				pill.addEventListener('click', function () {
+					var lang = pill.getAttribute('data-lang');
+					if (subLangs.has(lang)) { subLangs.delete(lang); pill.classList.remove('selected'); }
+					else { subLangs.add(lang); pill.classList.add('selected'); }
+				});
+			});
+			document.getElementById('sub-langs-next').addEventListener('click', function () {
+				if (!subLangs.size) { return; }
+				document.getElementById('sub-lang-summary').textContent = Array.from(subLangs).join(', ');
+				subStepLangs.style.display = 'none';
+				subStepPlan.style.display = 'block';
+				subShowStep(2);
+			});
+
+			// 2. Plan
+			[].forEach.call(document.querySelectorAll('.plan-card'), function (card) {
+				card.addEventListener('click', function () {
+					[].forEach.call(document.querySelectorAll('.plan-card'), function (c) { c.classList.remove('selected'); });
+					card.classList.add('selected');
+					subPlan = card.getAttribute('data-plan');
+					subPrice = parseInt(card.getAttribute('data-price'), 10);
+					subPeriodLabel = subPlan === 'Yearly' ? 'year' : 'month';
+					document.getElementById('sub-plan-summary').textContent = subPlan + ' \u00b7 AED ' + subPrice + ' / ' + subPeriodLabel;
+				});
+			});
+			document.getElementById('sub-plan-next').addEventListener('click', function () {
+				document.getElementById('sub-pay-summary').textContent = Array.from(subLangs).join(', ') + ' \u00b7 ' + subPlan + ' \u00b7 AED ' + subPrice + ' / ' + subPeriodLabel;
+				document.getElementById('subscribe-pay-btn').textContent = 'Subscribe AED ' + subPrice + ' / ' + subPeriodLabel;
+				subStepPlan.style.display = 'none';
+				subStepPay.style.display = 'block';
+				subShowStep(3);
+			});
+
+			// Back links
+			[].forEach.call(document.querySelectorAll('.sub-back'), function (link) {
+				link.addEventListener('click', function (e) {
+					e.preventDefault();
+					var from = link.getAttribute('data-from');
+					if (from === 'plan') { subStepPlan.style.display = 'none'; subStepLangs.style.display = 'block'; subShowStep(1); }
+					else { subStepPay.style.display = 'none'; subStepPlan.style.display = 'block'; subShowStep(2); }
+				});
+			});
+
+			// Card formatting for subscription
+			var subCardNumber = document.getElementById('sub-card-number');
+			var subCardExpiry = document.getElementById('sub-card-expiry');
+			var subCardCvc = document.getElementById('sub-card-cvc');
+			subCardNumber.addEventListener('input', function () {
+				var v = subCardNumber.value.replace(/\D/g, '').slice(0, 16);
+				subCardNumber.value = v.replace(/(.{4})/g, '$1 ').trim();
+			});
+			subCardExpiry.addEventListener('input', function () {
+				var v = subCardExpiry.value.replace(/\D/g, '').slice(0, 4);
+				subCardExpiry.value = v.length > 2 ? v.slice(0, 2) + '/' + v.slice(2) : v;
+			});
+			subCardCvc.addEventListener('input', function () {
+				subCardCvc.value = subCardCvc.value.replace(/\D/g, '').slice(0, 4);
+			});
+
+			document.getElementById('subscribe-pay-btn').addEventListener('click', function () {
+				var subFields = [
+					{ el: document.getElementById('sub-name'), ok: document.getElementById('sub-name').value.trim().length >= 2 },
+					{ el: document.getElementById('sub-email'), ok: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('sub-email').value.trim()) },
+					{ el: document.getElementById('sub-mobile'), ok: /^\+?\d{7,15}$/.test(document.getElementById('sub-mobile').value.replace(/[\s()-]/g, '')) },
+					{ el: document.getElementById('sub-card-name'), ok: document.getElementById('sub-card-name').value.trim().length >= 2 },
+					{ el: subCardNumber, ok: subCardNumber.value.replace(/\s/g, '').length >= 12 },
+					{ el: subCardExpiry, ok: /^\d{2}\/\d{2}$/.test(subCardExpiry.value.trim()) },
+					{ el: subCardCvc, ok: subCardCvc.value.trim().length >= 3 }
+				];
+				subFields.forEach(function (f) { f.el.classList.toggle('is-invalid', !f.ok); });
+				var allOk = subFields.every(function (f) { return f.ok; });
+				if (!allOk) {
+					var bad = subFields.filter(function (f) { return !f.ok; })[0];
+					if (bad) { bad.el.focus(); }
+					return;
+				}
+
+				var ref = 'ALI-SUB-' + Math.floor(1000 + Math.random() * 9000);
+				var now = new Date();
+				var next = new Date(now);
+				if (subPlan === 'Yearly') { next.setFullYear(next.getFullYear() + 1); }
+				else { next.setMonth(next.getMonth() + 1); }
+				document.getElementById('sub-done-langs').textContent = 'Languages: ' + Array.from(subLangs).join(', ');
+				document.getElementById('sub-done-plan').textContent = subPlan + ' \u00b7 AED ' + subPrice + ' / ' + subPeriodLabel;
+				document.getElementById('sub-done-ref').textContent = ref;
+				document.getElementById('sub-done-date').textContent = next.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+				subStepPay.style.display = 'none';
+				subStepDone.style.display = 'block';
+
+				if (getUser()) {
+					var u = getUser();
+					if (!u.subscriptions) { u.subscriptions = []; }
+					u.subscriptions.push({ plan: subPlan, price: subPrice, per: subPeriodLabel, langs: Array.from(subLangs), ref: ref });
+					setUser(u);
+				}
+			});
 		})();
 	</script>
 

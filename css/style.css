@@ -1516,3 +1516,107 @@ html {
 	font-size: 0.85rem;
 	color: var(--accent-dark);
 }
+
+/* ---------- Language subscription flow ---------- */
+.sub-steps {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 16px;
+}
+
+.sub-step {
+	flex: 1;
+	text-align: center;
+	font-size: 0.75rem;
+	font-weight: 700;
+	padding: 7px 4px;
+	border-radius: 999px;
+	background: #f1efe8;
+	color: var(--muted);
+}
+
+.sub-step.active {
+	background: var(--accent);
+	color: #0d1b3e;
+}
+
+.lang-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.lang-pill {
+	flex: 1 1 30%;
+	background: #ffffff;
+	border: 2px solid var(--line);
+	border-radius: 12px;
+	padding: 12px 8px;
+	font-weight: 700;
+	font-size: 0.9rem;
+	color: var(--dark);
+	cursor: pointer;
+	transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.lang-pill:hover {
+	border-color: var(--accent);
+}
+
+.lang-pill.selected {
+	background: #0d1b3e;
+	border-color: #0d1b3e;
+	color: #ffc400;
+}
+
+.plan-cards {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 14px;
+}
+
+.plan-card {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	background: #ffffff;
+	border: 2px solid var(--line);
+	border-radius: 14px;
+	padding: 16px 10px;
+	color: var(--dark);
+	cursor: pointer;
+	transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.plan-card strong {
+	font-size: 1.05rem;
+}
+
+.plan-card span {
+	font-size: 0.82rem;
+	color: var(--muted);
+}
+
+.plan-card .plan-note {
+	color: var(--accent-dark);
+	font-weight: 600;
+}
+
+.plan-card.selected {
+	background: var(--accent);
+	border-color: var(--accent);
+	box-shadow: 0 10px 26px rgba(255, 196, 0, 0.35);
+}
+
+.plan-card.selected span,
+.plan-card.selected strong {
+	color: #0d1b3e;
+}
+
+@media (max-width: 575.98px) {
+	.lang-pill {
+		flex: 1 1 46%;
+	}
+}
