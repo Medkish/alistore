@@ -1762,3 +1762,73 @@ html {
 .bestseller-actions .cart-ctl {
 	justify-content: flex-start;
 }
+
+/* ---------- Store benefits strip ---------- */
+.benefit-grid {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 16px;
+	margin-top: 28px;
+}
+
+.benefit-card {
+	background: #fff;
+	border: 1px solid var(--line);
+	border-radius: 16px;
+	padding: 22px 18px;
+	text-align: center;
+	transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.benefit-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 10px 24px rgba(20, 42, 86, 0.12);
+	border-color: var(--accent);
+}
+
+.benefit-icon {
+	width: 40px;
+	height: 40px;
+	color: var(--accent-dark);
+	margin-bottom: 12px;
+}
+
+.benefit-card h4 {
+	font-size: 1rem;
+	margin-bottom: 6px;
+	color: var(--dark);
+}
+
+.benefit-card p {
+	font-size: 0.85rem;
+	color: var(--muted);
+	margin: 0;
+	line-height: 1.5;
+}
+
+@media (max-width: 991px) {
+	.benefit-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 767px) {
+	.benefit-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------- Payment badges (footer) ---------- */
+.pay-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 14px;
+}
+
+.pay-badges span {
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	padding: 5px 10px;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.4px;
+	color: var(--dark);
+	background: #fff;
+}
