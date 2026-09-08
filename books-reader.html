@@ -2145,6 +2145,21 @@
 	</footer>
 
 	<script>
+		(function () {
+			var pill = document.createElement('div');
+			pill.id = 'conn-pill';
+			pill.textContent = 'Live';
+			document.body.appendChild(pill);
+			var setConn = function () {
+				var online = navigator.onLine !== false;
+				pill.className = 'conn-pill ' + (online ? 'on' : 'off');
+				pill.textContent = online ? '\u2713 Online \u00b7 Live' : 'Offline \u2014 cached';
+			};
+			window.addEventListener('online', setConn);
+			window.addEventListener('offline', setConn);
+			setConn();
+		})();
+
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', function () {
 				var refreshing = false;
@@ -2157,7 +2172,15 @@
 					reg.update();
 					setInterval(function () {
 						if (!document.hidden) { reg.update(); }
-					}, 30 * 60 * 1000);
+					}, 5 * 60 * 1000);
+
+					if (reg.periodicSync) {
+						navigator.permissions.query({ name: 'periodic-background-sync' }).then(function (status) {
+							if (status.state === 'granted') {
+								reg.periodicSync.register('alistore-refresh', { minInterval: 60 * 60 * 1000 });
+							}
+						}).catch(function () {});
+					}
 				}).catch(function () {});
 			});
 		}

@@ -46,6 +46,19 @@ self.addEventListener('activate', function (event) {
   );
 });
 
+self.addEventListener('message', function (event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+/* Installed app refreshes while in the background */
+self.addEventListener('periodicsync', function (event) {
+  if (event.tag === 'alistore-refresh') {
+    event.waitUntil(self.registration.update());
+  }
+});
+
 self.addEventListener('fetch', function (event) {
   var request = event.request;
   if (request.method !== 'GET' || request.url.indexOf('http') !== 0) {
