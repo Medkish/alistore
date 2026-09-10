@@ -1,0 +1,12 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/cart/page": "/cart",
+  "/books/page": "/books",
+  "/checkout/page": "/checkout",
+  "/login/page": "/login",
+  "/page": "/",
+  "/orders/page": "/orders",
+  "/profile/page": "/profile",
+  "/register/page": "/register",
+  "/books/[id]/page": "/books/[id]"
+}

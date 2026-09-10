@@ -1,0 +1,25 @@
+{
+  "name": "alistore-backend",
+  "version": "1.0.0",
+  "description": "AlioStore API - auth, cart, orders, donations and subscriptions",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "alistore",
+    "books",
+    "api",
+    "express"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
