@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  mobile        String         @default("")
+  passwordHash  String
+  role          String         @default("CUSTOMER")
+  cart          Json?
+  orders        Order[]
+  sessions      Session[]
+  donations     Donation[]
+  subscriptions Subscription[]
+  actions       ActionLog[]
+  createdAt     DateTime       @default(now())
+
+  @@index([email])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  books Book[]
+}
+
+model Book {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  title         String
+  author        String
+  description   String      @default("")
+  price         Decimal     @db.Decimal(10, 2)
+  prevPrice     Decimal?    @db.Decimal(10, 2)
+  stock         Int         @default(0)
+  rating        Decimal     @default(4.5) @db.Decimal(2, 1)
+  coverImage    String
+  featured      Boolean     @default(false)
+  bestseller    Boolean     @default(false)
+  published     Boolean     @default(true)
+  publishedAt   DateTime    @default(now())
+  categoryId    String
+  category      Category    @relation(fields: [categoryId], references: [id])
+  orderItems    OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([published])
+  @@index([publishedAt])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  reference       String      @unique
+  status          String      @default("PAID")
+  total           Decimal     @db.Decimal(10, 2)
+  paymentMethod   String      @default("demo")
+  paidAt          DateTime?
+  contactName     String      @default("")
+  contactEmail    String      @default("")
+  contactPhone    String      @default("")
+  contactAddress  String      @default("")
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  placedAt        DateTime    @default(now())
+
+  @@index([userId])
+  @@index([placedAt])
+  @@index([status])
+}
+
+model OrderItem {
+  id      String  @id @default(cuid())
+  qty     Int
+  price   Decimal @db.Decimal(10, 2)
+  orderId String
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  bookId  String
+  book    Book    @relation(fields: [bookId], references: [id])
+
+  @@index([orderId])
+  @@index([bookId])
+
+  @@unique([orderId, bookId])
+}
+
+model Donation {
+  id        String   @id @default(cuid())
+  reference String   @unique
+  amount    Decimal  @db.Decimal(10, 2)
+  method    String   @default("card")
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  at        DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Subscription {
+  id          String    @id @default(cuid())
+  reference   String    @unique
+  plan        String
+  period      String
+  nextBilling DateTime?
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  at          DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model ActionLog {
+  id      String   @id @default(cuid())
+  actorId String?
+  actor   User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  type    String
+  detail  String   @default("")
+  data    Json?
+  at      DateTime @default(now())
+
+  @@index([actorId])
+  @@index([type])
+}

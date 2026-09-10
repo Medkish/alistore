@@ -1,4 +1,9 @@
 node_modules/
-backend/data/*.json
+backend/data/
 *.log
 .env
+.env.local
+backend/.env
+frontend/.next/
+frontend/out/
+.DS_Store

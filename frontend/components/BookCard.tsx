@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/components/providers';
+import { formatAED } from '@/lib/format';
 
 interface BookCardProps {
   id: string;
@@ -19,7 +20,7 @@ export default function BookCard({ id, title, author, price, image, prevPrice, s
 
   return (
     <div className="bg-white rounded-2xl border border-line p-4 flex flex-col gap-3 text-center shadow-sm hover:shadow-lg transition group">
-      <div className="peer rounded-xl overflow-hidden bg-white">
+      <div className="rounded-xl overflow-hidden bg-white">
         <Link href={`/books/${id}/`}>
           <Image
             src={image}
@@ -36,18 +37,24 @@ export default function BookCard({ id, title, author, price, image, prevPrice, s
         </Link>
         <p className="text-xs text-muted">{author}</p>
         <div className="mt-1.5">
-          {prevPrice && <span className="text-muted line-through mr-2">{`$ ${prevPrice.toFixed(2)}`}</span>}
-          <span className={`font-extrabold ${sale ? 'text-red-600' : 'text-brand'}`}>
-            {`$ ${price.toFixed(2)}`}
-          </span>
+          {prevPrice && <span className="text-muted line-through mr-2">{formatAED(prevPrice)}</span>}
+          <span className={`font-extrabold ${sale ? 'text-red-600' : 'text-brand'}`}>{formatAED(price)}</span>
         </div>
       </div>
-      <button
-        onClick={() => add(title, price, image)}
-        className="btn-flash btn-primary-flash w-full text-sm py-2.5"
-      >
-        Add to Cart
-      </button>
+      <div className="flex gap-2">
+        <Link
+          href={`/books/${id}/`}
+          className="btn-flash btn-outline-flash text-brand border-brand flex-1 text-sm py-2.5"
+        >
+          View
+        </Link>
+        <button
+          onClick={() => add(id, title, price, image)}
+          className="btn-flash btn-primary-flash flex-1 text-sm py-2.5"
+        >
+          Add Cart
+        </button>
+      </div>
     </div>
   );
 }

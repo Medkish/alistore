@@ -21,35 +21,25 @@ export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-brand relative overflow-hidden">
-        <div className="mx-auto max-w-6xl px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
-          <div className="text-white relative z-10">
-            <span className="inline-block bg-accent text-brand text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
-              ★ Reader-powered
-            </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-6">
-              A reader-powered path for <span className="text-accent">Programming Languages</span> that fund change
-            </h1>
-            <p className="text-white/80 mb-8 text-base md:text-lg">
-              Browse best-selling titles. Every purchase supports the Alio &amp; Palma Cooperative and the communities it serves.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/books/" className="btn-flash btn-primary-flash">
-                Browse Books
-              </Link>
-              <Link href="/register/" className="btn-flash btn-outline-flash">
-                Create an Account
-              </Link>
-            </div>
-          </div>
-          <div className="relative flex justify-center md:justify-end">
-            <ImageCard book={CATALOG[0]} />
-          </div>
+      <section className="bg-brand relative overflow-hidden text-center">
+        <div className="mx-auto max-w-4xl px-4 py-16 md:py-24">
+          <span className="inline-block bg-accent text-brand text-xs font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
+            ★ Reader-powered
+          </span>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4 uppercase">
+            Online <span className="text-accent">Bookstore</span>
+          </h1>
+          <p className="text-white/80 mb-8 text-base md:text-lg">
+            Programming books that fund change. Every purchase supports the Alio &amp; Palma Cooperative.
+          </p>
+          <Link href="/books/" className="btn-flash btn-primary-flash">
+            Browse Books
+          </Link>
         </div>
       </section>
 
-      {/* Featured */}
-      <Section id="featured-books" title="Featured Books" tagline="Hand-picked for you">
+      {/* Popular Books */}
+      <Section id="featured-books" title="Popular Books" tagline="Readers' favourites">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {CATALOG.filter((b) => FEAT.includes(b.id)).map((b) => (
             <BookCard key={b.id} {...b} />
@@ -58,7 +48,7 @@ export default function HomePage() {
       </Section>
 
       {/* Best Sellers */}
-      <Section id="bestsellers" title="Bestsellers" tagline="Readers' favourites">
+      <Section id="bestsellers" title="Bestsellers" tagline="Hand-picked for you">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {CATALOG.filter((b) => BEST.includes(b.id)).map((b) => (
             <BookCard key={b.id} {...b} />
@@ -114,20 +104,5 @@ function Section({
         {children}
       </div>
     </section>
-  );
-}
-
-import Image from 'next/image';
-
-function ImageCard({ book }: { book: (typeof CATALOG)[0] }) {
-  return (
-    <div className="relative w-64 md:w-80 aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border border-white/20 group">
-      <Image
-        src={book.image}
-        alt={book.title}
-        fill
-        className="object-contain p-4 bg-white group-hover:scale-105 transition duration-500"
-      />
-    </div>
   );
 }

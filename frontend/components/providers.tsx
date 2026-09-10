@@ -11,9 +11,9 @@ interface CartContextValue {
   items: CartItem[];
   count: number;
   total: number;
-  add: (name: string, price: number, image?: string) => void;
-  setQty: (name: string, qty: number) => void;
-  remove: (name: string) => void;
+  add: (id: string, name: string, price: number, image?: string) => void;
+  setQty: (id: string, qty: number) => void;
+  remove: (id: string) => void;
   clear: () => void;
 }
 
@@ -42,22 +42,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [items]);
 
-  const add = useCallback((name: string, price: number, image?: string) => {
+  const add = useCallback((id: string, name: string, price: number, image?: string) => {
     setItems((prev) => {
-      const found = prev.find((i) => i.name === name);
-      if (found) return prev.map((i) => (i.name === name ? { ...i, qty: i.qty + 1 } : i));
-      return [...prev, { name, qty: 1, price, image }];
+      const found = prev.find((i) => i.id === id);
+      if (found) return prev.map((i) => (i.id === id ? { ...i, qty: i.qty + 1 } : i));
+      return [...prev, { id, name, qty: 1, price, image }];
     });
   }, []);
 
-  const setQty = useCallback((name: string, qty: number) => {
+  const setQty = useCallback((id: string, qty: number) => {
     setItems((prev) =>
-      qty <= 0 ? prev.filter((i) => i.name !== name) : prev.map((i) => (i.name === name ? { ...i, qty } : i)),
+      qty <= 0 ? prev.filter((i) => i.id !== id) : prev.map((i) => (i.id === id ? { ...i, qty } : i)),
     );
   }, []);
 
-  const remove = useCallback((name: string) => {
-    setItems((prev) => prev.filter((i) => i.name !== name));
+  const remove = useCallback((id: string) => {
+    setItems((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
   const clear = useCallback(() => {

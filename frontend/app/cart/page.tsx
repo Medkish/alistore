@@ -7,12 +7,22 @@ import QuantityStepper from '@/components/QuantityStepper';
 import { formatAED } from '@/lib/format';
 
 export default function CartPage() {
-  const { items, total, setQty, remove } = useCart();
+  const { items, total, setQty, remove, clear } = useCart();
 
   return (
     <section className="py-10 md:py-16">
       <div className="mx-auto max-w-3xl px-4">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-brand mb-8">Your Cart</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-brand">Your Cart</h1>
+          {items.length > 0 && (
+            <button
+              onClick={clear}
+              className="text-xs text-muted hover:text-red-600 underline font-semibold"
+            >
+              Clear Cart
+            </button>
+          )}
+        </div>
 
         {!items.length && (
           <div className="text-center py-16">
@@ -26,7 +36,7 @@ export default function CartPage() {
         <div className="flex flex-col gap-4">
           {items.map((it) => (
             <div
-              key={it.name}
+              key={it.id}
               className="bg-white border border-line rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center shadow-sm"
             >
               {it.image && (
@@ -35,14 +45,14 @@ export default function CartPage() {
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold">{it.name}</h3>
                 <p className="text-xs text-muted">{formatAED(it.price)} each</p>
-                <button onClick={() => remove(it.name)} className="text-xs text-muted hover:text-red-600 underline mt-1">
+                <button onClick={() => remove(it.id)} className="text-xs text-muted hover:text-red-600 underline mt-1">
                   Remove
                 </button>
               </div>
               <QuantityStepper
                 qty={it.qty}
-                onInc={() => setQty(it.name, it.qty + 1)}
-                onDec={() => setQty(it.name, it.qty - 1)}
+                onInc={() => setQty(it.id, it.qty + 1)}
+                onDec={() => setQty(it.id, it.qty - 1)}
               />
               <p className="font-extrabold text-brand whitespace-nowrap">{formatAED(it.qty * it.price)}</p>
             </div>

@@ -3,6 +3,7 @@ import type { Book } from '@/lib/types';
 export const CATALOG: Book[] = [
   { id: 'python', title: 'Python', author: 'Armor Ramsey', price: 40, image: '/images/programming1.jpeg', description: 'The friendliest path into programming — data, automation and scripting.', pages: 320, rating: 4.8 },
   { id: 'javascript', title: 'JavaScript', author: 'Armor Ramsey', price: 40, image: '/images/programming2.jpeg', description: 'Master the language of the web, from the DOM to modern async patterns.', pages: 340, rating: 4.7 },
+  { id: 'javascript-deep-dive', title: 'JavaScript Deep Dive', author: 'AlioStore', price: 29.99, image: '/images/product-item1.jpg', description: 'A deeper, hands-on journey through JavaScript — closures, the event loop, promises and performance.', pages: 410, rating: 4.9, prevPrice: 39.99 },
   { id: 'ruby', title: 'Ruby', author: 'Armor Ramsey', price: 40, image: '/images/programming3.jpeg', description: 'A beautiful, human-friendly language for building elegant products.', pages: 290, rating: 4.6 },
   { id: 'cpp', title: 'C++', author: 'Armor Ramsey', price: 35, image: '/images/programming4.jpeg', description: 'Performance-oriented programming with control at every level.', pages: 380, rating: 4.5 },
   { id: 'swift', title: 'Swift', author: 'Armor Ramsey', price: 40, image: '/images/programming5.jpeg', description: 'Build modern iOS and macOS apps with confidence and safety.', pages: 310, rating: 4.7 },

@@ -1,25 +1,42 @@
 {
   "name": "alistore-backend",
-  "version": "1.0.0",
-  "description": "AlioStore API - auth, cart, orders, donations and subscriptions",
-  "main": "server.js",
+  "version": "2.0.0",
+  "description": "AlioStore API - Node.js + Express + Prisma + PostgreSQL",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:push": "prisma db push",
+    "prisma:seed": "node prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "keywords": [
     "alistore",
     "books",
     "api",
-    "express"
+    "express",
+    "prisma",
+    "postgresql"
   ],
   "engines": {
-    "node": ">=16"
+    "node": ">=18.18"
   },
   "license": "MIT",
   "dependencies": {
+    "@prisma/client": "^6.7.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "multer": "^2.3.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.7.0"
   }
 }

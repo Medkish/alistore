@@ -11,7 +11,7 @@ import type { Book } from '@/lib/types';
 export default function BookDetailsClient({ book }: { book: Book }) {
   const { add, items } = useCart();
   const [qty, setQty] = useState(1);
-  const inCart = items.find((i) => i.name === book.title)?.qty ?? 0;
+  const inCart = items.find((i) => i.id === book.id)?.qty ?? 0;
 
   return (
     <section className="py-10 md:py-16">
@@ -53,7 +53,7 @@ export default function BookDetailsClient({ book }: { book: Book }) {
             />
             <button
               onClick={() => {
-                for (let i = 0; i < qty; i++) add(book.title, book.price, book.image);
+                for (let i = 0; i < qty; i++) add(book.id, book.title, book.price, book.image);
               }}
               className="btn-flash btn-primary-flash"
             >
