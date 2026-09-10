@@ -23,4 +23,17 @@ router.patch('/orders/:id/status', admin.updateOrderStatus);
 
 router.get('/users', admin.listUsers);
 
+router.get('/categories', admin.listCategories);
+router.post('/categories', admin.createCategory);
+router.put('/categories/:slug', admin.updateCategory);
+router.delete('/categories/:slug', admin.deleteCategory);
+
+router.get('/discounts', admin.listDiscounts);
+router.post('/discounts', admin.createDiscount);
+router.patch('/discounts/:id', admin.updateDiscount);
+router.delete('/discounts/:id', admin.deleteDiscount);
+
+router.get('/reviews', admin.listReviews);
+router.patch('/reviews/:id', admin.moderateReview);
+
 module.exports = router;

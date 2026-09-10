@@ -5,24 +5,30 @@ import type { CartItem, User } from '@/lib/types';
 import { api, setToken } from '@/lib/api';
 
 const CART_KEY = 'alistore_cart';
+const CART_SAVED_KEY = 'alistore_cart_saved';
+const WISHLIST_KEY = 'alistore_wishlist';
 const USER_KEY = 'alistore_user';
 
 interface CartContextValue {
   items: CartItem[];
+  saved: CartItem[];
   count: number;
   total: number;
   add: (id: string, name: string, price: number, image?: string) => void;
   setQty: (id: string, qty: number) => void;
   remove: (id: string) => void;
   clear: () => void;
+  saveForLater: (id: string) => void;
+  moveToCart: (id: string) => void;
+  removeSaved: (id: string) => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-function readCart(): CartItem[] {
+function readList(key: string): CartItem[] {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = window.localStorage.getItem(CART_KEY);
+    const raw = window.localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as CartItem[]) : [];
   } catch {
     return [];
@@ -31,9 +37,11 @@ function readCart(): CartItem[] {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [saved, setSaved] = useState<CartItem[]>([]);
 
   useEffect(() => {
-    setItems(readCart());
+    setItems(readList(CART_KEY));
+    setSaved(readList(CART_SAVED_KEY));
   }, []);
 
   useEffect(() => {
@@ -41,6 +49,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.setItem(CART_KEY, JSON.stringify(items));
     }
   }, [items]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(CART_SAVED_KEY, JSON.stringify(saved));
+    }
+  }, [saved]);
 
   const add = useCallback((id: string, name: string, price: number, image?: string) => {
     setItems((prev) => {
@@ -64,11 +78,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems([]);
   }, []);
 
+  const saveForLater = useCallback((id: string) => {
+    setItems((prev) => {
+      const item = prev.find((i) => i.id === id);
+      if (item) setSaved((s) => [...s, { ...item }]);
+      return prev.filter((i) => i.id !== id);
+    });
+  }, []);
+
+  const moveToCart = useCallback((id: string) => {
+    setSaved((prev) => {
+      const item = prev.find((i) => i.id === id);
+      if (item) setItems((cur) => [...cur, { ...item, qty: 1 }]);
+      return prev.filter((i) => i.id !== id);
+    });
+  }, []);
+
+  const removeSaved = useCallback((id: string) => {
+    setSaved((prev) => prev.filter((i) => i.id !== id));
+  }, []);
+
   const count = useMemo(() => items.reduce((s, i) => s + i.qty, 0), [items]);
   const total = useMemo(() => items.reduce((s, i) => s + i.qty * i.price, 0), [items]);
 
   return (
-    <CartContext.Provider value={{ items, count, total, add, setQty, remove, clear }}>
+    <CartContext.Provider
+      value={{ items, saved, count, total, add, setQty, remove, clear, saveForLater, moveToCart, removeSaved }}
+    >
       {children}
     </CartContext.Provider>
   );
@@ -77,6 +113,53 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 export function useCart(): CartContextValue {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCart must be used within CartProvider');
+  return ctx;
+}
+
+/* ----------------------- Wishlist ----------------------- */
+
+interface WishlistContextValue {
+  ids: string[];
+  toggle: (id: string) => void;
+  has: (id: string) => boolean;
+  count: number;
+  clear: () => void;
+}
+
+const WishlistContext = createContext<WishlistContextValue | null>(null);
+
+export function WishlistProvider({ children }: { children: React.ReactNode }) {
+  const [ids, setIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(WISHLIST_KEY);
+      if (raw) setIds(JSON.parse(raw) as string[]);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(ids));
+  }, [ids]);
+
+  const toggle = useCallback((id: string) => {
+    setIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }, []);
+
+  const has = useCallback((id: string) => ids.includes(id), [ids]);
+  const clear = useCallback(() => setIds([]), []);
+  const count = ids.length;
+
+  return <WishlistContext.Provider value={{ ids, toggle, has, count, clear }}>{children}</WishlistContext.Provider>;
+}
+
+export function useWishlist(): WishlistContextValue {
+  const ctx = useContext(WishlistContext);
+  if (!ctx) throw new Error('useWishlist must be used within WishlistProvider');
   return ctx;
 }
 

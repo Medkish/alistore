@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart, useAuth } from '@/components/providers';
+import { api } from '@/lib/api';
 import { formatAED } from '@/lib/format';
+import type { NotificationItem } from '@/lib/types';
 
 export default function Header() {
   const { count, total } = useCart();
@@ -12,6 +14,45 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const router = useRouter();
+  const [notifs, setNotifs] = useState<NotificationItem[]>([]);
+  const [unread, setUnread] = useState(0);
+  const [bellOpen, setBellOpen] = useState(false);
+  const bellRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let cancel = false;
+    if (user) {
+      api
+        .getNotifications()
+        .then((r) => {
+          if (cancel) return;
+          setNotifs(r.notifications);
+          setUnread(r.unread);
+        })
+        .catch(() => undefined);
+    }
+    return () => {
+      cancel = true;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (bellRef.current && !bellRef.current.contains(e.target as Node)) setBellOpen(false);
+    }
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, []);
+
+  async function markAllRead() {
+    try {
+      const r = await api.markNotificationsRead();
+      setNotifs(r.notifications);
+      setUnread(r.unread);
+    } catch {
+      /* offline */
+    }
+  }
 
   const nav = [
     { href: '/', label: 'Home' },
@@ -94,6 +135,52 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3 ml-auto lg:ml-0">
+            {user && (
+              <div className="relative" ref={bellRef}>
+                <button
+                  onClick={() => setBellOpen((b) => !b)}
+                  className="relative shrink-0 text-xl hover:opacity-80"
+                  aria-label="Notifications"
+                >
+                  🔔
+                  {unread > 0 && (
+                    <span className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-[10px] font-bold px-1.5">
+                      {unread}
+                    </span>
+                  )}
+                </button>
+                {bellOpen && (
+                  <div className="absolute right-0 mt-3 w-80 max-w-[90vw] bg-white border border-line rounded-2xl shadow-xl p-2 z-50">
+                    <div className="flex items-center justify-between px-2 py-1">
+                      <p className="text-sm font-extrabold text-brand">Notifications</p>
+                      {unread > 0 && (
+                        <button onClick={markAllRead} className="text-xs text-accent-dark font-bold hover:underline">
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    {notifs.length === 0 ? (
+                      <p className="text-xs text-muted px-2 py-4 text-center">No notifications yet.</p>
+                    ) : (
+                      <div className="max-h-72 overflow-y-auto">
+                        {notifs.map((n) => (
+                          <div
+                            key={n.id}
+                            className={`px-2 py-2 rounded-xl text-sm ${n.read ? 'opacity-60' : 'bg-accent/10'}`}
+                          >
+                            <p className="font-bold text-ink">{n.title}</p>
+                            <p className="text-xs text-muted">{n.message}</p>
+                            <p className="text-[10px] text-muted mt-1">
+                              {new Date(n.at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
             <Link href="/cart/" className="flex items-center gap-2 hover:opacity-80">
               <span className="relative shrink-0">
                 🛒

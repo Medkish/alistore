@@ -2,6 +2,23 @@ const orderService = require('../services/order.service');
 
 const PHONE_RE = /^[+0-9 ()-]{6,20}$/;
 
+const PAYMENT_METHODS = [
+  'credit-card',
+  'debit-card',
+  'paypal',
+  'apple-pay',
+  'google-pay',
+  'atm',
+  'bank-transfer',
+  'cash-on-delivery',
+  'demo'
+];
+
+function cleanPaymentMethod(v) {
+  const raw = String(v || '').toLowerCase().trim();
+  return PAYMENT_METHODS.includes(raw) ? raw : 'demo';
+}
+
 /* Validate checkout input on the server before trusting anything. */
 function validateShipping(s) {
   const shipping = s && typeof s === 'object' ? s : {};
@@ -25,7 +42,8 @@ async function create(req, res) {
   try {
     const order = await orderService.create(req.user.id, rawItems, {
       shipping,
-      paymentMethod: String((req.body && req.body.paymentMethod) || 'demo').trim() || 'demo'
+      paymentMethod: cleanPaymentMethod(req.body && req.body.paymentMethod),
+      coupon: String((req.body && req.body.coupon) || '').trim()
     });
     res.status(201).json({ order });
   } catch (err) {

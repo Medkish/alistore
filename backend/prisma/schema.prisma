@@ -20,6 +20,8 @@ model User {
   donations     Donation[]
   subscriptions Subscription[]
   actions       ActionLog[]
+  reviews       Review[]
+  notifications Notification[]
   createdAt     DateTime       @default(now())
 
   @@index([email])
@@ -57,9 +59,19 @@ model Book {
   bestseller    Boolean     @default(false)
   published     Boolean     @default(true)
   publishedAt   DateTime    @default(now())
+  isbn          String      @default("")
+  publisher     String      @default("AlioStore Publishing")
+  language      String      @default("English")
+  edition       String      @default("1st Edition")
+  format        String      @default("EPUB + PDF")
+  pages         Int?
+  toc           Json?
+  samplePath    String      @default("")
+  contentPath   String      @default("")
   categoryId    String
   category      Category    @relation(fields: [categoryId], references: [id])
   orderItems    OrderItem[]
+  reviews       Review[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
@@ -75,6 +87,8 @@ model Order {
   total           Decimal     @db.Decimal(10, 2)
   paymentMethod   String      @default("demo")
   paidAt          DateTime?
+  couponCode      String      @default("")
+  discountAmount  Decimal     @default(0) @db.Decimal(10, 2)
   contactName     String      @default("")
   contactEmail    String      @default("")
   contactPhone    String      @default("")
@@ -140,4 +154,48 @@ model ActionLog {
 
   @@index([actorId])
   @@index([type])
+}
+
+model Discount {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  type      String   @default("PERCENT") // PERCENT | FIXED
+  value     Decimal  @db.Decimal(10, 2)
+  minOrder  Decimal  @default(0) @db.Decimal(10, 2)
+  active    Boolean  @default(true)
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  text      String   @default("")
+  status    String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, bookId])
+  @@index([bookId])
+  @@index([status])
+}
+
+model Notification {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type    String
+  title   String
+  message String   @default("")
+  read    Boolean  @default(false)
+  at      DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
 }

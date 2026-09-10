@@ -11,11 +11,14 @@ import {
   type AdminStats,
   type AdminUser,
   type Book,
+  type CategoryItem,
+  type DiscountItem,
   type Order,
   type OrderStatus,
 } from '@/lib/types';
 
-type Tab = 'overview' | 'books' | 'orders' | 'users';
+type Tab = 'overview' | 'books' | 'categories' | 'inventory' | 'orders' | 'users' | 'discounts' | 'reviews' | 'reports';
+const TABS: Tab[] = ['overview', 'books', 'categories', 'inventory', 'orders', 'users', 'discounts', 'reviews', 'reports'];
 
 interface BookRow extends Book {}
 
@@ -31,6 +34,20 @@ const EMPTY_FORM = {
   bestseller: false,
   prevPrice: '',
 };
+
+function stockBadge(stock: number | undefined) {
+  if (stock === 0) return <span className="text-xs font-bold text-red-600">🔴 Out of Stock</span>;
+  if ((stock ?? 0) <= 10) return <span className="text-xs font-bold text-amber-600">🟡 Low Stock · {stock}</span>;
+  return <span className="text-xs font-bold text-green-700">🟢 In Stock · {stock}</span>;
+}
+
+function Stars({ n, size = 'text-sm' }: { n: number; size?: string }) {
+  return (
+    <span className={`${size} text-amber-500`}>
+      {[1, 2, 3, 4, 5].map((i) => (i <= Math.round(n) ? '★' : '☆'))}
+    </span>
+  );
+}
 
 export default function AdminPage() {
   const { user, login } = useAuth();
@@ -91,7 +108,7 @@ export default function AdminPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-brand">Admin Dashboard</h1>
-            <p className="text-sm text-muted">Manage books, orders, customers and store revenue.</p>
+            <p className="text-sm text-muted">Manage books, inventory, categories, coupons, reviews, orders, customers and reports.</p>
           </div>
           <span className="bg-brand text-accent text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wide">
             {user?.role}
@@ -99,7 +116,7 @@ export default function AdminPage() {
         </div>
 
         <div className="flex gap-2 mb-6 overflow-x-auto">
-          {(['overview', 'books', 'orders', 'users'] as Tab[]).map((t) => (
+          {TABS.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -113,9 +130,14 @@ export default function AdminPage() {
         </div>
 
         {tab === 'overview' && <Overview onGoOrders={() => setTab('orders')} onGoBooks={() => setTab('books')} />}
-        {tab === 'books' && <BooksTab />}
+        {tab === 'books' && <BooksTab onGoInventory={() => setTab('inventory')} />}
+        {tab === 'categories' && <CategoriesTab />}
+        {tab === 'inventory' && <InventoryTab />}
         {tab === 'orders' && <OrdersTab />}
         {tab === 'users' && <UsersTab />}
+        {tab === 'discounts' && <DiscountsTab />}
+        {tab === 'reviews' && <ReviewsTab />}
+        {tab === 'reports' && <ReportsTab />}
       </div>
     </section>
   );
@@ -138,10 +160,10 @@ function Overview({ onGoOrders, onGoBooks }: { onGoOrders: () => void; onGoBooks
 
   const cards = stats
     ? [
+        { label: 'Orders', value: formatNumber(stats.paidOrderCount), accent: true },
+        { label: 'Revenue', value: formatAED(stats.revenue), accent: true },
         { label: 'Books', value: formatNumber(stats.bookCount), accent: false },
-        { label: 'Units in Stock', value: formatNumber(stats.stockTotal), accent: false },
         { label: 'Customers', value: formatNumber(stats.userCount), accent: false },
-        { label: 'Revenue (paid)', value: formatAED(stats.revenue), accent: true },
       ]
     : [];
 
@@ -210,7 +232,7 @@ function Overview({ onGoOrders, onGoBooks }: { onGoOrders: () => void; onGoBooks
 
 /* --------------------- Books --------------------- */
 
-function BooksTab() {
+function BooksTab({ onGoInventory }: { onGoInventory?: () => void }) {
   const [books, setBooks] = useState<BookRow[] | null>(null);
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
@@ -380,7 +402,13 @@ function BooksTab() {
       <div className="lg:col-span-3 bg-white border border-line rounded-2xl p-6 shadow-sm w-full">
         <div className="flex items-center justify-between mb-4 gap-2">
           <h2 className="font-bold text-ink">Books ({books ? books.length : '…'})</h2>
-          <input
+          <div className="flex items-center gap-2">
+            {onGoInventory && (
+              <button onClick={onGoInventory} className="text-xs font-bold text-accent-dark hover:underline shrink-0">
+                Go to Inventory →
+              </button>
+            )}
+            <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search admin catalog..."
@@ -418,6 +446,7 @@ function BooksTab() {
             );
           })}
         </div>
+      </div>
       </div>
     </div>
   );
@@ -552,6 +581,558 @@ function UsersTab() {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* --------------------- Categories --------------------- */
+
+function CategoriesTab() {
+  const [cats, setCats] = useState<CategoryItem[] | null>(null);
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState('');
+
+  const load = useCallback(() => {
+    api
+      .adminCategories()
+      .then((res) => setCats(res.categories))
+      .catch((e) => setError((e as Error).message));
+  }, []);
+
+  useEffect(load, [load]);
+
+  async function add() {
+    if (!name.trim()) return;
+    setError('');
+    try {
+      await api.adminCreateCategory(name.trim());
+      setName('');
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function rename(c: CategoryItem) {
+    const next = window.prompt('Rename category:', c.name);
+    if (!next || next.trim() === c.name) return;
+    try {
+      await api.adminUpdateCategory(c.slug, next.trim());
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function remove(c: CategoryItem) {
+    if (!window.confirm(`Delete category "${c.name}"?`)) return;
+    setBusy(c.id);
+    try {
+      await api.adminDeleteCategory(c.slug);
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+    setBusy('');
+  }
+
+  return (
+    <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+      <div className="flex flex-wrap items-end gap-3 mb-6">
+        <div className="flex-1 min-w-[220px]">
+          <h2 className="font-bold text-ink mb-2">New Category</h2>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && add()}
+            placeholder="e.g. Web Development"
+            className="w-full border-2 border-line rounded-xl px-3 py-2 text-sm focus:border-brand focus:outline-none"
+          />
+        </div>
+        <button onClick={add} className="btn-flash btn-primary-flash">Add Category</button>
+      </div>
+      {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3 mb-4">{error}</p>}
+      <div className="flex flex-col gap-2">
+        {cats === null && <p className="text-sm text-muted">Loading categories…</p>}
+        {cats?.map((c) => (
+          <div key={c.id} className="flex flex-wrap justify-between items-center gap-2 text-sm border-b border-line last:border-0 pb-2">
+            <div>
+              <p className="font-bold text-ink">{c.name}</p>
+              <p className="text-xs text-muted">/{c.slug} · {c.booksCount} book(s)</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button onClick={() => rename(c)} className="text-xs font-bold text-brand hover:underline">Rename</button>
+              <button
+                onClick={() => remove(c)}
+                disabled={busy === c.id}
+                className="text-xs font-bold text-red-600 hover:underline disabled:opacity-50"
+              >
+                {busy === c.id ? '…' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* --------------------- Inventory --------------------- */
+
+function InventoryTab() {
+  const [books, setBooks] = useState<BookRow[] | null>(null);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState('');
+  const [prices, setPrices] = useState<Record<string, string>>({});
+
+  const load = useCallback(() => {
+    api
+      .adminBooks()
+      .then((res) => {
+        setBooks(res.books);
+        const p: Record<string, string> = {};
+        res.books.forEach((b) => (p[b.slug || b.id] = String(b.price)));
+        setPrices(p);
+      })
+      .catch((e) => setError((e as Error).message));
+  }, []);
+
+  useEffect(load, [load]);
+
+  async function adjust(slug: string, delta: number) {
+    setBusy(slug);
+    try {
+      const b = books?.find((x) => (x.slug || x.id) === slug);
+      await api.adminUpdateBook(slug, { stock: Math.max(0, (b?.stock ?? 0) + delta) });
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+    setBusy('');
+  }
+
+  async function savePrice(slug: string) {
+    const v = Number(prices[slug]);
+    if (!Number.isFinite(v) || v <= 0) return;
+    setBusy(slug);
+    try {
+      await api.adminUpdateBook(slug, { price: v });
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+    setBusy('');
+  }
+
+  const out = books?.filter((b) => (b.stock ?? 0) === 0).length ?? 0;
+  const low = books?.filter((b) => (b.stock ?? 0) > 0 && (b.stock ?? 0) <= 10).length ?? 0;
+  const healthy = books ? books.length - out - low : 0;
+
+  return (
+    <div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+        <div className="bg-white border border-line rounded-2xl p-4 shadow-sm">
+          <p className="text-xs text-muted font-semibold uppercase">Total Titles</p>
+          <p className="text-xl font-extrabold text-brand">{books ? books.length : '…'}</p>
+        </div>
+        <div className="bg-white border border-green-200 rounded-2xl p-4 shadow-sm">
+          <p className="text-xs text-muted font-semibold uppercase">🟢 In Stock</p>
+          <p className="text-xl font-extrabold text-green-700">{books ? healthy : '…'}</p>
+        </div>
+        <div className="bg-white border border-amber-300 rounded-2xl p-4 shadow-sm">
+          <p className="text-xs text-muted font-semibold uppercase">🟡 Low Stock</p>
+          <p className="text-xl font-extrabold text-amber-600">{books ? low : '…'}</p>
+        </div>
+        <div className="bg-white border border-red-300 rounded-2xl p-4 shadow-sm">
+          <p className="text-xs text-muted font-semibold uppercase">🔴 Out of Stock</p>
+          <p className="text-xl font-extrabold text-red-600">{books ? out : '…'}</p>
+        </div>
+      </div>
+
+      {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-4 mb-4">{error}</p>}
+
+      <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+        <h2 className="font-bold text-ink mb-4">Stock Levels</h2>
+        <div className="flex flex-col gap-2">
+          {books === null && <p className="text-sm text-muted">Loading inventory…</p>}
+          {books?.map((b) => {
+            const slug = b.slug || b.id;
+            return (
+              <div key={slug} className="flex flex-wrap items-center gap-3 border-b border-line last:border-0 py-2">
+                <Image src={b.image} alt={b.title} width={32} height={43} className="object-contain rounded" />
+                <div className="flex-1 min-w-[140px]">
+                  <p className="font-bold text-sm truncate">{b.title}</p>
+                  <p className="text-xs text-muted truncate">{b.author}</p>
+                </div>
+                <div className="w-28 text-right">{stockBadge(b.stock)}</div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => adjust(slug, -1)}
+                    disabled={busy === slug || (b.stock ?? 0) <= 0}
+                    className="w-8 h-8 rounded-lg border border-line font-bold text-ink hover:border-brand disabled:opacity-40"
+                  >
+                    −
+                  </button>
+                  <button
+                    onClick={() => adjust(slug, 1)}
+                    disabled={busy === slug}
+                    className="w-8 h-8 rounded-lg border border-line font-bold text-ink hover:border-brand disabled:opacity-40"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    value={prices[slug] ?? ''}
+                    onChange={(e) => setPrices((p) => ({ ...p, [slug]: e.target.value }))}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="w-20 border-2 border-line rounded-lg px-2 py-1 text-sm focus:border-brand focus:outline-none"
+                  />
+                  <button
+                    onClick={() => savePrice(slug)}
+                    disabled={busy === slug}
+                    className="text-xs font-bold text-brand hover:underline disabled:opacity-50"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* --------------------- Discounts / Coupons --------------------- */
+
+function DiscountsTab() {
+  const [discounts, setDiscounts] = useState<DiscountItem[] | null>(null);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({ code: '', type: 'PERCENT', value: '10', minOrder: '0' });
+  const [busy, setBusy] = useState('');
+
+  const load = useCallback(() => {
+    api
+      .adminDiscounts()
+      .then((res) => setDiscounts(res.discounts))
+      .catch((e) => setError((e as Error).message));
+  }, []);
+
+  useEffect(load, [load]);
+
+  async function add() {
+    setError('');
+    try {
+      await api.adminCreateDiscount({
+        code: form.code,
+        type: form.type,
+        value: Number(form.value),
+        minOrder: Number(form.minOrder),
+      });
+      setForm({ code: '', type: 'PERCENT', value: '10', minOrder: '0' });
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function toggle(d: DiscountItem) {
+    try {
+      await api.adminUpdateDiscount(d.id, { active: !d.active });
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function remove(d: DiscountItem) {
+    if (!window.confirm(`Delete coupon ${d.code}?`)) return;
+    setBusy(d.id);
+    try {
+      await api.adminDeleteDiscount(d.id);
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+    setBusy('');
+  }
+
+  return (
+    <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+      <h2 className="font-bold text-ink mb-4">Discount / Coupon System</h2>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+        <input
+          value={form.code}
+          onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
+          placeholder="CODE e.g. ALIO10"
+          className="border-2 border-line rounded-xl px-3 py-2 text-sm uppercase focus:border-brand focus:outline-none"
+        />
+        <select
+          value={form.type}
+          onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
+          className="border-2 border-line rounded-xl px-3 py-2 text-sm bg-white focus:border-brand focus:outline-none"
+        >
+          <option value="PERCENT">Percent (%)</option>
+          <option value="FIXED">Fixed (AED)</option>
+        </select>
+        <input
+          value={form.value}
+          onChange={(e) => setForm((f) => ({ ...f, value: e.target.value }))}
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder={form.type === 'PERCENT' ? '% off' : 'AED off'}
+          className="border-2 border-line rounded-xl px-3 py-2 text-sm focus:border-brand focus:outline-none"
+        />
+        <input
+          value={form.minOrder}
+          onChange={(e) => setForm((f) => ({ ...f, minOrder: e.target.value }))}
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Min order (AED 0)"
+          className="border-2 border-line rounded-xl px-3 py-2 text-sm focus:border-brand focus:outline-none"
+        />
+        <button onClick={add} className="btn-flash btn-primary-flash">Create Coupon</button>
+      </div>
+
+      {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3 mb-4">{error}</p>}
+
+      <div className="flex flex-col gap-2">
+        {discounts === null && <p className="text-sm text-muted">Loading coupons…</p>}
+        {discounts?.map((d) => {
+          const eff = d.type === 'PERCENT' ? (d.value >= 100 ? 100 : d.value) : Math.min(d.value, 100);
+          return (
+            <div key={d.id} className="flex flex-wrap justify-between items-center gap-2 text-sm border-b border-line last:border-0 pb-2">
+              <div>
+                <p className="font-bold text-ink">
+                  {d.code}{' '}
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border ${
+                    d.active ? 'bg-green-50 text-green-700 border-green-300' : 'bg-slate-100 text-slate-500 border-slate-300'
+                  }`}>
+                    {d.active ? 'ACTIVE' : 'PAUSED'}
+                  </span>
+                </p>
+                <p className="text-xs text-muted">
+                  {d.type === 'PERCENT' ? `${d.value}% off` : `AED ${d.value} off`} · min order {formatAED(d.minOrder)} · e.g. AED 100 → −{formatAED(eff)} → {formatAED(100 - eff)}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={() => toggle(d)} className="text-xs font-bold text-accent-dark hover:underline">
+                  {d.active ? 'Pause' : 'Activate'}
+                </button>
+                <button
+                  onClick={() => remove(d)}
+                  disabled={busy === d.id}
+                  className="text-xs font-bold text-red-600 hover:underline disabled:opacity-50"
+                >
+                  {busy === d.id ? '…' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {discounts && discounts.length === 0 && (
+        <p className="text-sm text-muted mt-3">No coupons yet. Create e.g. <strong>ALIO10</strong> for 10% off.</p>
+      )}
+    </div>
+  );
+}
+
+/* --------------------- Reviews --------------------- */
+
+function ReviewsTab() {
+  const [rows, setRows] = useState<{ id: string; rating: number; text: string; status: string; createdAt: string; book: { slug: string; title: string; image: string } | null; user: { id: string; name: string; email: string } | null }[] | null>(null);
+  const [pending, setPending] = useState(0);
+  const [filter, setFilter] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState('');
+
+  const load = useCallback(() => {
+    api
+      .adminReviews(filter || undefined)
+      .then((res) => {
+        setRows(res.reviews);
+        setPending(res.pending);
+      })
+      .catch((e) => setError((e as Error).message));
+  }, [filter]);
+
+  useEffect(load, [load]);
+
+  async function moderate(id: string, status: 'APPROVED' | 'REJECTED') {
+    setBusy(id);
+    try {
+      await api.adminModerateReview(id, status);
+      load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+    setBusy('');
+  }
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-5 overflow-x-auto">
+        {['', 'PENDING', 'APPROVED', 'REJECTED'].map((s) => (
+          <button
+            key={s || 'ALL'}
+            onClick={() => setFilter(s)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition ${
+              filter === s ? 'bg-brand text-white' : 'bg-white border border-line text-ink'
+            }`}
+          >
+            {s || 'All'}
+            {s === 'PENDING' && pending > 0 && <span className="ml-1.5 bg-amber-400 text-brand rounded-full px-1.5 text-[10px]">{pending}</span>}
+          </button>
+        ))}
+      </div>
+      {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-4 mb-4">{error}</p>}
+      <div className="flex flex-col gap-3">
+        {rows === null && <p className="text-sm text-muted">Loading reviews…</p>}
+        {rows && !rows.length && <p className="text-sm text-muted">No reviews here.</p>}
+        {rows?.map((r) => (
+          <div key={r.id} className="bg-white border border-line rounded-2xl p-5 shadow-sm">
+            <div className="flex flex-wrap justify-between gap-2 mb-1">
+              <div>
+                <p className="font-bold text-ink text-sm">{r.book?.title || 'Book'}</p>
+                <p className="text-xs text-muted">
+                  {r.user?.name} ({r.user?.email}) · <Stars n={r.rating} /> {r.rating}/5 · {new Date(r.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border self-start ${
+                r.status === 'APPROVED'
+                  ? 'bg-green-50 text-green-700 border-green-300'
+                  : r.status === 'REJECTED'
+                    ? 'bg-red-50 text-red-600 border-red-300'
+                    : 'bg-amber-50 text-amber-700 border-amber-300'
+              }`}>
+                {r.status}
+              </span>
+            </div>
+            {r.text && <p className="text-sm text-ink mt-2">{r.text}</p>}
+            {r.status !== 'APPROVED' && (
+              <div className="flex gap-2 mt-3">
+                <button onClick={() => moderate(r.id, 'APPROVED')} disabled={busy === r.id} className="text-xs font-bold bg-green-600 text-white rounded-lg px-3 py-1.5 hover:bg-green-700 disabled:opacity-50">
+                  ✓ Approve
+                </button>
+                <button onClick={() => moderate(r.id, 'REJECTED')} disabled={busy === r.id} className="text-xs font-bold bg-red-500 text-white rounded-lg px-3 py-1.5 hover:bg-red-600 disabled:opacity-50">
+                  ✕ Reject
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* --------------------- Reports --------------------- */
+
+function ReportsTab() {
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [orders, setOrders] = useState<Order[] | null>(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    Promise.all([api.adminStats(), api.adminOrders()])
+      .then(([s, o]) => {
+        setStats(s);
+        setOrders(o.orders);
+      })
+      .catch((e) => setError((e as Error).message));
+  }, []);
+
+  if (error) return <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-4">{error}</p>;
+
+  const paid = (orders || []).filter((o) => !['CANCELLED', 'PLACED'].includes(o.status || ''));
+  const revenue = stats?.revenue ?? paid.reduce((s, o) => s + o.total, 0);
+  const avg = paid.length ? revenue / paid.length : 0;
+
+  const days: { label: string; sum: number }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toDateString();
+    const sum = paid
+      .filter((o) => o.placedAt && new Date(o.placedAt).toDateString() === key)
+      .reduce((s, o) => s + o.total, 0);
+    days.push({ label: d.toLocaleDateString(undefined, { weekday: 'short' }), sum: Math.round(sum) });
+  }
+  const maxDay = Math.max(1, ...days.map((d) => d.sum));
+
+  const statusCounts = ORDER_STATUSES.map((s) => ({
+    status: s,
+    count: (orders || []).filter((o) => o.status === s).length,
+  }));
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        {[
+          { label: 'Total Orders', value: formatNumber(orders?.length || 0) },
+          { label: 'Total Revenue', value: formatAED(stats?.revenue || 0) },
+          { label: 'Avg Order (AED)', value: avg ? formatAED(avg) : '—' },
+          { label: 'Books', value: formatNumber(stats?.bookCount || 0) },
+          { label: 'Customers', value: formatNumber(stats?.userCount || 0) },
+        ].map((c) => (
+          <div key={c.label} className="bg-white border border-line rounded-2xl p-4 shadow-sm">
+            <p className="text-xs text-muted font-semibold uppercase tracking-wide">{c.label}</p>
+            <p className="text-xl font-extrabold text-brand mt-1">{c.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-5">
+        <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+          <h2 className="font-bold text-ink mb-2">Revenue — last 7 days</h2>
+          {orders === null ? (
+            <p className="text-sm text-muted">Loading…</p>
+          ) : (
+            <div className="flex items-end gap-3 h-40 mt-4">
+              {days.map((d) => (
+                <div key={d.label} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                  <span className="text-[10px] text-muted">{d.sum > 0 ? formatAED(d.sum) : ''}</span>
+                  <div
+                    className="w-full max-w-[40px] rounded-t-md bg-gradient-to-t from-accent to-accent-dark"
+                    style={{ height: `${Math.max(4, (d.sum / maxDay) * 100)}%` }}
+                  />
+                  <span className="text-[10px] text-muted">{d.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-muted mt-4">Based on orders in paid states (PAID / PROCESSING / SHIPPED / DELIVERED).</p>
+        </div>
+
+        <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+          <h2 className="font-bold text-ink mb-4">Orders by status</h2>
+          <div className="flex flex-col gap-2">
+            {statusCounts.map((s) => {
+              const total = orders?.length || 1;
+              const pct = Math.round(((s.count || 0) / total) * 100);
+              return (
+                <div key={s.status}>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="font-bold text-ink">{s.status}</span>
+                    <span className="text-muted">{s.count} · {pct}%</span>
+                  </div>
+                  <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-brand rounded-full" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

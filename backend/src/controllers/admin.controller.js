@@ -1,6 +1,22 @@
 const prisma = require('../lib/prisma');
 const bookService = require('../services/book.service');
 const orderService = require('../services/order.service');
+const notificationsService = require('../services/notifications.service');
+
+function slugify(s) {
+  return String(s || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function cleanCode(s) {
+  return String(s || '')
+    .toUpperCase()
+    .trim()
+    .replace(/\s+/g, '');
+}
 
 function num(v, fallback) {
   const n = Number(v);
@@ -118,4 +134,174 @@ async function uploadCover(req, res) {
   res.json({ url, filename: req.file.filename });
 }
 
-module.exports = { stats, listBooks, createBook, updateBook, deleteBook, listOrders, updateOrderStatus, listUsers, uploadCover };
+function serializeCategory(c) {
+  return { id: c.id, slug: c.slug, name: c.name, booksCount: c._count ? c._count.books : 0 };
+}
+
+async function listCategories(req, res) {
+  const cats = await prisma.category.findMany({ include: { _count: { select: { books: true } } }, orderBy: { name: 'asc' } });
+  res.json({ categories: cats.map(serializeCategory) });
+}
+
+async function createCategory(req, res) {
+  const name = String((req.body && req.body.name) || '').trim();
+  if (!name) return res.status(400).json({ error: 'Category name is required.' });
+  const slug = slugify(name);
+  const existing = await prisma.category.findUnique({ where: { slug } });
+  if (existing) return res.status(409).json({ error: 'A category with that name already exists.' });
+  const cat = await prisma.category.create({ data: { name, slug } });
+  res.status(201).json({ category: serializeCategory(cat) });
+}
+
+async function updateCategory(req, res) {
+  const existing = await prisma.category.findUnique({ where: { slug: req.params.slug } });
+  if (!existing) return res.status(404).json({ error: 'Category not found.' });
+  const name = String((req.body && req.body.name) || '').trim();
+  if (!name) return res.status(400).json({ error: 'Category name is required.' });
+  const slug = slugify(name);
+  if (slug !== req.params.slug) {
+    const dup = await prisma.category.findUnique({ where: { slug } });
+    if (dup) return res.status(409).json({ error: 'A category with that name already exists.' });
+  }
+  const cat = await prisma.category.update({ where: { id: existing.id }, data: { name, slug } });
+  res.json({ category: serializeCategory(cat) });
+}
+
+async function deleteCategory(req, res) {
+  const existing = await prisma.category.findUnique({ where: { slug: req.params.slug }, include: { _count: { select: { books: true } } } });
+  if (!existing) return res.status(404).json({ error: 'Category not found.' });
+  if (existing._count.books > 0) return res.status(409).json({ error: 'Move or delete the books in this category first.' });
+  await prisma.category.delete({ where: { id: existing.id } });
+  res.json({ ok: true });
+}
+
+function serializeDiscount(d) {
+  return {
+    id: d.id,
+    code: d.code,
+    type: d.type,
+    value: Number(d.value),
+    minOrder: Number(d.minOrder),
+    active: d.active,
+    expiresAt: d.expiresAt ? d.expiresAt.toISOString() : null,
+    createdAt: d.createdAt.toISOString()
+  };
+}
+
+async function listDiscounts(req, res) {
+  const discounts = await prisma.discount.findMany({ orderBy: { createdAt: 'desc' } });
+  res.json({ discounts: discounts.map(serializeDiscount) });
+}
+
+async function createDiscount(req, res) {
+  const body = req.body || {};
+  const code = cleanCode(body.code);
+  if (!code) return res.status(400).json({ error: 'Discount code is required.' });
+  const type = String(body.type || 'PERCENT').toUpperCase() === 'FIXED' ? 'FIXED' : 'PERCENT';
+  const value = num(body.value, NaN);
+  const minOrder = num(body.minOrder, 0);
+  if (!Number.isFinite(value) || value <= 0) return res.status(400).json({ error: 'value must be a positive number.' });
+  if (type === 'PERCENT' && value > 100) return res.status(400).json({ error: 'Percent discount cannot exceed 100%.' });
+  const existing = await prisma.discount.findUnique({ where: { code } });
+  if (existing) return res.status(409).json({ error: 'That code already exists.' });
+  const d = await prisma.discount.create({
+    data: {
+      code,
+      type,
+      value,
+      minOrder,
+      active: body.active !== false
+    }
+  });
+  res.status(201).json({ discount: serializeDiscount(d) });
+}
+
+async function updateDiscount(req, res) {
+  const existing = await prisma.discount.findUnique({ where: { id: req.params.id } });
+  if (!existing) return res.status(404).json({ error: 'Discount not found.' });
+  const body = req.body || {};
+  const data = {};
+  if (body.active != null) data.active = !!body.active;
+  if (body.type != null) data.type = String(body.type).toUpperCase() === 'FIXED' ? 'FIXED' : 'PERCENT';
+  if (body.value != null) {
+    const v = num(body.value, NaN);
+    if (!Number.isFinite(v) || v <= 0) return res.status(400).json({ error: 'value must be a positive number.' });
+    data.value = v;
+  }
+  if (body.minOrder != null) {
+    const m = num(body.minOrder, NaN);
+    if (!Number.isFinite(m) || m < 0) return res.status(400).json({ error: 'minOrder cannot be negative.' });
+    data.minOrder = m;
+  }
+  const d = await prisma.discount.update({ where: { id: existing.id }, data });
+  res.json({ discount: serializeDiscount(d) });
+}
+
+async function deleteDiscount(req, res) {
+  const existing = await prisma.discount.findUnique({ where: { id: req.params.id } });
+  if (!existing) return res.status(404).json({ error: 'Discount not found.' });
+  await prisma.discount.delete({ where: { id: existing.id } });
+  res.json({ ok: true });
+}
+
+function serializeReview(r) {
+  return {
+    id: r.id,
+    rating: r.rating,
+    text: r.text,
+    status: r.status,
+    createdAt: r.createdAt.toISOString(),
+    book: r.book ? { slug: r.book.slug, title: r.book.title, image: r.book.cover } : null,
+    user: r.user ? { id: r.user.id, name: r.user.name, email: r.user.email } : null
+  };
+}
+
+async function listReviews(req, res) {
+  const status = String(req.query.status || '').toUpperCase();
+  const where = status === 'PENDING' || status === 'APPROVED' || status === 'REJECTED' ? { status } : {};
+  const reviews = await prisma.review.findMany({
+    where,
+    include: { book: true, user: true },
+    orderBy: { createdAt: 'desc' },
+    take: 100
+  });
+  const pending = await prisma.review.count({ where: { status: 'PENDING' } });
+  res.json({ reviews: reviews.map(serializeReview), pending });
+}
+
+async function moderateReview(req, res) {
+  const status = String((req.body && req.body.status) || '').toUpperCase();
+  if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ error: 'status must be APPROVED or REJECTED.' });
+  const existing = await prisma.review.findUnique({ where: { id: req.params.id }, include: { book: true } });
+  if (!existing) return res.status(404).json({ error: 'Review not found.' });
+  const review = await prisma.review.update({ where: { id: existing.id }, data: { status } });
+  await notificationsService.create(
+    existing.userId,
+    'review_' + status.toLowerCase(),
+    status === 'APPROVED' ? 'Your review was approved' : 'Your review was not approved',
+    'Your review of "' + (existing.book ? existing.book.title : 'a book') + '" was ' + (status === 'APPROVED' ? 'accepted' : 'declined') + '.'
+  );
+  res.json({ review: serializeReview(review) });
+}
+
+module.exports = {
+  stats,
+  listBooks,
+  createBook,
+  updateBook,
+  deleteBook,
+  listOrders,
+  updateOrderStatus,
+  listUsers,
+  uploadCover,
+  listCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  listDiscounts,
+  createDiscount,
+  updateDiscount,
+  deleteDiscount,
+  listReviews,
+  moderateReview
+};

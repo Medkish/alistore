@@ -1,8 +1,59 @@
-/* AlioStore database seed - categories, books, demo users (CUSTOMER + ADMIN) */
+/* AlioStore database seed - 10 categories, books, demo users (CUSTOMER + ADMIN) */
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const path = require('path');
+const fs = require('fs');
 
 const prisma = new PrismaClient();
+
+const METADATA = {
+  python: { isbn: '978-1-688-00001-1', edition: '3rd Edition', pages: 320 },
+  javascript: { isbn: '978-1-688-00002-8', edition: '2nd Edition', pages: 340 },
+  'javascript-deep-dive': { isbn: '978-1-688-00003-5', edition: '1st Edition', pages: 410 },
+  ruby: { isbn: '978-1-688-00004-2', edition: '2nd Edition', pages: 290 },
+  cpp: { isbn: '978-1-688-00005-9', edition: '4th Edition', pages: 380 },
+  swift: { isbn: '978-1-688-00006-6', edition: '1st Edition', pages: 310 },
+  kotlin: { isbn: '978-1-688-00007-3', edition: '1st Edition', pages: 300 },
+  php: { isbn: '978-1-688-00008-0', edition: '3rd Edition', pages: 280 },
+  java: { isbn: '978-1-688-00009-7', edition: '5th Edition', pages: 360 },
+  go: { isbn: '978-1-688-00010-3', edition: '2nd Edition', pages: 270 },
+  rust: { isbn: '978-1-688-00011-0', edition: '1st Edition', pages: 330 },
+  database: { isbn: '978-1-688-00012-7', edition: '2nd Edition', pages: 300 },
+  devops: { isbn: '978-1-688-00013-4', edition: '1st Edition', pages: 320 },
+  ai: { isbn: '978-1-688-00014-1', edition: '1st Edition', pages: 350 },
+  cybersecurity: { isbn: '978-1-688-00015-8', edition: '1st Edition', pages: 290 }
+};
+
+const CATEGORIES = [
+  { slug: 'programming', name: 'Programming' },
+  { slug: 'javascript', name: 'JavaScript' },
+  { slug: 'python', name: 'Python' },
+  { slug: 'web-development', name: 'Web Development' },
+  { slug: 'database', name: 'Database' },
+  { slug: 'frontend', name: 'Frontend' },
+  { slug: 'backend', name: 'Backend' },
+  { slug: 'devops', name: 'DevOps' },
+  { slug: 'ai', name: 'Artificial Intelligence' },
+  { slug: 'cybersecurity', name: 'Cybersecurity' }
+];
+
+const BOOK_CATEGORY = {
+  python: 'python',
+  javascript: 'javascript',
+  'javascript-deep-dive': 'javascript',
+  ruby: 'programming',
+  cpp: 'programming',
+  swift: 'frontend',
+  kotlin: 'backend',
+  php: 'web-development',
+  java: 'backend',
+  go: 'backend',
+  rust: 'programming',
+  database: 'database',
+  devops: 'devops',
+  ai: 'ai',
+  cybersecurity: 'cybersecurity'
+};
 
 const BOOKS = [
   {
@@ -158,22 +209,93 @@ const BOOKS = [
     publishedAt: '2025-03-01T00:00:00Z',
     featured: true,
     bestseller: true
+  },
+  {
+    slug: 'database',
+    title: 'Database Systems',
+    author: 'AlioStore',
+    description: 'SQL, indexes, transactions and schema design — the database skills every developer needs.',
+    price: 39.99,
+    prevPrice: 49.99,
+    stock: 10,
+    rating: 4.7,
+    coverImage: 'images/programming2.jpeg',
+    publishedAt: '2025-05-10T00:00:00Z',
+    featured: true,
+    bestseller: false
+  },
+  {
+    slug: 'devops',
+    title: 'DevOps Handbook',
+    author: 'Alio & Palma Cooperative',
+    description: 'CI/CD, containers, Kubernetes and observability — shipping software the modern way.',
+    price: 42,
+    prevPrice: 52,
+    stock: 9,
+    rating: 4.8,
+    coverImage: 'images/programming4.jpeg',
+    publishedAt: '2025-06-01T00:00:00Z',
+    featured: true,
+    bestseller: false
+  },
+  {
+    slug: 'ai',
+    title: 'AI & Machine Learning',
+    author: 'AlioStore',
+    description: 'From linear models to neural networks and LLMs — machine learning made practical.',
+    price: 49.99,
+    prevPrice: 59.99,
+    stock: 8,
+    rating: 4.9,
+    coverImage: 'images/product-item1.jpg',
+    publishedAt: '2025-07-15T00:00:00Z',
+    featured: true,
+    bestseller: true
+  },
+  {
+    slug: 'cybersecurity',
+    title: 'Cybersecurity Essentials',
+    author: 'Alio & Palma Cooperative',
+    description: 'Threat modeling, cryptography, web security and incident response for builders.',
+    price: 44,
+    prevPrice: 54,
+    stock: 5,
+    rating: 4.6,
+    coverImage: 'images/product4.jpg',
+    publishedAt: '2025-08-01T00:00:00Z',
+    featured: false,
+    bestseller: false
   }
 ];
 
 async function main() {
-  const category = await prisma.category.upsert({
-    where: { slug: 'programming' },
-    update: {},
-    create: { name: 'Programming', slug: 'programming' }
-  });
+  const categoryMap = {};
+  for (const c of CATEGORIES) {
+    const cat = await prisma.category.upsert({
+      where: { slug: c.slug },
+      update: { name: c.name },
+      create: c
+    });
+    categoryMap[c.slug] = cat.id;
+  }
 
   for (const b of BOOKS) {
     const { slug, ...data } = b;
+    const meta = METADATA[slug] || { pages: 300 };
+    const categorySlug = BOOK_CATEGORY[slug] || 'programming';
+    let toc = [];
+    let tocRaw = '';
+    try {
+      tocRaw = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'frontend', 'public', 'books', slug, 'toc.json'), 'utf8');
+      toc = JSON.parse(tocRaw).chapters || [];
+    } catch (e) {
+      toc = [];
+    }
+    const common = { ...data, categoryId: categoryMap[categorySlug], pages: meta.pages, edition: meta.edition, isbn: meta.isbn, toc, samplePath: 'books/' + slug + '/sample.json', contentPath: 'books/' + slug + '/content.json' };
     await prisma.book.upsert({
       where: { slug },
-      update: { ...data, categoryId: category.id },
-      create: { slug, ...data, categoryId: category.id }
+      update: common,
+      create: { slug, ...common }
     });
   }
 
@@ -206,7 +328,7 @@ async function main() {
   });
 
   console.log(
-    'Seed complete: 1 category, ' + BOOKS.length + ' books, demo users (demo@aliostore.com / password123 · admin@aliostore.com / admin123)'
+    'Seed complete: ' + CATEGORIES.length + ' categories, ' + BOOKS.length + ' books, demo users (demo@aliostore.com / password123 · admin@aliostore.com / admin123)'
   );
 }
 

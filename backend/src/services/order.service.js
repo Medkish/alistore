@@ -1,6 +1,8 @@
 const crypto = require('crypto');
 const prisma = require('../lib/prisma');
 const { reserveStock } = require('./book.service');
+const discountService = require('./discount.service');
+const notificationsService = require('./notifications.service');
 
 const ORDER_STATUSES = ['PLACED', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
@@ -25,7 +27,7 @@ async function computeFromDb(items) {
     throw err;
   }
   const entries = [];
-  let total = 0;
+  let subtotal = 0;
   for (const it of items) {
     const slug = it.id || it.slug;
     if (!slug) {
@@ -42,9 +44,9 @@ async function computeFromDb(items) {
     const qty = Math.max(1, Number(it.qty) || 1);
     const price = Number(book.price);
     entries.push({ bookId: book.id, slug, qty, price, title: book.title, image: book.cover });
-    total += qty * price;
+    subtotal += qty * price;
   }
-  return { entries, total };
+  return { entries, subtotal };
 }
 
 function serializeOrder(order, includeUser) {
@@ -55,6 +57,8 @@ function serializeOrder(order, includeUser) {
     total: Number(order.total),
     paymentMethod: order.paymentMethod || 'demo',
     paidAt: order.paidAt ? order.paidAt.toISOString() : null,
+    couponCode: order.couponCode || '',
+    discountAmount: Number(order.discountAmount || 0),
     contact: {
       name: order.contactName || '',
       email: order.contactEmail || '',
@@ -77,7 +81,17 @@ function serializeOrder(order, includeUser) {
 
 async function create(userId, items, opts = {}) {
   const shipping = opts.shipping || {};
-  const { entries, total } = await computeFromDb(items);
+  const { entries, subtotal } = await computeFromDb(items);
+  let discountAmount = 0;
+  let couponCode = '';
+  if (opts.coupon) {
+    const res = await discountService.apply(opts.coupon, subtotal);
+    if (res.valid) {
+      discountAmount = res.discount;
+      couponCode = res.code;
+    }
+  }
+  const total = Math.round((subtotal - discountAmount) * 100) / 100;
   await reserveStock(entries);
 
   const order = await prisma.order.create({
@@ -87,6 +101,8 @@ async function create(userId, items, opts = {}) {
       total,
       paymentMethod: opts.paymentMethod || 'demo',
       paidAt: opts.paidAt != null ? opts.paidAt : new Date(),
+      couponCode,
+      discountAmount,
       contactName: String(shipping.name || '').trim(),
       contactEmail: String(shipping.email || '').trim(),
       contactPhone: String(shipping.phone || '').trim(),
@@ -98,6 +114,10 @@ async function create(userId, items, opts = {}) {
   });
 
   await prisma.user.update({ where: { id: userId }, data: { cart: [] } });
+  await notificationsService.create(userId, 'order_confirmed', 'Order confirmed', 'Your order ' + order.reference + ' was confirmed at ' + order.placedAt.toISOString() + '.');
+  if ((opts.status || 'PAID') !== 'PLACED') {
+    await notificationsService.create(userId, 'payment_received', 'Payment received', 'We received the payment for order ' + order.reference + '.');
+  }
   return serializeOrder(order);
 }
 
@@ -169,6 +189,11 @@ async function updateStatus(orderId, status, actorId) {
       data: { orderId: order.id, from: order.status, to: s }
     }
   }).catch(() => undefined);
+  if (s === 'SHIPPED' && order.userId) {
+    await notificationsService.create(order.userId, 'order_shipped', 'Order shipped', 'Your order ' + order.reference + ' has been shipped and is on its way.');
+  } else if (s === 'DELIVERED' && order.userId) {
+    await notificationsService.create(order.userId, 'order_delivered', 'Order delivered', 'Your order ' + order.reference + ' has been delivered. Enjoy!');
+  }
   return serializeOrder(updated, true);
 }
 
@@ -181,6 +206,27 @@ async function revenue() {
   return { revenue: Number(counts._sum.total || 0), paidOrderCount: counts._count._all };
 }
 
+/* A book is "owned" when it appears on an order in a paid state.
+   Content endpoints rely on this - never on client-side flags. */
+async function purchasedBookSlugs(userId) {
+  const orders = await prisma.order.findMany({
+    where: { userId, status: { in: ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'] } },
+    include: { items: { include: { book: true } } }
+  });
+  const slugs = new Set();
+  for (const o of orders) {
+    for (const it of o.items) {
+      if (it.book) slugs.add(it.book.slug);
+    }
+  }
+  return slugs;
+}
+
+async function hasPurchased(userId, slug) {
+  const owned = await purchasedBookSlugs(userId);
+  return owned.has(slug);
+}
+
 module.exports = {
   create,
   listForUser,
@@ -189,6 +235,8 @@ module.exports = {
   revenue,
   computeFromDb,
   serializeOrder,
+  purchasedBookSlugs,
+  hasPurchased,
   ORDER_STATUSES,
   TRANSITIONS
 };

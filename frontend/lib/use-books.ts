@@ -8,6 +8,15 @@ import type { Book } from '@/lib/types';
 export const CATEGORY_OPTIONS = [
   { slug: '', name: 'All Categories' },
   { slug: 'programming', name: 'Programming' },
+  { slug: 'javascript', name: 'JavaScript' },
+  { slug: 'python', name: 'Python' },
+  { slug: 'web-development', name: 'Web Development' },
+  { slug: 'database', name: 'Database' },
+  { slug: 'frontend', name: 'Frontend' },
+  { slug: 'backend', name: 'Backend' },
+  { slug: 'devops', name: 'DevOps' },
+  { slug: 'ai', name: 'Artificial Intelligence' },
+  { slug: 'cybersecurity', name: 'Cybersecurity' },
 ];
 
 export const PRICE_OPTIONS = [

@@ -50,6 +50,8 @@ export interface Order {
   placedAt?: string;
   paymentMethod?: string;
   paidAt?: string | null;
+  couponCode?: string;
+  discountAmount?: number;
   contact?: OrderContact;
   user?: { id?: string; name?: string; email?: string; mobile?: string };
 }
@@ -88,4 +90,58 @@ export interface CatalogItem {
   name: string;
   qty: number;
   price: number;
+}
+
+export interface CategoryItem {
+  id: string;
+  slug: string;
+  name: string;
+  booksCount: number;
+}
+
+export interface ReviewItem {
+  id: string;
+  rating: number;
+  text: string;
+  user: string;
+  createdAt: string;
+}
+
+export interface BookReviews {
+  average: number | null;
+  count: number;
+  purchased: boolean;
+  submitted: boolean;
+  status?: string | null;
+  reviews: ReviewItem[];
+}
+
+export interface NotificationItem {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  at: string;
+}
+
+export interface DiscountItem {
+  id: string;
+  code: string;
+  type: 'PERCENT' | 'FIXED';
+  value: number;
+  minOrder: number;
+  active: boolean;
+  expiresAt: string | null;
+  createdAt: string;
+}
+
+export interface CouponResult {
+  valid: boolean;
+  code?: string;
+  type?: string;
+  value?: number;
+  minOrder?: number;
+  discount: number;
+  error?: string;
 }

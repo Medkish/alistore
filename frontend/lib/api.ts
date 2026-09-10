@@ -1,4 +1,4 @@
-import type { AdminStats, AdminUser, Book, BooksResult, CartItem, Order, User } from '@/lib/types';
+import type { AdminStats, AdminUser, Book, BookReviews, BooksResult, CartItem, CategoryItem, CouponResult, DiscountItem, NotificationItem, Order, User } from '@/lib/types';
 
 const BASE = (process.env.NEXT_PUBLIC_API_BASE || '').replace(/\/$/, '');
 
@@ -87,13 +87,37 @@ export const api = {
   },
   getBook: (slug: string) => request<{ book: Book }>(`/books/${slug}`),
   getCategories: () =>
-    request<{ categories: { id: string; name: string; slug: string; bookCount: number }[] }>('/categories'),
-  placeOrder: (items: CartItem[], shipping: { name: string; email: string; phone: string; address: string }) =>
+    request<{ categories: CategoryItem[] }>('/categories'),
+  getBookReviews: (slug: string) => request<BookReviews>(`/books/${slug}/reviews`),
+  submitReview: (slug: string, rating: number, text: string) =>
+    request<{ review: { id: string; rating: number; text: string; status: string } }>(`/books/${slug}/reviews`, {
+      method: 'POST',
+      body: { rating, text },
+    }),
+  validateCoupon: (code: string, subtotal: number) =>
+    request<CouponResult>(`/discounts/${encodeURIComponent(code)}/validate?subtotal=${subtotal}`),
+  placeOrder: (
+    items: CartItem[],
+    shipping: { name: string; email: string; phone: string; address: string },
+    paymentMethod = 'demo',
+    coupon = '',
+  ) =>
     request<{ order: Order }>('/orders', {
       method: 'POST',
-      body: { items: items.map((i) => ({ id: i.id, qty: i.qty })), shipping, paymentMethod: 'demo' },
+      body: {
+        items: items.map((i) => ({ id: i.id, qty: i.qty })),
+        shipping,
+        paymentMethod,
+        coupon,
+      },
     }),
   getOrders: () => request<{ orders: Order[] }>('/orders'),
+  getNotifications: () => request<{ notifications: NotificationItem[]; unread: number }>('/me/notifications'),
+  markNotificationsRead: (id?: string) =>
+    request<{ notifications: NotificationItem[]; unread: number }>('/me/notifications/read', {
+      method: 'POST',
+      body: id ? { id } : {},
+    }),
   donate: (amount: number, method: string) =>
     request<{ reference: string; amount: number }>('/donations', { method: 'POST', body: { amount, method } }),
   subscribe: (body: { plan: string; period: string; email: string; nextBilling: string }) =>
@@ -117,6 +141,25 @@ export const api = {
   adminSetOrderStatus: (orderId: string, status: string) =>
     request<{ order: Order }>(`/admin/orders/${orderId}/status`, { method: 'PATCH', body: { status } }),
   adminUsers: () => request<{ users: AdminUser[] }>('/admin/users'),
+  adminCategories: () => request<{ categories: CategoryItem[] }>('/admin/categories'),
+  adminCreateCategory: (name: string) =>
+    request<{ category: CategoryItem }>('/admin/categories', { method: 'POST', body: { name } }),
+  adminUpdateCategory: (slug: string, name: string) =>
+    request<{ category: CategoryItem }>(`/admin/categories/${encodeURIComponent(slug)}`, { method: 'PUT', body: { name } }),
+  adminDeleteCategory: (slug: string) =>
+    request<{ ok: boolean }>(`/admin/categories/${encodeURIComponent(slug)}`, { method: 'DELETE' }),
+  adminDiscounts: () => request<{ discounts: DiscountItem[] }>('/admin/discounts'),
+  adminCreateDiscount: (body: { code: string; type: string; value: number; minOrder: number }) =>
+    request<{ discount: DiscountItem }>('/admin/discounts', { method: 'POST', body }),
+  adminUpdateDiscount: (id: string, body: Record<string, unknown>) =>
+    request<{ discount: DiscountItem }>(`/admin/discounts/${id}`, { method: 'PATCH', body }),
+  adminDeleteDiscount: (id: string) => request<{ ok: boolean }>(`/admin/discounts/${id}`, { method: 'DELETE' }),
+  adminReviews: (status?: string) =>
+    request<{ reviews: { id: string; rating: number; text: string; status: string; createdAt: string; book: { slug: string; title: string; image: string } | null; user: { id: string; name: string; email: string } | null }[]; pending: number }>(
+      `/admin/reviews${status ? `?status=${status}` : ''}`,
+    ),
+  adminModerateReview: (id: string, status: 'APPROVED' | 'REJECTED') =>
+    request<{ review: Record<string, unknown> }>(`/admin/reviews/${id}`, { method: 'PATCH', body: { status } }),
   uploadCover: (file: File) => {
     const fd = new FormData();
     fd.append('file', file);

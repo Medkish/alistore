@@ -16,7 +16,15 @@ function serialize(book) {
     coverImage: book.coverImage,
     category: book.category ? { id: book.category.id, name: book.category.name, slug: book.category.slug } : null,
     featured: book.featured,
-    bestseller: book.bestseller
+    bestseller: book.bestseller,
+    isbn: book.isbn || '',
+    publisher: book.publisher || 'AlioStore Publishing',
+    language: book.language || 'English',
+    edition: book.edition || '1st Edition',
+    format: book.format || 'EPUB + PDF',
+    pages: book.pages ?? null,
+    toc: Array.isArray(book.toc) ? book.toc : [],
+    sampleAvailable: !!(book.samplePath && book.samplePath.trim())
   };
 }
 
@@ -34,7 +42,7 @@ function parseNum(v) {
   return Number.isFinite(n) ? n : undefined;
 }
 
-async function list({ search, category, minPrice, maxPrice, minRating, sort, page, pageSize }) {
+async function list({ search, category, author, minPrice, maxPrice, minRating, inStock, sort, page, pageSize }) {
   const where = {};
   const s = String(search || '').trim();
   if (s) {
@@ -44,6 +52,10 @@ async function list({ search, category, minPrice, maxPrice, minRating, sort, pag
       { description: { contains: s, mode: 'insensitive' } }
     ];
   }
+  const a = String(author || '').trim();
+  if (a) where.author = { contains: a, mode: 'insensitive' };
+  if (inStock === true || inStock === 'true') where.stock = { gt: 0 };
+  if (inStock === false || inStock === 'false') where.stock = 0;
   if (category) {
     const cat = await prisma.category.findUnique({ where: { slug: category } });
     if (!cat) {

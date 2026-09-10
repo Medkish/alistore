@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { CartProvider, AuthProvider } from '@/components/providers';
+import { CartProvider, AuthProvider, WishlistProvider } from '@/components/providers';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 

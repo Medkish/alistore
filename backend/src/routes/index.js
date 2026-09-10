@@ -7,6 +7,8 @@ const orders = require('./order.routes');
 const donations = require('./donation.routes');
 const subscriptions = require('./subscription.routes');
 const admin = require('./admin.routes');
+const me = require('./me.routes');
+const discounts = require('./discount.routes');
 const { getConfig } = require('../controllers/config.controller');
 
 const router = Router();
@@ -19,6 +21,8 @@ router.use('/orders', orders);
 router.use('/donations', donations);
 router.use('/subscriptions', subscriptions);
 router.use('/admin', admin);
+router.use('/me', me);
+router.use('/discounts', discounts);
 
 router.get('/config', getConfig);
 
