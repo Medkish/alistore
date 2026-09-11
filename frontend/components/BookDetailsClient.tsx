@@ -73,7 +73,7 @@ export default function BookDetailsClient({ book }: { book: Book }) {
 
           {/* info */}
           <div>
-            <p className="text-xs font-bold text-accent-dark uppercase tracking-wide mb-1">{book.author}</p>
+            <p className="text-xs font-bold text-accent-dark uppercase tracking-wide mb-1">By {book.author}</p>
             <h1 className="text-3xl md:text-4xl font-extrabold text-brand mb-2">{book.title}</h1>
             {book.rating && (
               <p className="text-sm text-muted mb-3">
@@ -82,50 +82,57 @@ export default function BookDetailsClient({ book }: { book: Book }) {
               </p>
             )}
             <p className="text-brand font-extrabold text-2xl mb-4">{formatAED(book.price)}</p>
-            <p className="text-sm text-ink leading-relaxed mb-6">{book.description}</p>
-
-            {book.pages && (
-              <p className="text-xs text-muted mb-4">
-                Paperback · {book.pages} pages
-              </p>
-            )}
 
             {book.stock != null && (
-              <p className="text-xs mb-4">
+              <p className="text-sm mb-6">
                 {book.stock === 0 ? (
                   <span className="text-red-600 font-semibold">🔴 Out of Stock</span>
-                ) : book.stock <= 10 ? (
-                  <span className="text-amber-600 font-semibold">🟡 Low Stock · only {book.stock} left</span>
                 ) : (
-                  <span className="text-green-700 font-semibold">🟢 In Stock</span>
+                  <span className="text-green-700 font-semibold">
+                    {book.stock <= 10 ? '🟡' : '🟢'} In Stock · {book.stock} available
+                  </span>
                 )}
               </p>
             )}
 
-            <div className="flex flex-wrap gap-4 items-center mb-6">
+            {book.pages && (
+              <p className="text-xs text-muted mb-6">
+                Paperback · {book.pages} pages
+              </p>
+            )}
+
+            <p className="text-sm text-ink leading-relaxed mb-6">
+              <span className="font-bold text-ink block mb-1">Description</span>
+              {book.description}
+            </p>
+
+            <div className="flex flex-wrap gap-3 items-center mb-6">
               <QuantityStepper
                 qty={qty}
-                onInc={() => setQty((q) => q + 1)}
+                onInc={() => setQty((q) => (book.stock == null || q < book.stock ? q + 1 : q))}
                 onDec={() => setQty((q) => Math.max(1, q - 1))}
               />
               <button
                 onClick={() => {
                   for (let i = 0; i < qty; i++) add(book.id, book.title, book.price, book.image);
                 }}
-                className="btn-flash btn-primary-flash"
+                disabled={book.stock === 0}
+                className="btn-flash btn-primary-flash disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add to Cart
               </button>
               <button
                 onClick={() => toggle(book.id)}
                 aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
-                className={`shrink-0 h-12 w-12 rounded-xl border-2 text-xl transition ${
-                  liked ? 'border-red-300 bg-red-50' : 'border-line bg-white hover:border-accent'
+                className={`btn-flash px-4 py-2.5 text-sm border-2 transition ${
+                  liked
+                    ? 'border-red-300 bg-red-50 text-red-600 font-bold'
+                    : 'border-line bg-white text-ink hover:border-accent'
                 }`}
               >
-                {liked ? '♥' : '♡'}
+                {liked ? '♥ In Wishlist' : '♡ Add to Wishlist'}
               </button>
-              <Link href="/checkout/" className="btn-flash btn-outline-flash text-brand border-brand hover:bg-brand hover:text-white">
+              <Link href="/checkout/" className="btn-flash btn-outline-flash text-brand border-brand hover:bg-brand hover:text-white text-sm">
                 Buy the Book First
               </Link>
             </div>
