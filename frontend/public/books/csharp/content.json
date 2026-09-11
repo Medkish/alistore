@@ -1,0 +1,601 @@
+{
+  "slug": "csharp",
+  "title": "C#",
+  "titleTranslated": {
+    "en": "C#",
+    "ar": "سي شارب",
+    "fr": "C#",
+    "hi": "सी शार्प"
+  },
+  "description": "Modern .NET development — OOP, LINQ, async and the standard library.",
+  "level": "INTERMEDIATE",
+  "prerequisites": "Basic programming familiarity (any language).",
+  "languages": [
+    "en",
+    "ar",
+    "fr",
+    "hi"
+  ],
+  "pageCount": 60,
+  "chapters": [
+    {
+      "index": 1,
+      "chapter": 1,
+      "title": "The .NET Runtime & Tools",
+      "page": 12,
+      "pageTo": 18,
+      "objectives": [
+        "Explain the core ideas behind dotnet CLI and CLR.",
+        "Write and run working C# code that uses dotnet CLI, CLR, Roslyn.",
+        "Recognise and avoid the common pitfalls associated with sln."
+      ],
+      "notes": [
+        "Note — The .NET Runtime & Tools: dotnet CLI / CLR / Roslyn / sln are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "dotnet CLI",
+        "CLR",
+        "Roslyn",
+        "sln"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "C#",
+          "code": "dotnet new console -o Hello && dotnet run",
+          "output": "Hello, World!"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of dotnet CLI in C#?",
+          "answer": "dotnet CLI lets you sln — see chapter section 1.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid sln?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "chapter": 2,
+      "title": "Types, Value & Reference",
+      "page": 19,
+      "pageTo": 25,
+      "objectives": [
+        "Explain the core ideas behind int and string.",
+        "Write and run working C# code that uses int, string, struct.",
+        "Recognise and avoid the common pitfalls associated with record."
+      ],
+      "notes": [
+        "Note — Types, Value & Reference: int / string / struct / record are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "int",
+        "string",
+        "struct",
+        "record"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "C#",
+          "code": "record Book(string Title, decimal Price);",
+          "output": "Immutable with value equality"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of int in C#?",
+          "answer": "int lets you record — see chapter section 2.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid record?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "chapter": 3,
+      "title": "Classes & Interfaces",
+      "page": 26,
+      "pageTo": 32,
+      "objectives": [
+        "Explain the core ideas behind class and abstract.",
+        "Write and run working C# code that uses class, abstract, interface.",
+        "Recognise and avoid the common pitfalls associated with sealed."
+      ],
+      "notes": [
+        "Note — Classes & Interfaces: class / abstract / interface / sealed are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "class",
+        "abstract",
+        "interface",
+        "sealed"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "C#",
+          "code": "interface IPayable { decimal Total(); }",
+          "output": "Implementers must supply Total()"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of class in C#?",
+          "answer": "class lets you sealed — see chapter section 3.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid sealed?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "chapter": 4,
+      "title": "Properties & Linq",
+      "page": 33,
+      "pageTo": 39,
+      "objectives": [
+        "Explain the core ideas behind property and Linq.",
+        "Write and run working C# code that uses property, Linq, Where.",
+        "Recognise and avoid the common pitfalls associated with Select."
+      ],
+      "notes": [
+        "Note — Properties & Linq: property / Linq / Where / Select are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "property",
+        "Linq",
+        "Where",
+        "Select"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "C#",
+          "code": "var expensive = books.Where(b => b.Price > 30).Select(b => b.Title);",
+          "output": "Deferred, lazy sequence"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of property in C#?",
+          "answer": "property lets you select — see chapter section 4.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid Select?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "chapter": 5,
+      "title": "Async & Tasks",
+      "page": 40,
+      "pageTo": 46,
+      "objectives": [
+        "Explain the core ideas behind async and await.",
+        "Write and run working C# code that uses async, await, Task.",
+        "Recognise and avoid the common pitfalls associated with ConfigureAwait."
+      ],
+      "notes": [
+        "Note — Async & Tasks: async / await / Task / ConfigureAwait are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "async",
+        "await",
+        "Task",
+        "ConfigureAwait"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "C#",
+          "code": "var cart = await _cartService.LoadAsync(id);",
+          "output": "Suspends without blocking a thread"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of async in C#?",
+          "answer": "async lets you configureawait — see chapter section 5.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid ConfigureAwait?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "chapter": 6,
+      "title": "Collections & Generics",
+      "page": 47,
+      "pageTo": 53,
+      "objectives": [
+        "Explain the core ideas behind List<T> and Dictionary.",
+        "Write and run working C# code that uses List<T>, Dictionary, nullable refs.",
+        "Recognise and avoid the common pitfalls associated with patterns."
+      ],
+      "notes": [
+        "Note — Collections & Generics: List<T> / Dictionary / nullable refs / patterns are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "List<T>",
+        "Dictionary",
+        "nullable refs",
+        "patterns"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "C#",
+          "code": "return total switch { > 100 => 0.9m * total, _ => total };",
+          "output": "Switch expression applies 10% off"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of List<T> in C#?",
+          "answer": "List<T> lets you patterns — see chapter section 6.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid patterns?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "chapter": 7,
+      "title": "ASP.NET & EF Core",
+      "page": 54,
+      "pageTo": 60,
+      "objectives": [
+        "Explain the core ideas behind Minimal APIs and DI.",
+        "Write and run working C# code that uses Minimal APIs, DI, Entity Framework.",
+        "Recognise and avoid the common pitfalls associated with records."
+      ],
+      "notes": [
+        "Note — ASP.NET & EF Core: Minimal APIs / DI / Entity Framework / records are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "Minimal APIs",
+        "DI",
+        "Entity Framework",
+        "records"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "C#",
+          "code": "app.MapGet(\"/books\", () => db.Books.ToList());",
+          "output": "HTTP GET returns the book list"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of Minimal APIs in C#?",
+          "answer": "Minimal APIs lets you records — see chapter section 7.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid records?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    }
+  ],
+  "exercisesTotal": 21,
+  "tests": {
+    "instructions": "One assessment per chapter grouping plus a final exam. Every question maps to the section shown in brackets so you can revise precisely.",
+    "chapters": [
+      {
+        "chapter": 1,
+        "title": "The .NET Runtime & Tools",
+        "page": 12,
+        "questions": [
+          {
+            "q": "Which concept makes dotnet CLI behave that way? (C# ch.1)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Hello, World!\". Which statement caused it? (ch.1)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 2,
+        "title": "Types, Value & Reference",
+        "page": 19,
+        "questions": [
+          {
+            "q": "Which concept makes int behave that way? (C# ch.2)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Immutable with value equality\". Which statement caused it? (ch.2)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 3,
+        "title": "Classes & Interfaces",
+        "page": 26,
+        "questions": [
+          {
+            "q": "Which concept makes class behave that way? (C# ch.3)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Implementers must supply Total()\". Which statement caused it? (ch.3)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 4,
+        "title": "Properties & Linq",
+        "page": 33,
+        "questions": [
+          {
+            "q": "Which concept makes property behave that way? (C# ch.4)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Deferred, lazy sequence\". Which statement caused it? (ch.4)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 5,
+        "title": "Async & Tasks",
+        "page": 40,
+        "questions": [
+          {
+            "q": "Which concept makes async behave that way? (C# ch.5)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Suspends without blocking a thread\". Which statement caused it? (ch.5)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 6,
+        "title": "Collections & Generics",
+        "page": 47,
+        "questions": [
+          {
+            "q": "Which concept makes List<T> behave that way? (C# ch.6)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Switch expression applies 10% off\". Which statement caused it? (ch.6)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 7,
+        "title": "ASP.NET & EF Core",
+        "page": 54,
+        "questions": [
+          {
+            "q": "Which concept makes Minimal APIs behave that way? (C# ch.7)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"HTTP GET returns the book list\". Which statement caused it? (ch.7)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      }
+    ],
+    "assessment": [
+      {
+        "q": "Write C# code that reads a value, transforms it and prints the result. (final)",
+        "options": [
+          "compile only",
+          "read → transform → print",
+          "print only"
+        ],
+        "answer": "read → transform → print"
+      },
+      {
+        "q": "What does the score of 14.3 marks per chapter tell you about this exam's structure? (final)",
+        "options": [
+          "chapters weigh equally",
+          "the last chapter is heaviest",
+          "random weighting"
+        ],
+        "answer": "chapters weigh equally"
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "object",
+      "meaning": "An instance of a class holding its own state and behaviour.",
+      "translations": {
+        "ar": "كائن",
+        "fr": "objet",
+        "hi": "ऑब्जेक्ट"
+      }
+    },
+    {
+      "term": "string",
+      "meaning": "A sequence of characters representing text.",
+      "translations": {
+        "ar": "نص",
+        "fr": "chaîne de caractères",
+        "hi": "स्ट्रिंग"
+      }
+    },
+    {
+      "term": "recursion",
+      "meaning": "A function calling itself to solve smaller sub-problems.",
+      "translations": {
+        "ar": "عودة النّداء",
+        "fr": "récursivité",
+        "hi": "पुनरावर्तन"
+      }
+    },
+    {
+      "term": "thread",
+      "meaning": "The smallest unit of execution within a process.",
+      "translations": {
+        "ar": "خيط التنفيذ",
+        "fr": "fil d'exécution",
+        "hi": "थ्रेड"
+      }
+    },
+    {
+      "term": "scope",
+      "meaning": "The region of code where a name is visible and valid.",
+      "translations": {
+        "ar": "نطاق الأسماء",
+        "fr": "portée",
+        "hi": "स्कोप"
+      }
+    },
+    {
+      "term": "idiom",
+      "meaning": "A commonly used, idiomatic pattern in a language.",
+      "translations": {
+        "ar": "أسلوب متعارف",
+        "fr": "idiome",
+        "hi": "मुहावरा"
+      }
+    }
+  ],
+  "appendix": {
+    "furtherReading": [
+      "The C# language reference",
+      "Official language tour",
+      "Problem sets in the C# book club section"
+    ]
+  }
+}

@@ -1,0 +1,602 @@
+{
+  "slug": "typescript",
+  "title": "TypeScript",
+  "titleTranslated": {
+    "en": "TypeScript",
+    "ar": "تايب سكريبت",
+    "fr": "TypeScript",
+    "hi": "टाइपस्क्रिप्ट"
+  },
+  "description": "Type-safe JavaScript — types, generics, classes and modern tooling.",
+  "level": "INTERMEDIATE",
+  "prerequisites": "Working JavaScript knowledge.",
+  "languages": [
+    "en",
+    "ar",
+    "fr",
+    "hi"
+  ],
+  "pageCount": 60,
+  "chapters": [
+    {
+      "index": 1,
+      "chapter": 1,
+      "title": "Types on Top of JavaScript",
+      "page": 12,
+      "pageTo": 18,
+      "objectives": [
+        "Explain the core ideas behind tsc and annotations.",
+        "Write and run working TypeScript code that uses tsc, annotations, inference.",
+        "Recognise and avoid the common pitfalls associated with tsconfig."
+      ],
+      "notes": [
+        "Note — Types on Top of JavaScript: tsc / annotations / inference / tsconfig are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "tsc",
+        "annotations",
+        "inference",
+        "tsconfig"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript",
+          "code": "const status: string = \"PAID\";",
+          "output": "Compiles; typos fail at build time"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of tsc in TypeScript?",
+          "answer": "tsc lets you tsconfig — see chapter section 1.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid tsconfig?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "chapter": 2,
+      "title": "Interfaces & Type Aliases",
+      "page": 19,
+      "pageTo": 25,
+      "objectives": [
+        "Explain the core ideas behind interface and type.",
+        "Write and run working TypeScript code that uses interface, type, union.",
+        "Recognise and avoid the common pitfalls associated with discriminated."
+      ],
+      "notes": [
+        "Note — Interfaces & Type Aliases: interface / type / union / discriminated are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "interface",
+        "type",
+        "union",
+        "discriminated"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript",
+          "code": "type Result = { ok: true; data: string } | { ok: false };\nif (r.ok) r.data.toUpperCase();",
+          "output": "data is only accessible when ok === true"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of interface in TypeScript?",
+          "answer": "interface lets you discriminated — see chapter section 2.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid discriminated?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "chapter": 3,
+      "title": "Primitives & Utilities",
+      "page": 26,
+      "pageTo": 32,
+      "objectives": [
+        "Explain the core ideas behind tuple and enum.",
+        "Write and run working TypeScript code that uses tuple, enum, keyof.",
+        "Recognise and avoid the common pitfalls associated with Pick."
+      ],
+      "notes": [
+        "Note — Primitives & Utilities: tuple / enum / keyof / Partial / Pick are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "tuple",
+        "enum",
+        "keyof",
+        "Partial",
+        "Pick"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript",
+          "code": "type CartSummary = Pick<Cart, \"count\" | \"total\">;",
+          "output": "New type with only those two fields"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of tuple in TypeScript?",
+          "answer": "tuple lets you pick — see chapter section 3.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid Pick?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "chapter": 4,
+      "title": "Classes & Decorators",
+      "page": 33,
+      "pageTo": 39,
+      "objectives": [
+        "Explain the core ideas behind public/private and abstract.",
+        "Write and run working TypeScript code that uses public/private, abstract, implements.",
+        "Recognise and avoid the common pitfalls associated with decorators."
+      ],
+      "notes": [
+        "Note — Classes & Decorators: public/private / abstract / implements / decorators are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "public/private",
+        "abstract",
+        "implements",
+        "decorators"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript",
+          "code": "class Invoice implements Billable { total() { return 0; } }",
+          "output": "Compiler enforces total() exists"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of public/private in TypeScript?",
+          "answer": "public/private lets you decorators — see chapter section 4.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid decorators?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "chapter": 5,
+      "title": "Generics",
+      "page": 40,
+      "pageTo": 46,
+      "objectives": [
+        "Explain the core ideas behind T and constraints.",
+        "Write and run working TypeScript code that uses T, constraints, defaults.",
+        "Recognise and avoid the common pitfalls associated with infer."
+      ],
+      "notes": [
+        "Note — Generics: T / constraints / defaults / infer are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "T",
+        "constraints",
+        "defaults",
+        "infer"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript",
+          "code": "function wrap<T>(v: T): T[] { return [v]; }",
+          "output": "wrap(3) → number[]"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of T in TypeScript?",
+          "answer": "T lets you infer — see chapter section 5.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid infer?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "chapter": 6,
+      "title": "Modules & Namespaces",
+      "page": 47,
+      "pageTo": 53,
+      "objectives": [
+        "Explain the core ideas behind import type and barrel.",
+        "Write and run working TypeScript code that uses import type, barrel, declaration.",
+        "Recognise and avoid the common pitfalls associated with paths."
+      ],
+      "notes": [
+        "Note — Modules & Namespaces: import type / barrel / declaration / paths are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "import type",
+        "barrel",
+        "declaration",
+        "paths"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript",
+          "code": "import type { Book } from \"@/lib/types\";",
+          "output": "Type-only import erased at runtime"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of import type in TypeScript?",
+          "answer": "import type lets you paths — see chapter section 6.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid paths?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "chapter": 7,
+      "title": "Tooling, Tests & Builds",
+      "page": 54,
+      "pageTo": 60,
+      "objectives": [
+        "Explain the core ideas behind vite and vitest.",
+        "Write and run working TypeScript code that uses vite, vitest, eslint.",
+        "Recognise and avoid the common pitfalls associated with tsserver."
+      ],
+      "notes": [
+        "Note — Tooling, Tests & Builds: vite / vitest / eslint / tsserver are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "vite",
+        "vitest",
+        "eslint",
+        "tsserver"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript",
+          "code": "it(\"prices\", () => { expect(add(1, 2)).toBe(3); });",
+          "output": "Test passes with full type inference"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of vite in TypeScript?",
+          "answer": "vite lets you tsserver — see chapter section 7.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid tsserver?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    }
+  ],
+  "exercisesTotal": 21,
+  "tests": {
+    "instructions": "One assessment per chapter grouping plus a final exam. Every question maps to the section shown in brackets so you can revise precisely.",
+    "chapters": [
+      {
+        "chapter": 1,
+        "title": "Types on Top of JavaScript",
+        "page": 12,
+        "questions": [
+          {
+            "q": "Which concept makes tsc behave that way? (TypeScript ch.1)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Compiles; typos fail at build time\". Which statement caused it? (ch.1)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 2,
+        "title": "Interfaces & Type Aliases",
+        "page": 19,
+        "questions": [
+          {
+            "q": "Which concept makes interface behave that way? (TypeScript ch.2)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"data is only accessible when ok === true\". Which statement caused it? (ch.2)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 3,
+        "title": "Primitives & Utilities",
+        "page": 26,
+        "questions": [
+          {
+            "q": "Which concept makes tuple behave that way? (TypeScript ch.3)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"New type with only those two fields\". Which statement caused it? (ch.3)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 4,
+        "title": "Classes & Decorators",
+        "page": 33,
+        "questions": [
+          {
+            "q": "Which concept makes public/private behave that way? (TypeScript ch.4)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Compiler enforces total() exists\". Which statement caused it? (ch.4)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 5,
+        "title": "Generics",
+        "page": 40,
+        "questions": [
+          {
+            "q": "Which concept makes T behave that way? (TypeScript ch.5)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"wrap(3) → number[]\". Which statement caused it? (ch.5)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 6,
+        "title": "Modules & Namespaces",
+        "page": 47,
+        "questions": [
+          {
+            "q": "Which concept makes import type behave that way? (TypeScript ch.6)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Type-only import erased at runtime\". Which statement caused it? (ch.6)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 7,
+        "title": "Tooling, Tests & Builds",
+        "page": 54,
+        "questions": [
+          {
+            "q": "Which concept makes vite behave that way? (TypeScript ch.7)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Test passes with full type inference\". Which statement caused it? (ch.7)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      }
+    ],
+    "assessment": [
+      {
+        "q": "Write TypeScript code that reads a value, transforms it and prints the result. (final)",
+        "options": [
+          "compile only",
+          "read → transform → print",
+          "print only"
+        ],
+        "answer": "read → transform → print"
+      },
+      {
+        "q": "What does the score of 14.3 marks per chapter tell you about this exam's structure? (final)",
+        "options": [
+          "chapters weigh equally",
+          "the last chapter is heaviest",
+          "random weighting"
+        ],
+        "answer": "chapters weigh equally"
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "object",
+      "meaning": "An instance of a class holding its own state and behaviour.",
+      "translations": {
+        "ar": "كائن",
+        "fr": "objet",
+        "hi": "ऑब्जेक्ट"
+      }
+    },
+    {
+      "term": "string",
+      "meaning": "A sequence of characters representing text.",
+      "translations": {
+        "ar": "نص",
+        "fr": "chaîne de caractères",
+        "hi": "स्ट्रिंग"
+      }
+    },
+    {
+      "term": "recursion",
+      "meaning": "A function calling itself to solve smaller sub-problems.",
+      "translations": {
+        "ar": "عودة النّداء",
+        "fr": "récursivité",
+        "hi": "पुनरावर्तन"
+      }
+    },
+    {
+      "term": "thread",
+      "meaning": "The smallest unit of execution within a process.",
+      "translations": {
+        "ar": "خيط التنفيذ",
+        "fr": "fil d'exécution",
+        "hi": "थ्रेड"
+      }
+    },
+    {
+      "term": "scope",
+      "meaning": "The region of code where a name is visible and valid.",
+      "translations": {
+        "ar": "نطاق الأسماء",
+        "fr": "portée",
+        "hi": "स्कोप"
+      }
+    },
+    {
+      "term": "idiom",
+      "meaning": "A commonly used, idiomatic pattern in a language.",
+      "translations": {
+        "ar": "أسلوب متعارف",
+        "fr": "idiome",
+        "hi": "मुहावरा"
+      }
+    }
+  ],
+  "appendix": {
+    "furtherReading": [
+      "The TypeScript language reference",
+      "Official language tour",
+      "Problem sets in the TypeScript book club section"
+    ]
+  }
+}

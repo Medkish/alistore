@@ -1,0 +1,35 @@
+{
+  "title": "C#",
+  "excerpt": "Free sample — C# intermediate course. Chapter 1 begins: \"The .NET Runtime & Tools\".",
+  "chapter": "Chapter 1 · Free Preview",
+  "page": 12,
+  "objectives": [
+    "Explain the core ideas behind dotnet CLI and CLR.",
+    "Write and run working C# code that uses dotnet CLI, CLR, Roslyn.",
+    "Recognise and avoid the common pitfalls associated with sln."
+  ],
+  "notes": [
+    "Note — The .NET Runtime & Tools: dotnet CLI / CLR / Roslyn / sln are the heart of this chapter. Read the sample, then type it yourself.",
+    "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+    "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+  ],
+  "keyTerms": [
+    "dotnet CLI",
+    "CLR",
+    "Roslyn",
+    "sln"
+  ],
+  "samples": [
+    {
+      "title": "Worked sample",
+      "language": "C#",
+      "code": "dotnet new console -o Hello && dotnet run",
+      "output": "Hello, World!"
+    }
+  ],
+  "translatedNote": "هذا الفصل تمهيدي مجاني. تُفتح بقية الفصول فور شراء الكتاب. — Ce chapitre est un aperçu gratuit. — यह अध्याय निःशुल्क पूर्वावलोकन है।",
+  "paragraphs": [
+    "dotnet new console -o Hello && dotnet run",
+    "Hello, World!"
+  ]
+}

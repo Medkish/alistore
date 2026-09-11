@@ -18,10 +18,10 @@ const METADATA = {
   java: { isbn: '978-1-688-00009-7', edition: '5th Edition', pages: 360 },
   go: { isbn: '978-1-688-00010-3', edition: '2nd Edition', pages: 270 },
   rust: { isbn: '978-1-688-00011-0', edition: '1st Edition', pages: 330 },
-  database: { isbn: '978-1-688-00012-7', edition: '2nd Edition', pages: 300 },
-  devops: { isbn: '978-1-688-00013-4', edition: '1st Edition', pages: 320 },
-  ai: { isbn: '978-1-688-00014-1', edition: '1st Edition', pages: 350 },
-  cybersecurity: { isbn: '978-1-688-00015-8', edition: '1st Edition', pages: 290 }
+  typescript: { isbn: '978-1-688-00012-7', edition: '1st Edition', pages: 360 },
+  csharp: { isbn: '978-1-688-00013-4', edition: '2nd Edition', pages: 340 },
+  dart: { isbn: '978-1-688-00014-1', edition: '1st Edition', pages: 320 },
+  shell: { isbn: '978-1-688-00015-8', edition: '1st Edition', pages: 300 }
 };
 
 const CATEGORIES = [
@@ -29,12 +29,8 @@ const CATEGORIES = [
   { slug: 'javascript', name: 'JavaScript' },
   { slug: 'python', name: 'Python' },
   { slug: 'web-development', name: 'Web Development' },
-  { slug: 'database', name: 'Database' },
   { slug: 'frontend', name: 'Frontend' },
-  { slug: 'backend', name: 'Backend' },
-  { slug: 'devops', name: 'DevOps' },
-  { slug: 'ai', name: 'Artificial Intelligence' },
-  { slug: 'cybersecurity', name: 'Cybersecurity' }
+  { slug: 'backend', name: 'Backend' }
 ];
 
 const BOOK_CATEGORY = {
@@ -49,10 +45,10 @@ const BOOK_CATEGORY = {
   java: 'backend',
   go: 'backend',
   rust: 'programming',
-  database: 'database',
-  devops: 'devops',
-  ai: 'ai',
-  cybersecurity: 'cybersecurity'
+  typescript: 'javascript',
+  csharp: 'programming',
+  dart: 'frontend',
+  shell: 'backend'
 };
 
 const BOOKS = [
@@ -211,57 +207,57 @@ const BOOKS = [
     bestseller: true
   },
   {
-    slug: 'database',
-    title: 'Database Systems',
+    slug: 'typescript',
+    title: 'TypeScript',
     author: 'AlioStore',
-    description: 'SQL, indexes, transactions and schema design — the database skills every developer needs.',
+    description: 'Type-safe JavaScript — types, generics, interfaces and modern tooling.',
     price: 39.99,
     prevPrice: 49.99,
     stock: 10,
-    rating: 4.7,
+    rating: 4.8,
     coverImage: 'images/programming2.jpeg',
     publishedAt: '2025-05-10T00:00:00Z',
     featured: true,
-    bestseller: false
+    bestseller: true
   },
   {
-    slug: 'devops',
-    title: 'DevOps Handbook',
+    slug: 'csharp',
+    title: 'C#',
     author: 'Alio & Palma Cooperative',
-    description: 'CI/CD, containers, Kubernetes and observability — shipping software the modern way.',
+    description: 'Modern .NET development — OOP, LINQ, async, ASP.NET and EF Core.',
     price: 42,
     prevPrice: 52,
     stock: 9,
-    rating: 4.8,
+    rating: 4.7,
     coverImage: 'images/programming4.jpeg',
     publishedAt: '2025-06-01T00:00:00Z',
     featured: true,
     bestseller: false
   },
   {
-    slug: 'ai',
-    title: 'AI & Machine Learning',
+    slug: 'dart',
+    title: 'Dart',
     author: 'AlioStore',
-    description: 'From linear models to neural networks and LLMs — machine learning made practical.',
-    price: 49.99,
-    prevPrice: 59.99,
+    description: 'Cross-platform apps with Flutter — Dart types, OOP, async and widgets.',
+    price: 40,
+    prevPrice: 50,
     stock: 8,
-    rating: 4.9,
-    coverImage: 'images/product-item1.jpg',
+    rating: 4.6,
+    coverImage: 'images/programming6.jpeg',
     publishedAt: '2025-07-15T00:00:00Z',
     featured: true,
-    bestseller: true
+    bestseller: false
   },
   {
-    slug: 'cybersecurity',
-    title: 'Cybersecurity Essentials',
+    slug: 'shell',
+    title: 'Shell Scripting',
     author: 'Alio & Palma Cooperative',
-    description: 'Threat modeling, cryptography, web security and incident response for builders.',
-    price: 44,
-    prevPrice: 54,
+    description: 'Automate everything — Bash, pipes, control flow, functions and cron.',
+    price: 35,
+    prevPrice: 45,
     stock: 5,
-    rating: 4.6,
-    coverImage: 'images/product4.jpg',
+    rating: 4.5,
+    coverImage: 'images/programming5.jpeg',
     publishedAt: '2025-08-01T00:00:00Z',
     featured: false,
     bestseller: false
@@ -286,7 +282,7 @@ async function main() {
     let toc = [];
     let tocRaw = '';
     try {
-      tocRaw = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'frontend', 'public', 'books', slug, 'toc.json'), 'utf8');
+      tocRaw = fs.readFileSync(path.join(__dirname, '..', '..', 'frontend', 'public', 'books', slug, 'toc.json'), 'utf8');
       toc = JSON.parse(tocRaw).chapters || [];
     } catch (e) {
       toc = [];

@@ -1,0 +1,35 @@
+{
+  "title": "Swift",
+  "excerpt": "Free sample — Swift intermediate course. Chapter 1 begins: \"Swift & the Apple Ecosystem\".",
+  "chapter": "Chapter 1 · Free Preview",
+  "page": 12,
+  "objectives": [
+    "Explain the core ideas behind Playgrounds and Xcode.",
+    "Write and run working Swift code that uses Playgrounds, Xcode, build.",
+    "Recognise and avoid the common pitfalls associated with modules."
+  ],
+  "notes": [
+    "Note — Swift & the Apple Ecosystem: Playgrounds / Xcode / build / modules are the heart of this chapter. Read the sample, then type it yourself.",
+    "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+    "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+  ],
+  "keyTerms": [
+    "Playgrounds",
+    "Xcode",
+    "build",
+    "modules"
+  ],
+  "samples": [
+    {
+      "title": "Worked sample",
+      "language": "Swift",
+      "code": "print(\"Hello, Swift\")",
+      "output": "Hello, Swift"
+    }
+  ],
+  "translatedNote": "هذا الفصل تمهيدي مجاني. تُفتح بقية الفصول فور شراء الكتاب. — Ce chapitre est un aperçu gratuit. — यह अध्याय निःशुल्क पूर्वावलोकन है।",
+  "paragraphs": [
+    "print(\"Hello, Swift\")",
+    "Hello, Swift"
+  ]
+}

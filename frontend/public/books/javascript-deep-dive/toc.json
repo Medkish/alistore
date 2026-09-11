@@ -1,0 +1,41 @@
+{
+  "title": "JavaScript Deep Dive",
+  "pageCount": 60,
+  "chapters": [
+    {
+      "title": "The Event Loop Unpacked",
+      "page": 12,
+      "pageTo": 18
+    },
+    {
+      "title": "Closures & the Execution Stack",
+      "page": 19,
+      "pageTo": 25
+    },
+    {
+      "title": "Prototypal Inheritance",
+      "page": 26,
+      "pageTo": 32
+    },
+    {
+      "title": "Async Patterns & Microtasks",
+      "page": 33,
+      "pageTo": 39
+    },
+    {
+      "title": "Memory & Performance",
+      "page": 40,
+      "pageTo": 46
+    },
+    {
+      "title": "Engines: V8, JSC & SpiderMonkey",
+      "page": 47,
+      "pageTo": 53
+    },
+    {
+      "title": "Practical Debugging",
+      "page": 54,
+      "pageTo": 60
+    }
+  ]
+}

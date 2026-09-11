@@ -11,12 +11,8 @@ export const CATEGORY_OPTIONS = [
   { slug: 'javascript', name: 'JavaScript' },
   { slug: 'python', name: 'Python' },
   { slug: 'web-development', name: 'Web Development' },
-  { slug: 'database', name: 'Database' },
   { slug: 'frontend', name: 'Frontend' },
   { slug: 'backend', name: 'Backend' },
-  { slug: 'devops', name: 'DevOps' },
-  { slug: 'ai', name: 'Artificial Intelligence' },
-  { slug: 'cybersecurity', name: 'Cybersecurity' },
 ];
 
 export const PRICE_OPTIONS = [

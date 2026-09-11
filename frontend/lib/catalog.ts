@@ -11,11 +11,11 @@ export const CATALOG: Book[] = [
   { id: 'php', title: 'PHP', author: 'Armor Ramsey', price: 40, image: '/images/programming1.jpeg', description: 'Server-side scripting with PHP — forms, sessions, PDO and modern practices.', pages: 280, rating: 4.4, category: 'web-development', prevPrice: 50 },
   { id: 'java', title: 'Java', author: 'Armor Ramsey', price: 45, image: '/images/programming5.jpeg', description: 'Professional Java — OOP, collections, streams and building robust apps.', pages: 360, rating: 4.7, category: 'backend', prevPrice: 55 },
   { id: 'go', title: 'Go', author: 'Armor Ramsey', price: 40, image: '/images/programming3.jpeg', description: 'Concurrency-first Go — goroutines, channels, packaging and the ecosystem.', pages: 270, rating: 4.6, category: 'backend', prevPrice: 50 },
-  { id: 'rust', title: 'Rust', author: 'Alio & Palma Cooperative', price: 45, image: '/images/product4.jpg', description: 'The official AlioStore guide to safe, fast systems programming with Rust.', pages: 330, rating: 4.9, category: 'programming', prevPrice: 50 },
-  { id: 'database', title: 'Database Systems', author: 'AlioStore', price: 39.99, image: '/images/programming2.jpeg', description: 'SQL, indexes, transactions and schema design — the database skills every developer needs.', pages: 300, rating: 4.7, category: 'database', prevPrice: 49.99 },
-  { id: 'devops', title: 'DevOps Handbook', author: 'Alio & Palma Cooperative', price: 42, image: '/images/programming4.jpeg', description: 'CI/CD, containers, Kubernetes and observability — shipping software the modern way.', pages: 320, rating: 4.8, category: 'devops', prevPrice: 52 },
-  { id: 'ai', title: 'AI & Machine Learning', author: 'AlioStore', price: 49.99, image: '/images/product-item1.jpg', description: 'From linear models to neural networks and LLMs — machine learning made practical.', pages: 350, rating: 4.9, category: 'ai', prevPrice: 59.99 },
-  { id: 'cybersecurity', title: 'Cybersecurity Essentials', author: 'Alio & Palma Cooperative', price: 44, image: '/images/product4.jpg', description: 'Threat modeling, cryptography, web security and incident response for builders.', pages: 290, rating: 4.6, category: 'cybersecurity', prevPrice: 54 },
+  { id: 'rust', title: 'Rust', author: 'Alio & Palma Cooperative', price: 45, image: '/images/product4.jpg', description: 'Memory-safe systems programming that runs at blazing speed.', pages: 330, rating: 4.9, category: 'programming', prevPrice: 50 },
+  { id: 'typescript', title: 'TypeScript', author: 'AlioStore', price: 39.99, image: '/images/programming2.jpeg', description: 'Type-safe JavaScript — types, generics, interfaces and modern tooling.', pages: 360, rating: 4.8, category: 'javascript', prevPrice: 49.99 },
+  { id: 'csharp', title: 'C#', author: 'Alio & Palma Cooperative', price: 42, image: '/images/programming4.jpeg', description: 'Modern .NET development — OOP, LINQ, async, ASP.NET and EF Core.', pages: 340, rating: 4.7, category: 'programming', prevPrice: 52 },
+  { id: 'dart', title: 'Dart', author: 'AlioStore', price: 40, image: '/images/programming6.jpeg', description: 'Cross-platform apps with Flutter — Dart types, OOP, async and widgets.', pages: 320, rating: 4.6, category: 'frontend', prevPrice: 50 },
+  { id: 'shell', title: 'Shell Scripting', author: 'Alio & Palma Cooperative', price: 35, image: '/images/programming5.jpeg', description: 'Automate everything — Bash, pipes, control flow, functions and cron.', pages: 300, rating: 4.5, category: 'backend', prevPrice: 45 },
 ];
 
 export const CATEGORIES: { slug: string; name: string }[] = [
@@ -24,12 +24,8 @@ export const CATEGORIES: { slug: string; name: string }[] = [
   { slug: 'javascript', name: 'JavaScript' },
   { slug: 'python', name: 'Python' },
   { slug: 'web-development', name: 'Web Development' },
-  { slug: 'database', name: 'Database' },
   { slug: 'frontend', name: 'Frontend' },
   { slug: 'backend', name: 'Backend' },
-  { slug: 'devops', name: 'DevOps' },
-  { slug: 'ai', name: 'Artificial Intelligence' },
-  { slug: 'cybersecurity', name: 'Cybersecurity' },
 ];
 
 export function getBook(id: string): Book | undefined {

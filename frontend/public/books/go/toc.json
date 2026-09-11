@@ -1,0 +1,41 @@
+{
+  "title": "Go",
+  "pageCount": 60,
+  "chapters": [
+    {
+      "title": "Why Go",
+      "page": 12,
+      "pageTo": 18
+    },
+    {
+      "title": "Packages & Modules",
+      "page": 19,
+      "pageTo": 25
+    },
+    {
+      "title": "Types & Structs",
+      "page": 26,
+      "pageTo": 32
+    },
+    {
+      "title": "Interfaces",
+      "page": 33,
+      "pageTo": 39
+    },
+    {
+      "title": "Goroutines & Channels",
+      "page": 40,
+      "pageTo": 46
+    },
+    {
+      "title": "The Standard Library",
+      "page": 47,
+      "pageTo": 53
+    },
+    {
+      "title": "Building Services",
+      "page": 54,
+      "pageTo": 60
+    }
+  ]
+}
