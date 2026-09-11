@@ -130,11 +130,19 @@ async function listForUser(userId) {
   return orders.map((o) => serializeOrder(o));
 }
 
-async function listAll({ status, page, pageSize }) {
+async function listAll({ status, search, page, pageSize }) {
   const where = {};
   if (status) {
     const s = String(status).toUpperCase();
     if (ORDER_STATUSES.includes(s)) where.status = s;
+  }
+  const q = String(search || '').trim();
+  if (q) {
+    where.OR = [
+      { reference: { contains: q, mode: 'insensitive' } },
+      { contactName: { contains: q, mode: 'insensitive' } },
+      { contactEmail: { contains: q, mode: 'insensitive' } }
+    ];
   }
   const p = Math.max(1, Number(page) || 1);
   const size = Math.min(100, Math.max(1, Number(pageSize) || 20));

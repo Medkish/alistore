@@ -138,10 +138,17 @@ export const api = {
   adminUpdateBook: (slug: string, body: Record<string, unknown>) =>
     request<{ book: Book }>(`/admin/books/${encodeURIComponent(slug)}`, { method: 'PUT', body }),
   adminDeleteBook: (slug: string) => request<{ ok: boolean }>(`/admin/books/${encodeURIComponent(slug)}`, { method: 'DELETE' }),
-  adminOrders: (status?: string) =>
-    request<{ orders: Order[]; total: number; page: number; pageSize: number; totalPages: number }>(
-      `/admin/orders${status ? `?status=${status}` : ''}`,
-    ),
+  adminOrders: (options?: { status?: string; search?: string; page?: number; pageSize?: number }) => {
+    const params = new URLSearchParams();
+    if (options?.status) params.set('status', options.status);
+    if (options?.search) params.set('search', options.search);
+    if (options?.page && options.page > 1) params.set('page', String(options.page));
+    if (options?.pageSize) params.set('pageSize', String(options.pageSize));
+    const qs = params.toString();
+    return request<{ orders: Order[]; total: number; page: number; pageSize: number; totalPages: number }>(
+      `/admin/orders${qs ? `?${qs}` : ''}`,
+    );
+  },
   adminSetOrderStatus: (orderId: string, status: string) =>
     request<{ order: Order }>(`/admin/orders/${orderId}/status`, { method: 'PATCH', body: { status } }),
   adminUsers: () => request<{ users: AdminUser[] }>('/admin/users'),

@@ -99,6 +99,7 @@ async function deleteBook(req, res) {
 async function listOrders(req, res) {
   const result = await orderService.listAll({
     status: String(req.query.status || '').trim(),
+    search: String(req.query.search || '').trim(),
     page: num(req.query.page, 1),
     pageSize: num(req.query.pageSize, 20)
   });

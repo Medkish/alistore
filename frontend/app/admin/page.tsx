@@ -8,6 +8,7 @@ import { useAuth } from '@/components/providers';
 import { formatAED, formatNumber } from '@/lib/format';
 import {
   ORDER_STATUSES,
+  ORDER_TRANSITIONS,
   type AdminStats,
   type AdminUser,
   type Book,
@@ -454,34 +455,66 @@ function BooksTab({ onGoInventory }: { onGoInventory?: () => void }) {
 
 /* --------------------- Orders --------------------- */
 
+const PAGE_SIZE = 10;
+
+const STATUS_COLOR: Record<string, string> = {
+  PENDING: 'bg-slate-100 text-slate-700 border-slate-300',
+  PAID: 'bg-green-50 text-green-700 border-green-300',
+  SHIPPED: 'bg-blue-50 text-blue-700 border-blue-300',
+  DELIVERED: 'bg-emerald-50 text-emerald-700 border-emerald-300',
+  CANCELLED: 'bg-red-50 text-red-600 border-red-300',
+};
+
+const ACTION_LABEL: Record<string, string> = {
+  PAID: 'Mark Paid',
+  SHIPPED: 'Mark Shipped',
+  DELIVERED: 'Mark Delivered',
+  CANCELLED: 'Cancel',
+};
+
+const ACTION_STYLE: Record<string, string> = {
+  PAID: 'bg-green-600 hover:bg-green-700',
+  SHIPPED: 'bg-blue-600 hover:bg-blue-700',
+  DELIVERED: 'bg-emerald-600 hover:bg-emerald-700',
+  CANCELLED: 'bg-red-600 hover:bg-red-700',
+};
+
 function OrdersTab() {
   const [orders, setOrders] = useState<Order[] | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [status, setStatus] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState('');
   const [openId, setOpenId] = useState('');
 
   const load = useCallback(() => {
     api
-      .adminOrders()
-      .then((res) => setOrders(res.orders))
+      .adminOrders({ status, search, page, pageSize: PAGE_SIZE })
+      .then((res) => {
+        setOrders(res.orders);
+        setTotalPages(res.totalPages);
+        setTotal(res.total);
+      })
       .catch((e) => setError((e as Error).message));
-  }, []);
+  }, [status, search, page]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const counts = useMemo(() => {
-    const map: Record<string, number> = { '': orders?.length || 0 };
-    for (const s of ORDER_STATUSES) map[s] = (orders || []).filter((o) => o.status === s).length;
-    return map;
-  }, [orders]);
+  function applyFilter(nextStatus: string) {
+    setStatus(nextStatus);
+    setPage(1);
+  }
 
-  const visible = useMemo(
-    () => (status ? (orders || []).filter((o) => o.status === status) : orders || []),
-    [orders, status],
-  );
+  function runSearch() {
+    setPage(1);
+    setSearch(searchInput.trim());
+  }
 
   async function changeStatus(id: string, next: string) {
     setBusyId(id);
@@ -497,34 +530,46 @@ function OrdersTab() {
 
   return (
     <div>
-      <div className="flex gap-2 mb-5 overflow-x-auto">
-        {['', ...ORDER_STATUSES].map((s) => (
-          <button
-            key={s || 'ALL'}
-            onClick={() => setStatus(s)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition ${
-              status === s ? 'bg-brand text-white' : 'bg-white border border-line text-ink'
-            }`}
-          >
-            {s || 'All'}
-            <span className={`ml-1.5 text-[10px] ${status === s ? 'text-white/80' : 'text-muted'}`}>
-              {counts[s] ?? 0}
-            </span>
+      <div className="flex flex-col gap-3 mb-5">
+        <div className="flex gap-2 overflow-x-auto">
+          {['', ...ORDER_STATUSES].map((s) => (
+            <button
+              key={s || 'ALL'}
+              onClick={() => applyFilter(s)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition ${
+                status === s ? 'bg-brand text-white' : 'bg-white border border-line text-ink'
+              }`}
+            >
+              {s || 'All'}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && runSearch()}
+            placeholder="Search by reference, name or email"
+            className="flex-1 border-2 border-line rounded-xl px-3 py-2 text-sm focus:border-brand focus:outline-none"
+          />
+          <button onClick={runSearch} className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-bold hover:bg-accent-dark transition">
+            Search
           </button>
-        ))}
+        </div>
       </div>
 
       {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-4 mb-4">{error}</p>}
 
       <div className="flex flex-col gap-4">
         {orders === null && <p className="text-sm text-muted">Loading orders…</p>}
-        {orders !== null && !visible.length && <p className="text-sm text-muted">No orders in this state.</p>}
-        {visible.map((o) => {
+        {orders !== null && !orders.length && <p className="text-sm text-muted">No orders found.</p>}
+        {orders?.map((o) => {
           const expanded = openId === o.id;
-          const itemSubtotal = (o.items || []).reduce((s, it) => s + it.qty * (it.price || 0), 0);
+          const currentStatus = (o.status || 'PENDING') as OrderStatus;
+          const nextMoves = ORDER_TRANSITIONS[currentStatus] || [];
           return (
             <div key={o.id} className="bg-white border border-line rounded-2xl p-5 shadow-sm">
-              <div className="flex flex-wrap justify-between gap-3 mb-3">
+              <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                 <div>
                   <p className="font-bold text-ink">{o.reference}</p>
                   <p className="text-xs text-muted">
@@ -539,22 +584,20 @@ function OrdersTab() {
               <p className="text-sm text-ink mb-3">
                 {o.items.map((it) => `${it.name} × ${it.qty}`).join(', ')}
               </p>
-              <div className="flex flex-wrap items-center gap-3">
-                <select
-                  value={o.status}
-                  disabled={busyId === o.id}
-                  onChange={(e) => changeStatus(o.id as string, e.target.value)}
-                  className="border-2 border-brand rounded-xl px-3 py-2 text-sm font-semibold bg-white disabled:opacity-50"
-                >
-                  {ORDER_STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-xs text-muted">
-                  {o.status === 'DELIVERED' ? 'Completed' : `Currently: ${o.status}`}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`border text-xs font-bold px-2.5 py-1 rounded-lg ${STATUS_COLOR[currentStatus] || ''}`}>
+                  {currentStatus}
                 </span>
+                {nextMoves.map((next) => (
+                  <button
+                    key={next}
+                    disabled={busyId === o.id}
+                    onClick={() => changeStatus(o.id || '', next)}
+                    className={`px-3 py-1 rounded-lg text-[11px] font-bold text-white transition disabled:opacity-50 ${ACTION_STYLE[next] || 'bg-slate-400'}`}
+                  >
+                    {busyId === o.id ? '…' : ACTION_LABEL[next] || next}
+                  </button>
+                ))}
                 <button
                   onClick={() => setOpenId(expanded ? '' : (o.id as string))}
                   className="ml-auto text-xs font-bold text-accent-dark hover:underline"
@@ -613,7 +656,6 @@ function OrdersTab() {
                     <p className="text-sm text-muted mt-1">
                       {o.contact?.address || 'No shipping address recorded.'}
                     </p>
-                    <p className="text-xs text-muted mt-3">Order value includes {formatAED(itemSubtotal)} in items.</p>
                   </div>
                 </div>
               )}
@@ -621,6 +663,29 @@ function OrdersTab() {
           );
         })}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-6 text-sm">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            className="px-3 py-1 rounded-lg border border-line font-semibold disabled:opacity-40 hover:bg-slate-50"
+          >
+            ← Prev
+          </button>
+          <span className="text-muted">
+            Page <span className="font-bold text-ink">{page}</span> of <span className="font-bold text-ink">{totalPages}</span>
+            <span className="ml-2">({total} total)</span>
+          </span>
+          <button
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            className="px-3 py-1 rounded-lg border border-line font-semibold disabled:opacity-40 hover:bg-slate-50"
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -1124,7 +1189,7 @@ function ReportsTab() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    Promise.all([api.adminStats(), api.adminOrders()])
+    Promise.all([api.adminStats(), api.adminOrders({ pageSize: 1000 })])
       .then(([s, o]) => {
         setStats(s);
         setOrders(o.orders);
