@@ -8,7 +8,7 @@ import { CATALOG } from '@/lib/catalog';
 import { formatAED } from '@/lib/format';
 
 const FREE_DELIVERY_OVER = 150;
-const DELIVERY_FEE = 15;
+const DELIVERY_FEE = 10;
 
 function stockOf(id: string): number | null {
   const b = CATALOG.find((x) => x.id === id);
@@ -69,7 +69,9 @@ export default function CartPage() {
                     <Link href={`/books/${it.id}/`} className="font-bold hover:text-accent-dark line-clamp-1">
                       {it.name}
                     </Link>
-                    <p className="text-xs text-muted">{formatAED(it.price)} each</p>
+                    <p className="text-sm text-brand font-semibold mt-0.5">
+                      {formatAED(it.price)} × {it.qty}
+                    </p>
                     {stock === 0 ? (
                       <p className="text-xs text-red-600 font-semibold mt-1">🔴 Out of stock — remove to check out</p>
                     ) : stock != null && stock <= 5 ? (
@@ -180,6 +182,12 @@ export default function CartPage() {
                 className={`btn-flash btn-primary-flash mt-5 w-full text-center ${outOfStock ? 'opacity-50 pointer-events-none' : ''}`}
               >
                 Proceed to Checkout
+              </Link>
+              <Link
+                href="/books/"
+                className="btn-flash btn-outline-flash text-brand border-brand hover:bg-brand hover:text-white mt-3 w-full text-center"
+              >
+                CONTINUE SHOPPING
               </Link>
               <p className="text-[11px] text-muted text-center mt-3">🔒 Secure checkout · 3–5 working day delivery</p>
             </aside>

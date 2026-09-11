@@ -8,7 +8,7 @@ import { formatAED } from '@/lib/format';
 import type { CartItem } from '@/lib/types';
 
 const FREE_DELIVERY_OVER = 150;
-const DELIVERY_FEE = 15;
+const DELIVERY_FEE = 10;
 
 const PAY_METHODS = [
   { id: 'credit-card', label: 'Credit / Debit Card', hint: 'Visa · Mastercard · Amex' },
