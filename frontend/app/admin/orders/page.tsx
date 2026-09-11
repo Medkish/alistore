@@ -13,6 +13,7 @@ import {
 } from '@/lib/types';
 
 const PAGE_SIZE = 15;
+const SHIPPING_FEE = 10;
 
 const STATUS_COLOR: Record<string, string> = {
   PENDING:  'bg-slate-100 text-slate-700 border-slate-300',
@@ -23,10 +24,10 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 const ACTION_LABEL: Record<string, string> = {
-  PAID:     'Mark Paid',
-  SHIPPED:  'Mark Shipped',
-  DELIVERED:'Mark Delivered',
-  CANCELLED:'Cancel',
+  PAID:     'MARK AS PAID',
+  SHIPPED:  'MARK AS SHIPPED',
+  DELIVERED:'MARK AS DELIVERED',
+  CANCELLED:'CANCEL ORDER',
 };
 
 const ACTION_STYLE: Record<string, string> = {
@@ -255,68 +256,97 @@ export default function AdminOrdersPage() {
                                 {currentStatus === 'DELIVERED' ? 'Completed' : 'Closed'}
                               </span>
                             )}
-                            <ScrollArea>
-                              {nextMoves.map((next) => (
-                                <button
-                                  key={next}
-                                  disabled={busyId === o.id}
-                                  onClick={() => changeStatus(o.id || '', next)}
-                                  className={`px-2 py-1 rounded-lg text-[10px] font-bold text-white transition disabled:opacity-50 whitespace-nowrap ${ACTION_STYLE[next] || 'bg-slate-400'}`}
-                                >
-                                  {busyId === o.id ? '…' : ACTION_LABEL[next] || next}
-                                </button>
-                              ))}
-                            </ScrollArea>
                             <button
                               onClick={() => setOpenId(expanded ? '' : (o.id as string))}
-                              className="text-[11px] font-bold text-accent-dark hover:underline whitespace-nowrap shrink-0"
+                              className="ml-auto text-[11px] font-bold text-accent-dark hover:underline whitespace-nowrap shrink-0"
                             >
-                              {expanded ? 'Hide ↑' : 'View ↓'}
+                              {expanded ? 'Hide detail ↑' : 'View detail ↓'}
                             </button>
                           </div>
 
                           {expanded && (
-                            <div className="mt-3 border-t border-line pt-3 grid gap-4 lg:grid-cols-2">
-                              <div>
-                                <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-1.5">Items</p>
-                                <ul className="space-y-1 text-xs">
-                                  {o.items.map((it, i) => (
-                                    <li key={i} className="flex justify-between gap-3">
-                                      <span className="text-ink">{it.name} × {it.qty}</span>
-                                      <span className="font-semibold whitespace-nowrap">{formatAED(it.qty * (it.price || 0))}</span>
-                                    </li>
-                                  ))}
-                                  {(o.discountAmount ?? 0) > 0 && (
-                                    <li className="flex justify-between text-green-600">
-                                      <span>{o.couponCode ? `Discount (${o.couponCode})` : 'Discount'}</span>
-                                      <span>−{formatAED(o.discountAmount as number)}</span>
-                                    </li>
-                                  )}
-                                  <li className="flex justify-between font-extrabold text-brand border-t border-line pt-1.5 mt-1.5">
-                                    <span>Total</span>
-                                    <span>{formatAED(o.total)}</span>
-                                  </li>
-                                </ul>
+                            <div className="mt-4 border border-line rounded-2xl bg-slate-50/50 p-5">
+                              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                                <p className="text-lg font-extrabold text-ink">{o.reference}</p>
+                                <span className={`border text-xs font-bold px-2.5 py-1 rounded-lg ${STATUS_COLOR[currentStatus] || ''}`}>
+                                  {currentStatus}
+                                </span>
                               </div>
-                              <div className="text-xs space-y-1">
-                                <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-1.5">Details</p>
-                                <p>
-                                  <span className="text-muted">Payment:</span>{' '}
-                                  <span className="font-semibold text-ink">{o.paymentMethod || '—'}</span>
-                                </p>
-                                <p>
-                                  <span className="text-muted">Paid:</span>{' '}
-                                  <span className="font-semibold text-ink">
-                                    {o.paidAt ? new Date(o.paidAt).toLocaleString() : 'Pending'}
-                                  </span>
-                                </p>
-                                <p>
-                                  <span className="text-muted">Contact:</span>{' '}
-                                  <span className="font-semibold text-ink">
-                                    {o.contact?.name || '—'} · {o.contact?.phone || '—'}
-                                  </span>
-                                </p>
-                                <p className="text-muted">{o.contact?.address || 'No shipping address.'}</p>
+
+                              <div className="grid gap-5 md:grid-cols-2">
+                                <div>
+                                  <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-2 border-b border-dashed border-line pb-1">
+                                    Customer
+                                  </p>
+                                  <div className="text-xs space-y-1">
+                                    <p>
+                                      <span className="text-muted">Name:</span>{' '}
+                                      <span className="font-semibold text-ink">{o.user?.name || o.contact?.name || '—'}</span>
+                                    </p>
+                                    <p>
+                                      <span className="text-muted">Email:</span>{' '}
+                                      <span className="font-semibold text-ink">{o.user?.email || o.contact?.email || '—'}</span>
+                                    </p>
+                                    <p>
+                                      <span className="text-muted">Phone:</span>{' '}
+                                      <span className="font-semibold text-ink">{o.contact?.phone || '—'}</span>
+                                    </p>
+                                    <p>
+                                      <span className="text-muted">Ship to:</span>{' '}
+                                      <span className="text-ink">{o.contact?.address || '—'}</span>
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-2 border-b border-dashed border-line pb-1">
+                                    Items
+                                  </p>
+                                  <ul className="text-xs space-y-1.5">
+                                    {o.items.map((it, i) => (
+                                      <li key={i} className="flex justify-between gap-3">
+                                        <span className="text-ink">{it.name} × {it.qty}</span>
+                                        <span className="font-semibold whitespace-nowrap">{formatAED(it.qty * (it.price || 0))}</span>
+                                      </li>
+                                    ))}
+                                    <li className="flex justify-between text-muted border-t border-dashed border-line pt-1.5 mt-1.5">
+                                      <span>Shipping</span>
+                                      <span className="font-semibold text-ink">{formatAED(SHIPPING_FEE)}</span>
+                                    </li>
+                                    {(o.discountAmount ?? 0) > 0 && (
+                                      <li className="flex justify-between text-green-600">
+                                        <span>{o.couponCode ? `Discount (${o.couponCode})` : 'Discount'}</span>
+                                        <span>−{formatAED(o.discountAmount as number)}</span>
+                                      </li>
+                                    )}
+                                    <li className="flex justify-between font-extrabold text-brand border-t border-line pt-1.5 mt-1.5">
+                                      <span>TOTAL</span>
+                                      <span>
+                                        {formatAED(itemSubtotal + SHIPPING_FEE - (o.discountAmount ?? 0))}
+                                      </span>
+                                    </li>
+                                  </ul>
+                                  <p className="text-[10px] text-muted mt-2">
+                                    Payment: {o.paymentMethod || '—'} ·{' '}
+                                    Paid: {o.paidAt ? new Date(o.paidAt).toLocaleString() : 'Pending'}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="mt-5 flex flex-wrap items-center gap-2">
+                                <span className="text-xs font-bold text-muted uppercase tracking-wide mr-1">Status</span>
+                                <ScrollArea>
+                                  {nextMoves.map((next) => (
+                                    <button
+                                      key={next}
+                                      disabled={busyId === o.id}
+                                      onClick={() => changeStatus(o.id || '', next)}
+                                      className={`px-3 py-1.5 rounded-lg text-[11px] font-bold text-white transition disabled:opacity-50 whitespace-nowrap ${ACTION_STYLE[next] || 'bg-slate-400'}`}
+                                    >
+                                      {busyId === o.id ? '…' : ACTION_LABEL[next] || next}
+                                    </button>
+                                  ))}
+                                </ScrollArea>
                               </div>
                             </div>
                           )}

@@ -9,6 +9,14 @@ import { formatAED } from '@/lib/format';
 
 const ORDER_STEPS: OrderStatus[] = ['PENDING', 'PAID', 'SHIPPED', 'DELIVERED'];
 
+const STEP_LABELS: Record<OrderStatus, string> = {
+  PENDING: 'Order Placed',
+  PAID: 'Payment Confirmed',
+  SHIPPED: 'Shipped',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
+};
+
 const STATUS_STYLE: Record<OrderStatus, string> = {
   PENDING: 'bg-slate-100 text-slate-700 border-slate-300',
   PAID: 'bg-green-50 text-green-700 border-green-300',
@@ -84,7 +92,7 @@ export default function OrdersPage() {
                   className="w-full text-left px-5 py-4 flex flex-wrap items-center justify-between gap-3 hover:bg-slate-50 transition"
                 >
                   <div>
-                    <p className="font-bold text-ink">Order #{o.reference || 1001 + i}</p>
+                    <p className="font-bold text-ink">MY ORDER #{o.reference || 1001 + i}</p>
                     <p className="text-xs text-muted mt-0.5">
                       {placed
                         ? placed.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
@@ -140,18 +148,24 @@ export default function OrdersPage() {
                     {!cancelled && (
                       <div className="flex items-center gap-1 my-3 overflow-x-auto py-1">
                         {ORDER_STEPS.map((step, idx) => {
-                          const active = reached >= idx;
+                          const done = reached > idx;
+                          const current = reached === idx;
+                          const icon = done ? '✓' : current ? '●' : '○';
                           return (
                             <div key={step} className="flex items-center gap-1 shrink-0">
                               <span
                                 className={`px-2 py-1 rounded-full border text-[10px] font-bold whitespace-nowrap ${
-                                  active ? 'bg-brand text-white border-brand' : 'bg-white text-muted border-line'
+                                  done
+                                    ? 'bg-green-600 text-white border-green-600'
+                                    : current
+                                      ? 'bg-brand text-white border-brand'
+                                      : 'bg-white text-muted border-line'
                                 }`}
                               >
-                                {active ? '●' : '○'} {step}
+                                {icon} {STEP_LABELS[step]}
                               </span>
                               {idx < ORDER_STEPS.length - 1 && (
-                                <span className={`h-px w-4 ${reached > idx ? 'bg-brand' : 'bg-line'}`} />
+                                <span className={`h-px w-4 ${reached > idx ? 'bg-green-600' : 'bg-line'}`} />
                               )}
                             </div>
                           );

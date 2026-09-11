@@ -112,6 +112,7 @@ export const api = {
       },
     }),
   getOrders: () => request<{ orders: Order[] }>('/orders'),
+  getOrder: (id: string) => request<{ order: Order }>(`/orders/${encodeURIComponent(id)}`),
   getNotifications: () => request<{ notifications: NotificationItem[]; unread: number }>('/me/notifications'),
   markNotificationsRead: (id?: string) =>
     request<{ notifications: NotificationItem[]; unread: number }>('/me/notifications/read', {
