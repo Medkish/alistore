@@ -1,0 +1,603 @@
+{
+  "slug": "python",
+  "title": "TypeScript-like intro to Python for Data",
+  "titleTranslated": {
+    "en": "Python",
+    "ar": "بايثون",
+    "fr": "Python",
+    "hi": "पाइथन"
+  },
+  "description": "The complete Python guide — syntax, data structures, OOP and real-world projects.",
+  "level": "BEGINNER",
+  "prerequisites": "No prior programming experience.",
+  "languages": [
+    "en",
+    "ar",
+    "fr",
+    "hi"
+  ],
+  "pageCount": 60,
+  "chapters": [
+    {
+      "index": 1,
+      "chapter": 1,
+      "title": "Getting Started with Python",
+      "page": 12,
+      "pageTo": 18,
+      "objectives": [
+        "Explain the core ideas behind interpreter and REPL.",
+        "Write and run working TypeScript-like intro to Python for Data code that uses interpreter, REPL, print.",
+        "Recognise and avoid the common pitfalls associated with comments."
+      ],
+      "notes": [
+        "Note — Getting Started with Python: interpreter / REPL / print / comments are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "interpreter",
+        "REPL",
+        "print",
+        "comments"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript-like intro to Python for Data",
+          "code": "name = input(\"What is your name? \")\nprint(f\"Hello, {name}!\")",
+          "output": "What is your name? Alio\nHello, Alio!"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of interpreter in TypeScript-like intro to Python for Data?",
+          "answer": "interpreter lets you comments — see chapter section 1.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid comments?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "chapter": 2,
+      "title": "Variables & Types",
+      "page": 19,
+      "pageTo": 25,
+      "objectives": [
+        "Explain the core ideas behind int and float.",
+        "Write and run working TypeScript-like intro to Python for Data code that uses int, float, str.",
+        "Recognise and avoid the common pitfalls associated with type()."
+      ],
+      "notes": [
+        "Note — Variables & Types: int / float / str / bool / type() are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "int",
+        "float",
+        "str",
+        "bool",
+        "type()"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript-like intro to Python for Data",
+          "code": "price = 29.99\nqty = 3\nprint(type(price), type(qty))\nprint(price * qty)",
+          "output": "<class 'float'> <class 'int'>\n89.97000000000001"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of int in TypeScript-like intro to Python for Data?",
+          "answer": "int lets you type() — see chapter section 2.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid type()?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "chapter": 3,
+      "title": "Control Flow",
+      "page": 26,
+      "pageTo": 32,
+      "objectives": [
+        "Explain the core ideas behind if/elif/else and while.",
+        "Write and run working TypeScript-like intro to Python for Data code that uses if/elif/else, while, for.",
+        "Recognise and avoid the common pitfalls associated with range."
+      ],
+      "notes": [
+        "Note — Control Flow: if/elif/else / while / for / range are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "if/elif/else",
+        "while",
+        "for",
+        "range"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript-like intro to Python for Data",
+          "code": "total = 120\nif total >= 100:\n    total *= 0.9\nprint(total)",
+          "output": "108.0"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of if/elif/else in TypeScript-like intro to Python for Data?",
+          "answer": "if/elif/else lets you range — see chapter section 3.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid range?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "chapter": 4,
+      "title": "Functions",
+      "page": 33,
+      "pageTo": 39,
+      "objectives": [
+        "Explain the core ideas behind def and parameters.",
+        "Write and run working TypeScript-like intro to Python for Data code that uses def, parameters, return.",
+        "Recognise and avoid the common pitfalls associated with default args."
+      ],
+      "notes": [
+        "Note — Functions: def / parameters / return / default args are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "def",
+        "parameters",
+        "return",
+        "default args"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript-like intro to Python for Data",
+          "code": "def tax(amount, rate=0.05):\n    return amount * rate\nprint(tax(200))",
+          "output": "10.0"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of def in TypeScript-like intro to Python for Data?",
+          "answer": "def lets you default args — see chapter section 4.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid default args?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "chapter": 5,
+      "title": "Data Structures",
+      "page": 40,
+      "pageTo": 46,
+      "objectives": [
+        "Explain the core ideas behind list and tuple.",
+        "Write and run working TypeScript-like intro to Python for Data code that uses list, tuple, dict.",
+        "Recognise and avoid the common pitfalls associated with comprehensions."
+      ],
+      "notes": [
+        "Note — Data Structures: list / tuple / dict / set / comprehensions are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "list",
+        "tuple",
+        "dict",
+        "set",
+        "comprehensions"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript-like intro to Python for Data",
+          "code": "scores = {\"Ali\": 92, \"Lina\": 88}\nprint([s for s in scores.values() if s > 90])",
+          "output": "[92]"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of list in TypeScript-like intro to Python for Data?",
+          "answer": "list lets you comprehensions — see chapter section 5.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid comprehensions?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "chapter": 6,
+      "title": "OOP in Practice",
+      "page": 47,
+      "pageTo": 53,
+      "objectives": [
+        "Explain the core ideas behind class and __init__.",
+        "Write and run working TypeScript-like intro to Python for Data code that uses class, __init__, methods.",
+        "Recognise and avoid the common pitfalls associated with inheritance."
+      ],
+      "notes": [
+        "Note — OOP in Practice: class / __init__ / methods / inheritance are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "class",
+        "__init__",
+        "methods",
+        "inheritance"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript-like intro to Python for Data",
+          "code": "class Book:\n    def __init__(self, title):\n        self.title = title\nb = Book(\"Python\")\nprint(b.title)",
+          "output": "Python"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of class in TypeScript-like intro to Python for Data?",
+          "answer": "class lets you inheritance — see chapter section 6.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid inheritance?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "chapter": 7,
+      "title": "Real-World Projects",
+      "page": 54,
+      "pageTo": 60,
+      "objectives": [
+        "Explain the core ideas behind files and modules.",
+        "Write and run working TypeScript-like intro to Python for Data code that uses files, modules, exceptions.",
+        "Recognise and avoid the common pitfalls associated with pip."
+      ],
+      "notes": [
+        "Note — Real-World Projects: files / modules / exceptions / pip are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "files",
+        "modules",
+        "exceptions",
+        "pip"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "TypeScript-like intro to Python for Data",
+          "code": "try:\n    with open(\"notes.txt\") as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print(\"Missing file\")",
+          "output": "Missing file"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of files in TypeScript-like intro to Python for Data?",
+          "answer": "files lets you pip — see chapter section 7.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid pip?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    }
+  ],
+  "exercisesTotal": 21,
+  "tests": {
+    "instructions": "One assessment per chapter grouping plus a final exam. Every question maps to the section shown in brackets so you can revise precisely.",
+    "chapters": [
+      {
+        "chapter": 1,
+        "title": "Getting Started with Python",
+        "page": 12,
+        "questions": [
+          {
+            "q": "Which concept makes interpreter behave that way? (TypeScript-like intro to Python for Data ch.1)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"What is your name? Alio\nHello, Alio!\". Which statement caused it? (ch.1)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 2,
+        "title": "Variables & Types",
+        "page": 19,
+        "questions": [
+          {
+            "q": "Which concept makes int behave that way? (TypeScript-like intro to Python for Data ch.2)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"<class 'float'> <class 'int'>\n89.97000000000001\". Which statement caused it? (ch.2)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 3,
+        "title": "Control Flow",
+        "page": 26,
+        "questions": [
+          {
+            "q": "Which concept makes if/elif/else behave that way? (TypeScript-like intro to Python for Data ch.3)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"108.0\". Which statement caused it? (ch.3)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 4,
+        "title": "Functions",
+        "page": 33,
+        "questions": [
+          {
+            "q": "Which concept makes def behave that way? (TypeScript-like intro to Python for Data ch.4)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"10.0\". Which statement caused it? (ch.4)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 5,
+        "title": "Data Structures",
+        "page": 40,
+        "questions": [
+          {
+            "q": "Which concept makes list behave that way? (TypeScript-like intro to Python for Data ch.5)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"[92]\". Which statement caused it? (ch.5)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 6,
+        "title": "OOP in Practice",
+        "page": 47,
+        "questions": [
+          {
+            "q": "Which concept makes class behave that way? (TypeScript-like intro to Python for Data ch.6)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Python\". Which statement caused it? (ch.6)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 7,
+        "title": "Real-World Projects",
+        "page": 54,
+        "questions": [
+          {
+            "q": "Which concept makes files behave that way? (TypeScript-like intro to Python for Data ch.7)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Missing file\". Which statement caused it? (ch.7)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      }
+    ],
+    "assessment": [
+      {
+        "q": "Write TypeScript-like intro to Python for Data code that reads a value, transforms it and prints the result. (final)",
+        "options": [
+          "compile only",
+          "read → transform → print",
+          "print only"
+        ],
+        "answer": "read → transform → print"
+      },
+      {
+        "q": "What does the score of 14.3 marks per chapter tell you about this exam's structure? (final)",
+        "options": [
+          "chapters weigh equally",
+          "the last chapter is heaviest",
+          "random weighting"
+        ],
+        "answer": "chapters weigh equally"
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "object",
+      "meaning": "An instance of a class holding its own state and behaviour.",
+      "translations": {
+        "ar": "كائن",
+        "fr": "objet",
+        "hi": "ऑब्जेक्ट"
+      }
+    },
+    {
+      "term": "string",
+      "meaning": "A sequence of characters representing text.",
+      "translations": {
+        "ar": "نص",
+        "fr": "chaîne de caractères",
+        "hi": "स्ट्रिंग"
+      }
+    },
+    {
+      "term": "recursion",
+      "meaning": "A function calling itself to solve smaller sub-problems.",
+      "translations": {
+        "ar": "عودة النّداء",
+        "fr": "récursivité",
+        "hi": "पुनरावर्तन"
+      }
+    },
+    {
+      "term": "thread",
+      "meaning": "The smallest unit of execution within a process.",
+      "translations": {
+        "ar": "خيط التنفيذ",
+        "fr": "fil d'exécution",
+        "hi": "थ्रेड"
+      }
+    },
+    {
+      "term": "scope",
+      "meaning": "The region of code where a name is visible and valid.",
+      "translations": {
+        "ar": "نطاق الأسماء",
+        "fr": "portée",
+        "hi": "स्कोप"
+      }
+    },
+    {
+      "term": "idiom",
+      "meaning": "A commonly used, idiomatic pattern in a language.",
+      "translations": {
+        "ar": "أسلوب متعارف",
+        "fr": "idiome",
+        "hi": "मुहावरा"
+      }
+    }
+  ],
+  "appendix": {
+    "furtherReading": [
+      "The TypeScript-like intro to Python for Data language reference",
+      "Official language tour",
+      "Problem sets in the TypeScript-like intro to Python for Data book club section"
+    ]
+  }
+}

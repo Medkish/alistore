@@ -1,0 +1,531 @@
+{
+  "slug": "swift",
+  "title": "Swift",
+  "titleTranslated": {
+    "en": "Swift",
+    "ar": "سويفت",
+    "fr": "Swift",
+    "hi": "स्विफ्ट"
+  },
+  "description": "Build for Apple platforms with Swift — types, concurrency and SwiftUI basics.",
+  "level": "INTERMEDIATE",
+  "prerequisites": "Basic programming familiarity.",
+  "languages": [
+    "en",
+    "ar",
+    "fr",
+    "hi"
+  ],
+  "pageCount": 53,
+  "chapters": [
+    {
+      "index": 1,
+      "chapter": 1,
+      "title": "Swift & the Apple Ecosystem",
+      "page": 12,
+      "pageTo": 18,
+      "objectives": [
+        "Explain the core ideas behind Playgrounds and Xcode.",
+        "Write and run working Swift code that uses Playgrounds, Xcode, build.",
+        "Recognise and avoid the common pitfalls associated with modules."
+      ],
+      "notes": [
+        "Note — Swift & the Apple Ecosystem: Playgrounds / Xcode / build / modules are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "Playgrounds",
+        "Xcode",
+        "build",
+        "modules"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Swift",
+          "code": "print(\"Hello, Swift\")",
+          "output": "Hello, Swift"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of Playgrounds in Swift?",
+          "answer": "Playgrounds lets you modules — see chapter section 1.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid modules?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "chapter": 2,
+      "title": "Values, Types & Optionals",
+      "page": 19,
+      "pageTo": 25,
+      "objectives": [
+        "Explain the core ideas behind let and var.",
+        "Write and run working Swift code that uses let, var, optionals.",
+        "Recognise and avoid the common pitfalls associated with guard."
+      ],
+      "notes": [
+        "Note — Values, Types & Optionals: let / var / optionals / guard are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "let",
+        "var",
+        "optionals",
+        "guard"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Swift",
+          "code": "let qty: Int? = 3\nprint(qty.map { $0 * 2 } ?? 0)",
+          "output": "Optional(6) becomes 6 via ?? → 6"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of let in Swift?",
+          "answer": "let lets you guard — see chapter section 2.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid guard?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "chapter": 3,
+      "title": "Functions & Closures",
+      "page": 26,
+      "pageTo": 32,
+      "objectives": [
+        "Explain the core ideas behind func and generics.",
+        "Write and run working Swift code that uses func, generics, trailing closures.",
+        "Recognise and avoid the common pitfalls associated with map."
+      ],
+      "notes": [
+        "Note — Functions & Closures: func / generics / trailing closures / map are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "func",
+        "generics",
+        "trailing closures",
+        "map"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Swift",
+          "code": "let prices = [10, 20]\nprint(prices.map { $0 * 1.05 })",
+          "output": "[10.5, 21.0]"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of func in Swift?",
+          "answer": "func lets you map — see chapter section 3.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid map?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "chapter": 4,
+      "title": "Protocols & Generics",
+      "page": 33,
+      "pageTo": 39,
+      "objectives": [
+        "Explain the core ideas behind protocol and extension.",
+        "Write and run working Swift code that uses protocol, extension, associatedtype.",
+        "Recognise and avoid the common pitfalls associated with where."
+      ],
+      "notes": [
+        "Note — Protocols & Generics: protocol / extension / associatedtype / where are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "protocol",
+        "extension",
+        "associatedtype",
+        "where"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Swift",
+          "code": "protocol Discountable { func discounted() -> Double }\nextension Double: Discountable { func discounted() -> Double { self * 0.9 } }",
+          "output": "Any Double now has .discounted()"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of protocol in Swift?",
+          "answer": "protocol lets you where — see chapter section 4.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid where?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "chapter": 5,
+      "title": "Concurrency with Async/Await",
+      "page": 40,
+      "pageTo": 46,
+      "objectives": [
+        "Explain the core ideas behind async and await.",
+        "Write and run working Swift code that uses async, await, Task.",
+        "Recognise and avoid the common pitfalls associated with actors."
+      ],
+      "notes": [
+        "Note — Concurrency with Async/Await: async / await / Task / actors are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "async",
+        "await",
+        "Task",
+        "actors"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Swift",
+          "code": "let books = try await client.listBooks()",
+          "output": "Result available after suspension"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of async in Swift?",
+          "answer": "async lets you actors — see chapter section 5.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid actors?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "chapter": 6,
+      "title": "SwiftUI Essentials",
+      "page": 47,
+      "pageTo": 53,
+      "objectives": [
+        "Explain the core ideas behind View and body.",
+        "Write and run working Swift code that uses View, body, State.",
+        "Recognise and avoid the common pitfalls associated with some View."
+      ],
+      "notes": [
+        "Note — SwiftUI Essentials: View / body / State / some View are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "View",
+        "body",
+        "State",
+        "some View"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Swift",
+          "code": "struct Row: View {\n  var body: some View { Text(\"Swift\").padding() }\n}",
+          "output": "A text row rendered inside a view hierarchy"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of View in Swift?",
+          "answer": "View lets you some view — see chapter section 6.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid some View?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    }
+  ],
+  "exercisesTotal": 18,
+  "tests": {
+    "instructions": "One assessment per chapter grouping plus a final exam. Every question maps to the section shown in brackets so you can revise precisely.",
+    "chapters": [
+      {
+        "chapter": 1,
+        "title": "Swift & the Apple Ecosystem",
+        "page": 12,
+        "questions": [
+          {
+            "q": "Which concept makes Playgrounds behave that way? (Swift ch.1)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Hello, Swift\". Which statement caused it? (ch.1)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 2,
+        "title": "Values, Types & Optionals",
+        "page": 19,
+        "questions": [
+          {
+            "q": "Which concept makes let behave that way? (Swift ch.2)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Optional(6) becomes 6 via ?? → 6\". Which statement caused it? (ch.2)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 3,
+        "title": "Functions & Closures",
+        "page": 26,
+        "questions": [
+          {
+            "q": "Which concept makes func behave that way? (Swift ch.3)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"[10.5, 21.0]\". Which statement caused it? (ch.3)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 4,
+        "title": "Protocols & Generics",
+        "page": 33,
+        "questions": [
+          {
+            "q": "Which concept makes protocol behave that way? (Swift ch.4)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Any Double now has .discounted()\". Which statement caused it? (ch.4)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 5,
+        "title": "Concurrency with Async/Await",
+        "page": 40,
+        "questions": [
+          {
+            "q": "Which concept makes async behave that way? (Swift ch.5)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Result available after suspension\". Which statement caused it? (ch.5)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 6,
+        "title": "SwiftUI Essentials",
+        "page": 47,
+        "questions": [
+          {
+            "q": "Which concept makes View behave that way? (Swift ch.6)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"A text row rendered inside a view hierarchy\". Which statement caused it? (ch.6)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      }
+    ],
+    "assessment": [
+      {
+        "q": "Write Swift code that reads a value, transforms it and prints the result. (final)",
+        "options": [
+          "compile only",
+          "read → transform → print",
+          "print only"
+        ],
+        "answer": "read → transform → print"
+      },
+      {
+        "q": "What does the score of 16.7 marks per chapter tell you about this exam's structure? (final)",
+        "options": [
+          "chapters weigh equally",
+          "the last chapter is heaviest",
+          "random weighting"
+        ],
+        "answer": "chapters weigh equally"
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "function",
+      "meaning": "A reusable block of code that performs a task.",
+      "translations": {
+        "ar": "دالة",
+        "fr": "fonction",
+        "hi": "फ़ंक्शन"
+      }
+    },
+    {
+      "term": "loop",
+      "meaning": "A construct that repeats a block of code while a condition holds.",
+      "translations": {
+        "ar": "حَلقة",
+        "fr": "boucle",
+        "hi": "लूप"
+      }
+    },
+    {
+      "term": "recursion",
+      "meaning": "A function calling itself to solve smaller sub-problems.",
+      "translations": {
+        "ar": "عودة النّداء",
+        "fr": "récursivité",
+        "hi": "पुनरावर्तन"
+      }
+    },
+    {
+      "term": "memory",
+      "meaning": "The storage space allocated to running programs.",
+      "translations": {
+        "ar": "الذاكرة",
+        "fr": "mémoire",
+        "hi": "मेमोरी"
+      }
+    },
+    {
+      "term": "composition",
+      "meaning": "Building complex types by combining simpler ones.",
+      "translations": {
+        "ar": "تكوين",
+        "fr": "composition",
+        "hi": "संरचना"
+      }
+    },
+    {
+      "term": "module",
+      "meaning": "A file or unit that groups related code for reuse.",
+      "translations": {
+        "ar": "وحدة",
+        "fr": "module",
+        "hi": "मॉड्यूल"
+      }
+    }
+  ],
+  "appendix": {
+    "furtherReading": [
+      "The Swift language reference",
+      "Official language tour",
+      "Problem sets in the Swift book club section"
+    ]
+  }
+}

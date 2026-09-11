@@ -1,0 +1,35 @@
+{
+  "title": "Dart",
+  "excerpt": "Free sample — Dart intermediate course. Chapter 1 begins: \"Dart & the VM\".",
+  "chapter": "Chapter 1 · Free Preview",
+  "page": 12,
+  "objectives": [
+    "Explain the core ideas behind flutter and dart run.",
+    "Write and run working Dart code that uses flutter, dart run, JIT/AOT.",
+    "Recognise and avoid the common pitfalls associated with pub."
+  ],
+  "notes": [
+    "Note — Dart & the VM: flutter / dart run / JIT/AOT / pub are the heart of this chapter. Read the sample, then type it yourself.",
+    "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+    "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+  ],
+  "keyTerms": [
+    "flutter",
+    "dart run",
+    "JIT/AOT",
+    "pub"
+  ],
+  "samples": [
+    {
+      "title": "Worked sample",
+      "language": "Dart",
+      "code": "void main() { print(\"Hello, Dart\"); }",
+      "output": "Hello, Dart"
+    }
+  ],
+  "translatedNote": "هذا الفصل تمهيدي مجاني. تُفتح بقية الفصول فور شراء الكتاب. — Ce chapitre est un aperçu gratuit. — यह अध्याय निःशुल्क पूर्वावलोकन है।",
+  "paragraphs": [
+    "void main() { print(\"Hello, Dart\"); }",
+    "Hello, Dart"
+  ]
+}

@@ -1,0 +1,603 @@
+{
+  "slug": "dart",
+  "title": "Dart",
+  "titleTranslated": {
+    "en": "Dart",
+    "ar": "دارت",
+    "fr": "Dart",
+    "hi": "डार्ट"
+  },
+  "description": "Build cross-platform apps with Flutter — Dart types, OOP and async.",
+  "level": "INTERMEDIATE",
+  "prerequisites": "Familiarity with an OOP language.",
+  "languages": [
+    "en",
+    "ar",
+    "fr",
+    "hi"
+  ],
+  "pageCount": 60,
+  "chapters": [
+    {
+      "index": 1,
+      "chapter": 1,
+      "title": "Dart & the VM",
+      "page": 12,
+      "pageTo": 18,
+      "objectives": [
+        "Explain the core ideas behind flutter and dart run.",
+        "Write and run working Dart code that uses flutter, dart run, JIT/AOT.",
+        "Recognise and avoid the common pitfalls associated with pub."
+      ],
+      "notes": [
+        "Note — Dart & the VM: flutter / dart run / JIT/AOT / pub are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "flutter",
+        "dart run",
+        "JIT/AOT",
+        "pub"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Dart",
+          "code": "void main() { print(\"Hello, Dart\"); }",
+          "output": "Hello, Dart"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of flutter in Dart?",
+          "answer": "flutter lets you pub — see chapter section 1.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid pub?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "chapter": 2,
+      "title": "Types & Variables",
+      "page": 19,
+      "pageTo": 25,
+      "objectives": [
+        "Explain the core ideas behind var and final.",
+        "Write and run working Dart code that uses var, final, const.",
+        "Recognise and avoid the common pitfalls associated with sound types."
+      ],
+      "notes": [
+        "Note — Types & Variables: var / final / const / nullable / sound types are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "var",
+        "final",
+        "const",
+        "nullable",
+        "sound types"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Dart",
+          "code": "int? qty;\nprint(qty?.isEven ?? true);",
+          "output": "true"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of var in Dart?",
+          "answer": "var lets you sound types — see chapter section 2.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid sound types?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "chapter": 3,
+      "title": "Functions & Closures",
+      "page": 26,
+      "pageTo": 32,
+      "objectives": [
+        "Explain the core ideas behind => and optional params.",
+        "Write and run working Dart code that uses =>, optional params, tear-offs.",
+        "Recognise and avoid the common pitfalls associated with callbacks."
+      ],
+      "notes": [
+        "Note — Functions & Closures: => / optional params / tear-offs / callbacks are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "=>",
+        "optional params",
+        "tear-offs",
+        "callbacks"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Dart",
+          "code": "json.map(_jsonToCart).toList();",
+          "output": "Each map entry mapped by the function"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of => in Dart?",
+          "answer": "=> lets you callbacks — see chapter section 3.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid callbacks?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "chapter": 4,
+      "title": "OOP & Mixins",
+      "page": 33,
+      "pageTo": 39,
+      "objectives": [
+        "Explain the core ideas behind class and extends.",
+        "Write and run working Dart code that uses class, extends, with.",
+        "Recognise and avoid the common pitfalls associated with abstract."
+      ],
+      "notes": [
+        "Note — OOP & Mixins: class / extends / with / implements / abstract are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "class",
+        "extends",
+        "with",
+        "implements",
+        "abstract"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Dart",
+          "code": "class Checkout extends Base with Discounts {}",
+          "output": "Checkout gains Discounts behaviour"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of class in Dart?",
+          "answer": "class lets you abstract — see chapter section 4.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid abstract?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "chapter": 5,
+      "title": "Collections & Immutability",
+      "page": 40,
+      "pageTo": 46,
+      "objectives": [
+        "Explain the core ideas behind List and Set.",
+        "Write and run working Dart code that uses List, Set, Map.",
+        "Recognise and avoid the common pitfalls associated with unmodifiable."
+      ],
+      "notes": [
+        "Note — Collections & Immutability: List / Set / Map / unmodifiable are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "List",
+        "Set",
+        "Map",
+        "unmodifiable"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Dart",
+          "code": "final taxes = List.unmodifiable([5]);",
+          "output": "Adding to taxes throws"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of List in Dart?",
+          "answer": "List lets you unmodifiable — see chapter section 5.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid unmodifiable?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "chapter": 6,
+      "title": "Async & Futures",
+      "page": 47,
+      "pageTo": 53,
+      "objectives": [
+        "Explain the core ideas behind async and await.",
+        "Write and run working Dart code that uses async, await, Stream.",
+        "Recognise and avoid the common pitfalls associated with Future."
+      ],
+      "notes": [
+        "Note — Async & Futures: async / await / Stream / Future are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "async",
+        "await",
+        "Stream",
+        "Future"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Dart",
+          "code": "final list = await api.fetch().timeout(Duration(seconds: 5));",
+          "output": "Resolves or throws after 5s"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of async in Dart?",
+          "answer": "async lets you future — see chapter section 6.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid Future?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "chapter": 7,
+      "title": "Flutter Fundamentals",
+      "page": 54,
+      "pageTo": 60,
+      "objectives": [
+        "Explain the core ideas behind Widget and State.",
+        "Write and run working Dart code that uses Widget, State, build.",
+        "Recognise and avoid the common pitfalls associated with MaterialApp."
+      ],
+      "notes": [
+        "Note — Flutter Fundamentals: Widget / State / build / MaterialApp are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "Widget",
+        "State",
+        "build",
+        "MaterialApp"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Dart",
+          "code": "class Price extends StatelessWidget {\n  Widget build(c) => Text(\"AED 40\");\n}",
+          "output": "Elapsed widget renders the price"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of Widget in Dart?",
+          "answer": "Widget lets you materialapp — see chapter section 7.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid MaterialApp?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    }
+  ],
+  "exercisesTotal": 21,
+  "tests": {
+    "instructions": "One assessment per chapter grouping plus a final exam. Every question maps to the section shown in brackets so you can revise precisely.",
+    "chapters": [
+      {
+        "chapter": 1,
+        "title": "Dart & the VM",
+        "page": 12,
+        "questions": [
+          {
+            "q": "Which concept makes flutter behave that way? (Dart ch.1)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Hello, Dart\". Which statement caused it? (ch.1)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 2,
+        "title": "Types & Variables",
+        "page": 19,
+        "questions": [
+          {
+            "q": "Which concept makes var behave that way? (Dart ch.2)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"true\". Which statement caused it? (ch.2)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 3,
+        "title": "Functions & Closures",
+        "page": 26,
+        "questions": [
+          {
+            "q": "Which concept makes => behave that way? (Dart ch.3)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Each map entry mapped by the function\". Which statement caused it? (ch.3)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 4,
+        "title": "OOP & Mixins",
+        "page": 33,
+        "questions": [
+          {
+            "q": "Which concept makes class behave that way? (Dart ch.4)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Checkout gains Discounts behaviour\". Which statement caused it? (ch.4)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 5,
+        "title": "Collections & Immutability",
+        "page": 40,
+        "questions": [
+          {
+            "q": "Which concept makes List behave that way? (Dart ch.5)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Adding to taxes throws\". Which statement caused it? (ch.5)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 6,
+        "title": "Async & Futures",
+        "page": 47,
+        "questions": [
+          {
+            "q": "Which concept makes async behave that way? (Dart ch.6)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Resolves or throws after 5s\". Which statement caused it? (ch.6)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 7,
+        "title": "Flutter Fundamentals",
+        "page": 54,
+        "questions": [
+          {
+            "q": "Which concept makes Widget behave that way? (Dart ch.7)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Elapsed widget renders the price\". Which statement caused it? (ch.7)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      }
+    ],
+    "assessment": [
+      {
+        "q": "Write Dart code that reads a value, transforms it and prints the result. (final)",
+        "options": [
+          "compile only",
+          "read → transform → print",
+          "print only"
+        ],
+        "answer": "read → transform → print"
+      },
+      {
+        "q": "What does the score of 14.3 marks per chapter tell you about this exam's structure? (final)",
+        "options": [
+          "chapters weigh equally",
+          "the last chapter is heaviest",
+          "random weighting"
+        ],
+        "answer": "chapters weigh equally"
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "object",
+      "meaning": "An instance of a class holding its own state and behaviour.",
+      "translations": {
+        "ar": "كائن",
+        "fr": "objet",
+        "hi": "ऑब्जेक्ट"
+      }
+    },
+    {
+      "term": "string",
+      "meaning": "A sequence of characters representing text.",
+      "translations": {
+        "ar": "نص",
+        "fr": "chaîne de caractères",
+        "hi": "स्ट्रिंग"
+      }
+    },
+    {
+      "term": "recursion",
+      "meaning": "A function calling itself to solve smaller sub-problems.",
+      "translations": {
+        "ar": "عودة النّداء",
+        "fr": "récursivité",
+        "hi": "पुनरावर्तन"
+      }
+    },
+    {
+      "term": "thread",
+      "meaning": "The smallest unit of execution within a process.",
+      "translations": {
+        "ar": "خيط التنفيذ",
+        "fr": "fil d'exécution",
+        "hi": "थ्रेड"
+      }
+    },
+    {
+      "term": "scope",
+      "meaning": "The region of code where a name is visible and valid.",
+      "translations": {
+        "ar": "نطاق الأسماء",
+        "fr": "portée",
+        "hi": "स्कोप"
+      }
+    },
+    {
+      "term": "idiom",
+      "meaning": "A commonly used, idiomatic pattern in a language.",
+      "translations": {
+        "ar": "أسلوب متعارف",
+        "fr": "idiome",
+        "hi": "मुहावरा"
+      }
+    }
+  ],
+  "appendix": {
+    "furtherReading": [
+      "The Dart language reference",
+      "Official language tour",
+      "Problem sets in the Dart book club section"
+    ]
+  }
+}

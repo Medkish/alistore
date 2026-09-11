@@ -1,0 +1,601 @@
+{
+  "slug": "go",
+  "title": "Go",
+  "titleTranslated": {
+    "en": "Go",
+    "ar": "غو",
+    "fr": "Go",
+    "hi": "गो"
+  },
+  "description": "Concurrency-first Go — goroutines, channels, packaging and the ecosystem.",
+  "level": "INTERMEDIATE",
+  "prerequisites": "Basic programming familiarity.",
+  "languages": [
+    "en",
+    "ar",
+    "fr",
+    "hi"
+  ],
+  "pageCount": 60,
+  "chapters": [
+    {
+      "index": 1,
+      "chapter": 1,
+      "title": "Why Go",
+      "page": 12,
+      "pageTo": 18,
+      "objectives": [
+        "Explain the core ideas behind gofmt and single binary.",
+        "Write and run working Go code that uses gofmt, single binary, simplicity.",
+        "Recognise and avoid the common pitfalls associated with tooling."
+      ],
+      "notes": [
+        "Note — Why Go: gofmt / single binary / simplicity / tooling are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "gofmt",
+        "single binary",
+        "simplicity",
+        "tooling"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Go",
+          "code": "package main\nimport \"fmt\"\nfunc main() { fmt.Println(\"Hello, Go\") }",
+          "output": "Hello, Go"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of gofmt in Go?",
+          "answer": "gofmt lets you tooling — see chapter section 1.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid tooling?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "chapter": 2,
+      "title": "Packages & Modules",
+      "page": 19,
+      "pageTo": 25,
+      "objectives": [
+        "Explain the core ideas behind go.mod and import.",
+        "Write and run working Go code that uses go.mod, import, export.",
+        "Recognise and avoid the common pitfalls associated with go get."
+      ],
+      "notes": [
+        "Note — Packages & Modules: go.mod / import / export / go get are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "go.mod",
+        "import",
+        "export",
+        "go get"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Go",
+          "code": "go mod init alistore/checkout",
+          "output": "go.mod created with module path"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of go.mod in Go?",
+          "answer": "go.mod lets you go get — see chapter section 2.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid go get?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "chapter": 3,
+      "title": "Types & Structs",
+      "page": 26,
+      "pageTo": 32,
+      "objectives": [
+        "Explain the core ideas behind struct and methods.",
+        "Write and run working Go code that uses struct, methods, pointers.",
+        "Recognise and avoid the common pitfalls associated with composite literals."
+      ],
+      "notes": [
+        "Note — Types & Structs: struct / methods / pointers / composite literals are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "struct",
+        "methods",
+        "pointers",
+        "composite literals"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Go",
+          "code": "type Cart struct { Total float64 }\nfunc (c Cart) WithTax() float64 { return c.Total * 1.05 }",
+          "output": "Returns total plus 5% tax"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of struct in Go?",
+          "answer": "struct lets you composite literals — see chapter section 3.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid composite literals?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "chapter": 4,
+      "title": "Interfaces",
+      "page": 33,
+      "pageTo": 39,
+      "objectives": [
+        "Explain the core ideas behind interface{} and type assertions.",
+        "Write and run working Go code that uses interface{}, type assertions, satisfaction.",
+        "Recognise and avoid the common pitfalls associated with errors."
+      ],
+      "notes": [
+        "Note — Interfaces: interface{} / type assertions / satisfaction / errors are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "interface{}",
+        "type assertions",
+        "satisfaction",
+        "errors"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Go",
+          "code": "var err error = fmt.Errorf(\"stock too low\")",
+          "output": "Any value with Error() string satisfies error"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of interface{} in Go?",
+          "answer": "interface{} lets you errors — see chapter section 4.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid errors?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "chapter": 5,
+      "title": "Goroutines & Channels",
+      "page": 40,
+      "pageTo": 46,
+      "objectives": [
+        "Explain the core ideas behind go func and chan.",
+        "Write and run working Go code that uses go func, chan, select.",
+        "Recognise and avoid the common pitfalls associated with sync.WaitGroup."
+      ],
+      "notes": [
+        "Note — Goroutines & Channels: go func / chan / select / sync.WaitGroup are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "go func",
+        "chan",
+        "select",
+        "sync.WaitGroup"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Go",
+          "code": "ch := make(chan int)\ngo producer(ch)\ngo consumer(ch)",
+          "output": "Values flow between goroutines"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of go func in Go?",
+          "answer": "go func lets you sync.waitgroup — see chapter section 5.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid sync.WaitGroup?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "chapter": 6,
+      "title": "The Standard Library",
+      "page": 47,
+      "pageTo": 53,
+      "objectives": [
+        "Explain the core ideas behind net/http and encoding/json.",
+        "Write and run working Go code that uses net/http, encoding/json, io.",
+        "Recognise and avoid the common pitfalls associated with context."
+      ],
+      "notes": [
+        "Note — The Standard Library: net/http / encoding/json / io / context are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "net/http",
+        "encoding/json",
+        "io",
+        "context"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Go",
+          "code": "http.HandleFunc(\"/\", handler); http.ListenAndServe(\":8080\", nil)",
+          "output": "Serves requests on :8080"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of net/http in Go?",
+          "answer": "net/http lets you context — see chapter section 6.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid context?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "chapter": 7,
+      "title": "Building Services",
+      "page": 54,
+      "pageTo": 60,
+      "objectives": [
+        "Explain the core ideas behind middleware and logging.",
+        "Write and run working Go code that uses middleware, logging, graceful shutdown.",
+        "Recognise and avoid the common pitfalls associated with deploy."
+      ],
+      "notes": [
+        "Note — Building Services: middleware / logging / graceful shutdown / deploy are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "middleware",
+        "logging",
+        "graceful shutdown",
+        "deploy"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Go",
+          "code": "srv.Shutdown(ctx)",
+          "output": "In-flight requests drain before exit"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of middleware in Go?",
+          "answer": "middleware lets you deploy — see chapter section 7.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid deploy?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    }
+  ],
+  "exercisesTotal": 21,
+  "tests": {
+    "instructions": "One assessment per chapter grouping plus a final exam. Every question maps to the section shown in brackets so you can revise precisely.",
+    "chapters": [
+      {
+        "chapter": 1,
+        "title": "Why Go",
+        "page": 12,
+        "questions": [
+          {
+            "q": "Which concept makes gofmt behave that way? (Go ch.1)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Hello, Go\". Which statement caused it? (ch.1)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 2,
+        "title": "Packages & Modules",
+        "page": 19,
+        "questions": [
+          {
+            "q": "Which concept makes go.mod behave that way? (Go ch.2)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"go.mod created with module path\". Which statement caused it? (ch.2)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 3,
+        "title": "Types & Structs",
+        "page": 26,
+        "questions": [
+          {
+            "q": "Which concept makes struct behave that way? (Go ch.3)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Returns total plus 5% tax\". Which statement caused it? (ch.3)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 4,
+        "title": "Interfaces",
+        "page": 33,
+        "questions": [
+          {
+            "q": "Which concept makes interface{} behave that way? (Go ch.4)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Any value with Error() string satisfies error\". Which statement caused it? (ch.4)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 5,
+        "title": "Goroutines & Channels",
+        "page": 40,
+        "questions": [
+          {
+            "q": "Which concept makes go func behave that way? (Go ch.5)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Values flow between goroutines\". Which statement caused it? (ch.5)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 6,
+        "title": "The Standard Library",
+        "page": 47,
+        "questions": [
+          {
+            "q": "Which concept makes net/http behave that way? (Go ch.6)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Serves requests on :8080\". Which statement caused it? (ch.6)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 7,
+        "title": "Building Services",
+        "page": 54,
+        "questions": [
+          {
+            "q": "Which concept makes middleware behave that way? (Go ch.7)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"In-flight requests drain before exit\". Which statement caused it? (ch.7)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      }
+    ],
+    "assessment": [
+      {
+        "q": "Write Go code that reads a value, transforms it and prints the result. (final)",
+        "options": [
+          "compile only",
+          "read → transform → print",
+          "print only"
+        ],
+        "answer": "read → transform → print"
+      },
+      {
+        "q": "What does the score of 14.3 marks per chapter tell you about this exam's structure? (final)",
+        "options": [
+          "chapters weigh equally",
+          "the last chapter is heaviest",
+          "random weighting"
+        ],
+        "answer": "chapters weigh equally"
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "object",
+      "meaning": "An instance of a class holding its own state and behaviour.",
+      "translations": {
+        "ar": "كائن",
+        "fr": "objet",
+        "hi": "ऑब्जेक्ट"
+      }
+    },
+    {
+      "term": "string",
+      "meaning": "A sequence of characters representing text.",
+      "translations": {
+        "ar": "نص",
+        "fr": "chaîne de caractères",
+        "hi": "स्ट्रिंग"
+      }
+    },
+    {
+      "term": "recursion",
+      "meaning": "A function calling itself to solve smaller sub-problems.",
+      "translations": {
+        "ar": "عودة النّداء",
+        "fr": "récursivité",
+        "hi": "पुनरावर्तन"
+      }
+    },
+    {
+      "term": "thread",
+      "meaning": "The smallest unit of execution within a process.",
+      "translations": {
+        "ar": "خيط التنفيذ",
+        "fr": "fil d'exécution",
+        "hi": "थ्रेड"
+      }
+    },
+    {
+      "term": "scope",
+      "meaning": "The region of code where a name is visible and valid.",
+      "translations": {
+        "ar": "نطاق الأسماء",
+        "fr": "portée",
+        "hi": "स्कोप"
+      }
+    },
+    {
+      "term": "idiom",
+      "meaning": "A commonly used, idiomatic pattern in a language.",
+      "translations": {
+        "ar": "أسلوب متعارف",
+        "fr": "idiome",
+        "hi": "मुहावरा"
+      }
+    }
+  ],
+  "appendix": {
+    "furtherReading": [
+      "The Go language reference",
+      "Official language tour",
+      "Problem sets in the Go book club section"
+    ]
+  }
+}

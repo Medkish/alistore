@@ -1,0 +1,36 @@
+{
+  "title": "PHP",
+  "pageCount": 53,
+  "chapters": [
+    {
+      "title": "PHP on the Server",
+      "page": 12,
+      "pageTo": 18
+    },
+    {
+      "title": "Syntax & Types",
+      "page": 19,
+      "pageTo": 25
+    },
+    {
+      "title": "Functions & Arrays",
+      "page": 26,
+      "pageTo": 32
+    },
+    {
+      "title": "Forms & Sessions",
+      "page": 33,
+      "pageTo": 39
+    },
+    {
+      "title": "PDO & Databases",
+      "page": 40,
+      "pageTo": 46
+    },
+    {
+      "title": "Modern PHP & Composer",
+      "page": 47,
+      "pageTo": 53
+    }
+  ]
+}

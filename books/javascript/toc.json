@@ -1,0 +1,41 @@
+{
+  "title": "JavaScript",
+  "pageCount": 60,
+  "chapters": [
+    {
+      "title": "The Language of the Web",
+      "page": 12,
+      "pageTo": 18
+    },
+    {
+      "title": "Variables, Scopes & Hoisting",
+      "page": 19,
+      "pageTo": 25
+    },
+    {
+      "title": "Functions & Closures",
+      "page": 26,
+      "pageTo": 32
+    },
+    {
+      "title": "Objects & Prototypes",
+      "page": 33,
+      "pageTo": 39
+    },
+    {
+      "title": "The DOM in Depth",
+      "page": 40,
+      "pageTo": 46
+    },
+    {
+      "title": "Async: Promises & Fetch",
+      "page": 47,
+      "pageTo": 53
+    },
+    {
+      "title": "Modern Tooling",
+      "page": 54,
+      "pageTo": 60
+    }
+  ]
+}
