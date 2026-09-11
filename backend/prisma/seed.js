@@ -55,7 +55,7 @@ const BOOKS = [
   {
     slug: 'python',
     title: 'Python',
-    author: 'Armor Ramsey',
+    author: 'Kamara',
     description: 'The complete Python guide — syntax, data structures, OOP and real-world projects.',
     price: 40,
     prevPrice: 50,
@@ -69,7 +69,7 @@ const BOOKS = [
   {
     slug: 'javascript',
     title: 'JavaScript',
-    author: 'Armor Ramsey',
+    author: 'Tessie',
     description: 'Modern JavaScript from the basics to async patterns and the browser DOM.',
     price: 40,
     prevPrice: 50,
@@ -83,7 +83,7 @@ const BOOKS = [
   {
     slug: 'javascript-deep-dive',
     title: 'JavaScript Deep Dive',
-    author: 'AlioStore',
+    author: 'Kamara',
     description: 'A deeper, hands-on journey through JavaScript — closures, the event loop, promises and performance.',
     price: 29.99,
     prevPrice: 39.99,
@@ -97,7 +97,7 @@ const BOOKS = [
   {
     slug: 'ruby',
     title: 'Ruby',
-    author: 'Armor Ramsey',
+    author: 'Tessie',
     description: 'A beautiful, human-friendly language for building elegant products.',
     price: 40,
     prevPrice: 50,
@@ -111,7 +111,7 @@ const BOOKS = [
   {
     slug: 'cpp',
     title: 'C++',
-    author: 'Armor Ramsey',
+    author: 'Kamara',
     description: 'C++ fundamentals — memory, classes, templates and the standard library.',
     price: 35,
     prevPrice: 45,
@@ -125,7 +125,7 @@ const BOOKS = [
   {
     slug: 'swift',
     title: 'Swift',
-    author: 'Armor Ramsey',
+    author: 'Tessie',
     description: 'Build for Apple platforms with Swift — types, concurrency and SwiftUI basics.',
     price: 40,
     prevPrice: 50,
@@ -139,7 +139,7 @@ const BOOKS = [
   {
     slug: 'kotlin',
     title: 'Kotlin',
-    author: 'Armor Ramsey',
+    author: 'Kamara',
     description: 'Expressive JVM & Android development with Kotlin idioms and coroutines.',
     price: 40,
     prevPrice: 50,
@@ -153,7 +153,7 @@ const BOOKS = [
   {
     slug: 'php',
     title: 'PHP',
-    author: 'Armor Ramsey',
+    author: 'Tessie',
     description: 'Server-side scripting with PHP — forms, sessions, PDO and modern practices.',
     price: 40,
     prevPrice: 50,
@@ -167,7 +167,7 @@ const BOOKS = [
   {
     slug: 'java',
     title: 'Java',
-    author: 'Armor Ramsey',
+    author: 'Kamara',
     description: 'Professional Java — OOP, collections, streams and building robust apps.',
     price: 45,
     prevPrice: 55,
@@ -181,7 +181,7 @@ const BOOKS = [
   {
     slug: 'go',
     title: 'Go',
-    author: 'Armor Ramsey',
+    author: 'Tessie',
     description: 'Concurrency-first Go — goroutines, channels, packaging and the ecosystem.',
     price: 40,
     prevPrice: 50,
@@ -195,7 +195,7 @@ const BOOKS = [
   {
     slug: 'rust',
     title: 'Rust',
-    author: 'Alio & Palma Cooperative',
+    author: 'Kamara',
     description: 'The official AlioStore guide to safe, fast systems programming with Rust.',
     price: 45,
     prevPrice: 50,
@@ -209,7 +209,7 @@ const BOOKS = [
   {
     slug: 'typescript',
     title: 'TypeScript',
-    author: 'AlioStore',
+    author: 'Tessie',
     description: 'Type-safe JavaScript — types, generics, interfaces and modern tooling.',
     price: 39.99,
     prevPrice: 49.99,
@@ -223,7 +223,7 @@ const BOOKS = [
   {
     slug: 'csharp',
     title: 'C#',
-    author: 'Alio & Palma Cooperative',
+    author: 'Kamara',
     description: 'Modern .NET development — OOP, LINQ, async, ASP.NET and EF Core.',
     price: 42,
     prevPrice: 52,
@@ -237,7 +237,7 @@ const BOOKS = [
   {
     slug: 'dart',
     title: 'Dart',
-    author: 'AlioStore',
+    author: 'Tessie',
     description: 'Cross-platform apps with Flutter — Dart types, OOP, async and widgets.',
     price: 40,
     prevPrice: 50,
@@ -251,7 +251,7 @@ const BOOKS = [
   {
     slug: 'shell',
     title: 'Shell Scripting',
-    author: 'Alio & Palma Cooperative',
+    author: 'Kamara',
     description: 'Automate everything — Bash, pipes, control flow, functions and cron.',
     price: 35,
     prevPrice: 45,

@@ -99,7 +99,7 @@ For local frontend dev against this backend, set in `frontend/.env.local`:
 `GET /api/books` example response:
 
 ```json
-{ "books": [ { "id": "python", "title": "Python", "author": "Armor Ramsey", "price": 40, "image": "images/programming1.jpeg", "stock": 12, "rating": 4.8, "category": { "name": "Programming" } } ] }
+{ "books": [ { "id": "python", "title": "Python", "author": "Kamara", "price": 40, "image": "images/programming1.jpeg", "stock": 12, "rating": 4.8, "category": { "name": "Programming" } } ] }
 ```
 
 Data lives in PostgreSQL. Passwords are hashed with bcrypt; sessions are stored as
