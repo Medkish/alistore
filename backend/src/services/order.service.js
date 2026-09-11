@@ -49,13 +49,22 @@ async function computeFromDb(items) {
   return { entries, subtotal };
 }
 
+const PAYMENT_METHODS = ['card', 'cash-on-delivery', 'demo'];
+
+function cleanPaymentMethod(value) {
+  const v = String(value || '').toLowerCase();
+  return PAYMENT_METHODS.includes(v) ? v : 'demo';
+}
+
 function serializeOrder(order, includeUser) {
   return {
     id: order.id,
     reference: order.reference,
     status: order.status,
     total: Number(order.total),
-    paymentMethod: order.paymentMethod || 'demo',
+    paymentProvider: order.paymentProvider || 'demo',
+    paymentStatus: order.paymentStatus || 'UNPAID',
+    paymentReference: order.paymentReference || '',
     paidAt: order.paidAt ? order.paidAt.toISOString() : null,
     couponCode: order.couponCode || '',
     discountAmount: Number(order.discountAmount || 0),
@@ -94,13 +103,18 @@ async function create(userId, items, opts = {}) {
   const total = Math.round((subtotal - discountAmount) * 100) / 100;
   await reserveStock(entries);
 
+  const reference = newRef();
+  const alreadyPaid = opts.status === 'PAID';
+
   const order = await prisma.order.create({
     data: {
-      reference: newRef(),
+      reference,
       status: opts.status || 'PENDING',
       total,
-      paymentMethod: opts.paymentMethod || 'demo',
-      paidAt: opts.paidAt != null ? opts.paidAt : (opts.status === 'PAID' ? new Date() : null),
+      paymentStatus: alreadyPaid ? 'PAID' : 'UNPAID',
+      paymentProvider: cleanPaymentMethod(opts.paymentMethod),
+      paymentReference: alreadyPaid ? 'DEMO-' + reference : '',
+      paidAt: opts.paidAt != null ? opts.paidAt : (alreadyPaid ? new Date() : null),
       couponCode,
       discountAmount,
       contactName: String(shipping.name || '').trim(),
@@ -184,9 +198,23 @@ async function updateStatus(orderId, status, actorId) {
     err.status = 409;
     throw err;
   }
+  const data = {
+    status: s,
+    paidAt: s === 'PAID' ? new Date() : order.paidAt,
+    paymentStatus: order.paymentStatus,
+    paymentReference: order.paymentReference
+  };
+  if (s === 'PAID') {
+    data.paymentStatus = 'PAID';
+    if (!data.paymentReference) data.paymentReference = 'DEMO-' + order.reference;
+  } else if (s === 'CANCELLED' && order.paymentStatus === 'PAID') {
+    data.paymentStatus = 'REFUNDED';
+  } else if (s === 'CANCELLED') {
+    data.paymentStatus = 'FAILED';
+  }
   const updated = await prisma.order.update({
     where: { id: orderId },
-    data: { status: s, paidAt: s === 'PAID' ? new Date() : order.paidAt },
+    data,
     include: { items: { include: { book: true } }, user: true }
   });
   await prisma.actionLog.create({

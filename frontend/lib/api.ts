@@ -113,6 +113,8 @@ export const api = {
     }),
   getOrders: () => request<{ orders: Order[] }>('/orders'),
   getOrder: (id: string) => request<{ order: Order }>(`/orders/${encodeURIComponent(id)}`),
+  payOrderDemo: (id: string) =>
+    request<{ order: Order }>(`/orders/${encodeURIComponent(id)}/payments/demo`, { method: 'POST' }),
   getNotifications: () => request<{ notifications: NotificationItem[]; unread: number }>('/me/notifications'),
   markNotificationsRead: (id?: string) =>
     request<{ notifications: NotificationItem[]; unread: number }>('/me/notifications/read', {

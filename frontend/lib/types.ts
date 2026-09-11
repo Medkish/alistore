@@ -48,7 +48,9 @@ export interface Order {
   total: number;
   status?: string;
   placedAt?: string;
-  paymentMethod?: string;
+  paymentProvider?: string;
+  paymentStatus?: string;
+  paymentReference?: string;
   paidAt?: string | null;
   couponCode?: string;
   discountAmount?: number;

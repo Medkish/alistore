@@ -639,7 +639,7 @@ function OrdersTab() {
                   <div>
                     <p className="text-xs font-bold text-muted uppercase tracking-wide mb-2">Details</p>
                     <p className="text-sm text-ink">
-                      Payment: <span className="font-semibold">{o.paymentMethod || '—'}</span>
+                      Payment: <span className="font-semibold">{o.paymentProvider || '—'}</span>
                     </p>
                     <p className="text-sm text-ink">
                       Paid:{' '}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart, useAuth } from '@/components/providers';
 import { api } from '@/lib/api';
 import { formatAED } from '@/lib/format';
@@ -23,14 +24,36 @@ export default function CheckoutPage() {
     country: 'United Arab Emirates',
   });
 
-  const [done, setDone] = useState(false);
-  const [ref, setRef] = useState('');
+  const [payMethod, setPayMethod] = useState<'card' | 'cash-on-delivery'>('card');
   const [loading, setLoading] = useState(false);
   const [flash, setFlash] = useState('');
   const [error, setError] = useState('');
+  const [couponInput, setCouponInput] = useState('');
+  const [couponBusy, setCouponBusy] = useState(false);
+  const [discount, setDiscount] = useState({ code: '', amount: 0 });
+  const router = useRouter();
 
   const shipping = DELIVERY_FEE;
-  const finalTotal = total + shipping;
+  const finalTotal = total - discount.amount + shipping;
+
+  async function applyCoupon() {
+    const code = couponInput.trim();
+    if (!code) return fail('Enter a coupon code.');
+    setCouponBusy(true);
+    setError('');
+    try {
+      const res = await api.validateCoupon(code, total);
+      if (res.valid) {
+        setDiscount({ code: res.code || code, amount: res.discount });
+      } else {
+        setDiscount({ code: '', amount: 0 });
+        fail(res.error || 'Coupon is not valid.');
+      }
+    } catch (e) {
+      fail((e as Error).message || 'Could not apply coupon.');
+    }
+    setCouponBusy(false);
+  }
 
   function setField(field: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -66,53 +89,46 @@ export default function CheckoutPage() {
           phone: form.phone.trim(),
           address: [form.address.trim(), form.city.trim(), form.country.trim()].filter(Boolean).join(', '),
         },
-        'card',
-        '',
+        payMethod,
+        discount.code,
       );
-      setRef(res.order.reference || res.order.id || 'ALI-ORD-' + Date.now());
+      const ref = res.order.reference || res.order.id || 'ALI-ORD-' + Date.now();
+      const id = res.order.id || '';
+      const amount = finalTotal.toFixed(2);
       clear();
-      setDone(true);
-      return;
+      if (payMethod === 'card' && id) {
+        try {
+          const payRes = await api.payOrderDemo(id);
+          if (payRes.order.status === 'PAID') {
+            router.replace(
+              `/payment/success?order=${encodeURIComponent(ref)}&amount=${amount}&status=PAID&method=card&id=${id}`,
+            );
+            return;
+          }
+        } catch {
+          /* fallthrough — payment could not be confirmed */
+        }
+        router.replace(`/payment/failed?order=${encodeURIComponent(ref)}&amount=${amount}&method=card&id=${id}`);
+        return;
+      }
+      router.replace(
+        `/payment/success?order=${encodeURIComponent(ref)}&amount=${amount}&status=PENDING&method=${payMethod}&id=${id}`,
+      );
     } catch {
-      setRef('ALI-ORD-' + Math.floor(1000 + Math.random() * 9000));
+      const fallbackRef = 'ALI-ORD-' + Math.floor(1000 + Math.random() * 9000);
+      router.replace(
+        `/payment/failed?order=${encodeURIComponent(fallbackRef)}&amount=${finalTotal.toFixed(2)}&method=${payMethod}`,
+      );
     }
-    setDone(true);
-    setLoading(false);
   }
 
-  if (!items.length && !done) {
+  if (!items.length) {
     return (
       <section className="py-16 text-center">
         <p className="text-muted mb-6">Nothing to check out.</p>
         <Link href="/books/" className="btn-flash btn-primary-flash">
           Browse Books
         </Link>
-      </section>
-    );
-  }
-
-  if (done) {
-    return (
-      <section className="py-10 md:py-16">
-        <div className="mx-auto max-w-md px-4">
-          <div className="bg-white border border-line rounded-3xl p-8 text-center shadow-sm">
-            <p className="text-5xl mb-4">🎉</p>
-            <h1 className="text-2xl font-extrabold text-brand mb-2">ORDER CONFIRMED</h1>
-            <p className="text-ink font-bold mb-1">Order: #{ref}</p>
-            <p className="text-muted text-sm mb-6">Thank you for your purchase!</p>
-            <span className="inline-block border border-green-300 bg-green-50 text-green-700 text-xs font-bold px-3 py-1 rounded-lg mb-8">
-              Status: PENDING
-            </span>
-            <div className="flex flex-col gap-3">
-              <Link href="/orders/" className="btn-flash btn-primary-flash text-center">
-                VIEW MY ORDER
-              </Link>
-              <Link href="/books/" className="btn-flash btn-outline-flash text-brand border-brand text-center">
-                CONTINUE SHOPPING
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
     );
   }
@@ -197,7 +213,63 @@ export default function CheckoutPage() {
           </div>
 
           <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+            <h2 className="font-bold text-ink mb-4">Payment Method</h2>
+            <div className="flex flex-col sm:flex-row gap-3">
+              {(
+                [
+                  { value: 'card', label: '💳 Card', hint: 'Simulated online payment — confirmed instantly' },
+                  { value: 'cash-on-delivery', label: '💵 Cash on Delivery', hint: 'Pay when your order arrives' },
+                ] as const
+              ).map((p) => (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => setPayMethod(p.value)}
+                  className={`flex-1 border-2 rounded-2xl px-4 py-3 text-left transition ${
+                    payMethod === p.value ? 'border-brand bg-brand/5' : 'border-line hover:border-brand/40'
+                  }`}
+                >
+                  <span className="block font-bold text-ink text-sm">{p.label}</span>
+                  <span className="block text-[11px] text-muted mt-0.5">{p.hint}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
             <h2 className="font-bold text-ink mb-4">Order Summary</h2>
+            <label className="block text-sm mb-4">
+              <span className="font-semibold text-ink">Coupon</span>
+              <div className="flex gap-2 mt-1">
+                <input
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value)}
+                  placeholder="Code (e.g. WELCOME10)"
+                  disabled={discount.amount > 0}
+                  className="flex-1 border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none text-sm disabled:bg-slate-50"
+                />
+                <button
+                  type="button"
+                  onClick={applyCoupon}
+                  disabled={couponBusy || discount.amount > 0}
+                  className="btn-flash btn-outline-flash text-brand border-brand px-4 text-xs whitespace-nowrap disabled:opacity-60"
+                >
+                  {couponBusy ? '…' : discount.amount > 0 ? 'Applied ✓' : 'Apply'}
+                </button>
+              </div>
+              {discount.amount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDiscount({ code: '', amount: 0 });
+                    setCouponInput('');
+                  }}
+                  className="text-[11px] text-red-500 mt-1 hover:underline"
+                >
+                  Remove coupon
+                </button>
+              )}
+            </label>
             <ul className="space-y-2 border-b border-line pb-4">
               {items.map((it) => (
                 <li key={it.id} className="flex justify-between gap-3 text-sm">
@@ -217,6 +289,12 @@ export default function CheckoutPage() {
                 <dt className="text-muted">Shipping</dt>
                 <dd className="font-semibold">{formatAED(shipping)}</dd>
               </div>
+              {discount.amount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <dt>Discount ({discount.code})</dt>
+                  <dd className="font-semibold">−{formatAED(discount.amount)}</dd>
+                </div>
+              )}
               <div className="flex justify-between font-extrabold text-brand text-lg border-t border-line pt-3 mt-3">
                 <dt>TOTAL</dt>
                 <dd>{formatAED(finalTotal)}</dd>
@@ -230,7 +308,7 @@ export default function CheckoutPage() {
               disabled={loading}
               className="btn-flash btn-primary-flash w-full mt-6 text-center disabled:opacity-60"
             >
-              {loading ? 'Placing Order…' : 'PLACE ORDER'}
+              {loading ? 'Processing Payment…' : 'CONTINUE TO PAYMENT'}
             </button>
             <p className="text-[11px] text-muted text-center mt-3">🔒 Secure checkout · 3–5 working day delivery</p>
           </div>

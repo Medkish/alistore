@@ -23,6 +23,14 @@ const STATUS_COLOR: Record<string, string> = {
   CANCELLED:'bg-red-50 text-red-600 border-red-300',
 };
 
+const PAYMENT_COLOR: Record<string, string> = {
+  UNPAID:   'bg-slate-100 text-slate-600 border-slate-300',
+  PENDING:  'bg-amber-50 text-amber-700 border-amber-300',
+  PAID:     'bg-green-50 text-green-700 border-green-300',
+  FAILED:   'bg-red-50 text-red-600 border-red-300',
+  REFUNDED: 'bg-purple-50 text-purple-700 border-purple-300',
+};
+
 const ACTION_LABEL: Record<string, string> = {
   PAID:     'MARK AS PAID',
   SHIPPED:  'MARK AS SHIPPED',
@@ -208,6 +216,7 @@ export default function AdminOrdersPage() {
                     <th className="px-4 py-3 font-bold">Order</th>
                     <th className="px-4 py-3 font-bold">Customer</th>
                     <th className="px-4 py-3 font-bold text-right">Total</th>
+                    <th className="px-4 py-3 font-bold">Payment</th>
                     <th className="px-4 py-3 font-bold">Status</th>
                   </tr>
                 </thead>
@@ -245,6 +254,15 @@ export default function AdminOrdersPage() {
                         </td>
                         <td className="px-4 py-3 text-right font-extrabold text-brand align-top whitespace-nowrap">
                           {formatAED(o.total)}
+                        </td>
+                        <td className="px-4 py-3 align-top whitespace-nowrap">
+                          <span className={`border text-[11px] font-bold px-2 py-0.5 rounded-lg ${PAYMENT_COLOR[o.paymentStatus || 'UNPAID'] || ''}`}>
+                            {o.paymentStatus || 'UNPAID'}
+                          </span>
+                          <span className="block text-[11px] text-muted font-normal mt-0.5">
+                            {o.paymentProvider || 'demo'}
+                            {o.paymentReference ? ` · ${o.paymentReference}` : ''}
+                          </span>
                         </td>
                         <td className="px-4 py-3 align-top">
                           <div className="flex flex-wrap items-center gap-2">
@@ -327,7 +345,8 @@ export default function AdminOrdersPage() {
                                     </li>
                                   </ul>
                                   <p className="text-[10px] text-muted mt-2">
-                                    Payment: {o.paymentMethod || '—'} ·{' '}
+                                    Payment: {o.paymentProvider || '—'} · {o.paymentStatus || 'UNPAID'}
+                                    {o.paymentReference ? ` · ${o.paymentReference}` : ''} ·{' '}
                                     Paid: {o.paidAt ? new Date(o.paidAt).toLocaleString() : 'Pending'}
                                   </p>
                                 </div>

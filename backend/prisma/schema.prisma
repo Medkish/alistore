@@ -81,12 +81,14 @@ model Book {
 }
 
 model Order {
-  id              String      @id @default(cuid())
-  reference       String      @unique
-  status          String      @default("PAID")
-  total           Decimal     @db.Decimal(10, 2)
-  paymentMethod   String      @default("demo")
-  paidAt          DateTime?
+  id                String        @id @default(cuid())
+  reference         String        @unique
+  status            String        @default("PENDING")
+  total             Decimal       @db.Decimal(10, 2)
+  paymentStatus     PaymentStatus @default(UNPAID)
+  paymentProvider   String        @default("demo")
+  paymentReference  String        @default("")
+  paidAt            DateTime?
   couponCode      String      @default("")
   discountAmount  Decimal     @default(0) @db.Decimal(10, 2)
   contactName     String      @default("")
@@ -101,6 +103,14 @@ model Order {
   @@index([userId])
   @@index([placedAt])
   @@index([status])
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
 }
 
 model OrderItem {

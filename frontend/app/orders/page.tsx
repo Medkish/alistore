@@ -138,9 +138,9 @@ export default function OrdersPage() {
                       </li>
                     </ul>
 
-                    {o.paymentMethod && (
+                    {o.paymentProvider && (
                       <p className="text-xs text-muted mb-3">
-                        Payment: <span className="font-semibold text-ink">{o.paymentMethod}</span>
+                        Payment: <span className="font-semibold text-ink">{o.paymentProvider}</span>
                         {o.paidAt ? ` · paid ${new Date(o.paidAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}` : ''}
                       </p>
                     )}
