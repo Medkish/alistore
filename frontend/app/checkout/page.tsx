@@ -7,143 +7,74 @@ import { api } from '@/lib/api';
 import { formatAED } from '@/lib/format';
 import type { CartItem } from '@/lib/types';
 
-const FREE_DELIVERY_OVER = 150;
 const DELIVERY_FEE = 10;
-
-const PAY_METHODS = [
-  { id: 'credit-card', label: 'Credit / Debit Card', hint: 'Visa · Mastercard · Amex' },
-  { id: 'paypal', label: 'PayPal', hint: 'Pay with your PayPal balance' },
-  { id: 'apple-pay', label: 'Apple Pay', hint: 'Fast checkout on your iPhone' },
-  { id: 'google-pay', label: 'Google Pay', hint: 'Fast checkout on Android' },
-  { id: 'atm', label: 'ATM / Cash Deposit', hint: 'Deposit into our account' },
-  { id: 'bank-transfer', label: 'Bank Transfer', hint: 'Direct UAE transfer' },
-  { id: 'cash-on-delivery', label: 'Cash on Delivery', hint: 'Pay when it arrives' },
-];
-
-const STEPS = [
-  { id: 1, label: 'Customer Info' },
-  { id: 2, label: 'Shipping Address' },
-  { id: 3, label: 'Order Summary' },
-  { id: 4, label: 'Payment' },
-];
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function CheckoutPage() {
   const { items, total, clear } = useCart();
   const { user } = useAuth();
 
-  const [step, setStep] = useState(1);
+  const [form, setForm] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: '',
+    address: '',
+    city: '',
+    country: 'United Arab Emirates',
+  });
+
   const [done, setDone] = useState(false);
   const [ref, setRef] = useState('');
   const [loading, setLoading] = useState(false);
+  const [flash, setFlash] = useState('');
   const [error, setError] = useState('');
-  const [snapshot, setSnapshot] = useState<{ items: CartItem[]; discount: number; deliveryFee: number; subtotal: number } | null>(null);
 
-  const [customer, setCustomer] = useState({ name: user?.name || '', email: user?.email || '', phone: '' });
-  const [address, setAddress] = useState({ line1: '', city: '', country: 'UAE', zip: '' });
-  const [payMethod, setPayMethod] = useState('credit-card');
-  const [card, setCard] = useState({ number: '', expiry: '', cvc: '' });
-  const [coupon, setCoupon] = useState('');
-  const [discount, setDiscount] = useState(0);
-  const [couponMsg, setCouponMsg] = useState('');
-  const [couponKind, setCouponKind] = useState<'ok' | 'err'>('ok');
-  const [validation, setValidation] = useState('');
+  const shipping = DELIVERY_FEE;
+  const finalTotal = total + shipping;
 
-  const deliveryFee = total >= FREE_DELIVERY_OVER ? 0 : DELIVERY_FEE;
-  const finalTotal = Math.max(0, total - discount) + deliveryFee;
-
-  function setCust(field: keyof typeof customer, value: string) {
-    setCustomer((s) => ({ ...s, [field]: value }));
-    setValidation('');
+  function setField(field: keyof typeof form, value: string) {
+    setForm((f) => ({ ...f, [field]: value }));
+    setError('');
   }
 
-  function setAddr(field: keyof typeof address, value: string) {
-    setAddress((s) => ({ ...s, [field]: value }));
-    setValidation('');
-  }
-
-  function fail(msg: string): boolean {
-    setValidation(msg);
-    setError(msg);
-    return false;
-  }
-
-  function validateStep(current: number): boolean {
-    if (current === 1) {
-      if (!customer.name.trim()) return fail('Full name is required.');
-      if (!EMAIL_RE.test(customer.email.trim())) return fail('Enter a valid email address.');
-      if (customer.phone.trim().replace(/\D/g, '').length < 7) return fail('Enter a valid phone number.');
-      return true;
-    }
-    if (current === 2) {
-      if (!address.line1.trim()) return fail('Street address is required.');
-      if (!address.city.trim()) return fail('City is required.');
-      if (!address.country.trim()) return fail('Country is required.');
-      return true;
-    }
-    if (current === 4 && payMethod === 'credit-card') {
-      const digits = card.number.replace(/\D/g, '');
-      if (digits.length < 12) return fail('Enter a valid card number.');
-      if (!/^\d{2}\/\d{2}$/.test(card.expiry.trim())) return fail('Expiry must be MM/YY.');
-      if (!/^\d{3,4}$/.test(card.cvc.trim())) return fail('CVC must be 3 or 4 digits.');
-    }
+  function validate(): boolean {
+    if (!form.name.trim()) return fail('Full name is required.');
+    if (!EMAIL_RE.test(form.email.trim())) return fail('Enter a valid email address.');
+    if (form.phone.trim().replace(/\D/g, '').length < 7) return fail('Enter a valid phone number.');
+    if (!form.address.trim()) return fail('Shipping address is required.');
+    if (!form.city.trim()) return fail('City is required.');
+    if (!form.country.trim()) return fail('Country is required.');
     return true;
   }
 
-  function next() {
-    setValidation('');
-    if (!validateStep(step)) return;
-    setStep((s) => Math.min(STEPS.length, s + 1));
-  }
-
-  function back() {
-    setValidation('');
-    setStep((s) => Math.max(1, s - 1));
-  }
-
-  async function applyCoupon() {
-    if (!coupon.trim()) return;
-    setCouponMsg('');
-    setDiscount(0);
-    try {
-      const res = await api.validateCoupon(coupon.trim(), total);
-      if (res.valid) {
-        setDiscount(res.discount);
-        setCouponMsg(`✓ ${res.code} applied — you save ${formatAED(res.discount)}`);
-        setCouponKind('ok');
-      } else {
-        setDiscount(0);
-        setCouponMsg(res.error || 'Invalid coupon.');
-        setCouponKind('err');
-      }
-    } catch {
-      setDiscount(0);
-      setCouponMsg('Demo mode — coupons apply after connecting the backend.');
-      setCouponKind('err');
-    }
+  function fail(msg: string): boolean {
+    setError(msg);
+    setFlash(msg);
+    return false;
   }
 
   async function placeOrder() {
-    setError('');
+    if (!validate()) return;
     setLoading(true);
+    setError('');
     try {
-      const fullAddress = [address.line1, address.city, address.country].filter(Boolean).join(', ');
       const res = await api.placeOrder(
         items,
-        { ...customer, address: fullAddress },
-        payMethod,
-        coupon.trim(),
+        {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          address: [form.address.trim(), form.city.trim(), form.country.trim()].filter(Boolean).join(', '),
+        },
+        'card',
+        '',
       );
-      setSnapshot({ items: [...items], discount, deliveryFee, subtotal: total });
       setRef(res.order.reference || res.order.id || 'ALI-ORD-' + Date.now());
       clear();
       setDone(true);
       return;
     } catch {
-      setSnapshot({ items: [...items], discount, deliveryFee, subtotal: total });
       setRef('ALI-ORD-' + Math.floor(1000 + Math.random() * 9000));
-      clear();
     }
     setDone(true);
     setLoading(false);
@@ -161,71 +92,26 @@ export default function CheckoutPage() {
   }
 
   if (done) {
-    const method = PAY_METHODS.find((m) => m.id === payMethod);
     return (
       <section className="py-10 md:py-16">
-        <div className="mx-auto max-w-lg px-4 text-center">
-          <div className="bg-green-100 text-green-800 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 text-5xl font-bold">
-            ✓
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-brand mb-2">Thank you! Order Placed</h1>
-          <p className="text-muted mb-6">
-            Reference: <strong className="text-ink">{ref}</strong>
-          </p>
-          <div className="bg-white border border-line rounded-2xl p-5 text-left text-sm mb-6 shadow-sm">
-            <h2 className="font-bold mb-3">Order details</h2>
-            <ul className="space-y-2 mb-3 border-b border-line pb-3">
-              {(snapshot?.items ?? []).map((it) => (
-                <li key={it.id} className="flex justify-between">
-                  <span className="text-ink">
-                    {it.name} × {it.qty}
-                  </span>
-                  <span className="font-semibold">{formatAED(it.qty * it.price)}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="space-y-1 text-muted">
-              {(snapshot?.discount ?? 0) > 0 && (
-                <p className="flex justify-between">
-                  <span>Coupon</span>
-                  <span className="text-green-600">−{formatAED(snapshot!.discount)}</span>
-                </p>
-              )}
-              <p className="flex justify-between">
-                <span>Delivery</span>
-                <span>{(snapshot?.deliveryFee ?? 0) === 0 ? 'Free' : formatAED(snapshot?.deliveryFee ?? 0)}</span>
-              </p>
-              <p className="flex justify-between font-extrabold text-brand text-base">
-                <span>Total paid</span>
-                <span>{formatAED(Math.max(0, (snapshot?.subtotal ?? 0) - (snapshot?.discount ?? 0)) + (snapshot?.deliveryFee ?? 0))}</span>
-              </p>
-            </div>
-            <div className="border-t border-line mt-3 pt-3 grid sm:grid-cols-2 gap-2 text-xs text-muted">
-              <p>
-                <span className="font-semibold text-ink block">Payment</span>
-                {method?.label || payMethod}
-              </p>
-              <p>
-                <span className="font-semibold text-ink block">Ship to</span>
-                {customer.name}
-                <br />
-                {[address.line1, address.city, address.country].filter(Boolean).join(', ')}
-              </p>
-            </div>
-          </div>
-          <div className="flex justify-center gap-4">
-            {!user && (
-              <Link href="/register/" className="btn-flash btn-primary-flash">
-                Create Account to Track
+        <div className="mx-auto max-w-md px-4">
+          <div className="bg-white border border-line rounded-3xl p-8 text-center shadow-sm">
+            <p className="text-5xl mb-4">🎉</p>
+            <h1 className="text-2xl font-extrabold text-brand mb-2">ORDER CONFIRMED</h1>
+            <p className="text-ink font-bold mb-1">Order: #{ref}</p>
+            <p className="text-muted text-sm mb-6">Thank you for your purchase!</p>
+            <span className="inline-block border border-green-300 bg-green-50 text-green-700 text-xs font-bold px-3 py-1 rounded-lg mb-8">
+              Status: PENDING
+            </span>
+            <div className="flex flex-col gap-3">
+              <Link href="/orders/" className="btn-flash btn-primary-flash text-center">
+                VIEW MY ORDER
               </Link>
-            )}
-            <Link href="/orders/" className="btn-flash btn-outline-flash text-brand border-brand">
-              Track My Order
-            </Link>
+              <Link href="/books/" className="btn-flash btn-outline-flash text-brand border-brand text-center">
+                CONTINUE SHOPPING
+              </Link>
+            </div>
           </div>
-          <Link href="/books/" className="block mt-4 text-xs font-semibold text-accent-dark hover:underline">
-            ← Continue shopping
-          </Link>
         </div>
       </section>
     );
@@ -233,277 +119,121 @@ export default function CheckoutPage() {
 
   return (
     <section className="py-10 md:py-16">
-      <div className="mx-auto max-w-4xl px-4">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-brand mb-6">Checkout</h1>
+      <div className="mx-auto max-w-3xl px-4">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-brand">CHECKOUT</h1>
+          <Link href="/cart/" className="text-xs font-semibold text-accent-dark hover:underline">
+            ← Back to Cart
+          </Link>
+        </div>
 
-        <ol className="flex items-center gap-2 mb-8 overflow-x-auto">
-          {STEPS.map((s, i) => (
-            <li key={s.id} className="flex items-center gap-2 shrink-0">
-              <span
-                className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-extrabold border-2 ${
-                  step > s.id
-                    ? 'bg-green-100 text-green-800 border-green-300'
-                    : step === s.id
-                      ? 'bg-brand text-white border-brand'
-                      : 'bg-white text-muted border-line'
-                }`}
-              >
-                {step > s.id ? '✓' : s.id}
-              </span>
-              <span className={`text-sm font-bold ${step >= s.id ? 'text-ink' : 'text-muted'}`}>{s.label}</span>
-              {i < STEPS.length - 1 && <span className={`h-px w-6 ${step > s.id ? 'bg-green-300' : 'bg-line'}`} />}
-            </li>
-          ))}
-        </ol>
-
-        <div className="grid lg:grid-cols-[1fr_300px] gap-6 items-start">
-          <div className="flex flex-col gap-4">
-            {step === 1 && (
-              <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
-                <h2 className="font-bold mb-4">Customer Information</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <label className="block text-sm">
-                    <span className="font-semibold text-ink">Full Name *</span>
-                    <input
-                      value={customer.name}
-                      onChange={(e) => setCust('name', e.target.value)}
-                      placeholder="Jane Doe"
-                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                    />
-                  </label>
-                  <label className="block text-sm">
-                    <span className="font-semibold text-ink">Email *</span>
-                    <input
-                      type="email"
-                      value={customer.email}
-                      onChange={(e) => setCust('email', e.target.value)}
-                      placeholder="jane@example.com"
-                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                    />
-                  </label>
-                  <label className="block text-sm sm:col-span-2">
-                    <span className="font-semibold text-ink">Phone *</span>
-                    <input
-                      value={customer.phone}
-                      onChange={(e) => setCust('phone', e.target.value)}
-                      placeholder="+971 50 123 4567"
-                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                    />
-                  </label>
-                </div>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
-                <h2 className="font-bold mb-4">Shipping Address</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <label className="block text-sm sm:col-span-2">
-                    <span className="font-semibold text-ink">Street Address *</span>
-                    <textarea
-                      value={address.line1}
-                      onChange={(e) => setAddr('line1', e.target.value)}
-                      rows={2}
-                      placeholder="Building, street, landmark"
-                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                    />
-                  </label>
-                  <label className="block text-sm">
-                    <span className="font-semibold text-ink">City *</span>
-                    <input
-                      value={address.city}
-                      onChange={(e) => setAddr('city', e.target.value)}
-                      placeholder="Dubai"
-                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                    />
-                  </label>
-                  <label className="block text-sm">
-                    <span className="font-semibold text-ink">Country *</span>
-                    <input
-                      value={address.country}
-                      onChange={(e) => setAddr('country', e.target.value)}
-                      placeholder="United Arab Emirates"
-                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                    />
-                  </label>
-                  <label className="block text-sm">
-                    <span className="font-semibold text-ink">ZIP / Postal Code</span>
-                    <input
-                      value={address.zip}
-                      onChange={(e) => setAddr('zip', e.target.value)}
-                      placeholder="00000"
-                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                    />
-                  </label>
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="flex flex-col gap-4">
-                <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
-                  <h2 className="font-bold mb-4">Order Summary</h2>
-                  <div className="flex flex-wrap items-baseline justify-between mb-3">
-                    <p className="text-sm text-muted">
-                      Delivering to <strong className="text-ink">{customer.name}</strong> ·{' '}
-                      {[address.line1, address.city, address.country].filter(Boolean).join(', ')}
-                    </p>
-                  </div>
-                  <ul className="space-y-2 border-b border-line pb-4">
-                    {items.map((it) => (
-                      <li key={it.id} className="flex justify-between text-sm">
-                        <span className="text-ink">
-                          {it.name} × {it.qty}
-                        </span>
-                        <span className="font-semibold">{formatAED(it.qty * it.price)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex gap-3 mt-4">
-                    <input
-                      value={coupon}
-                      onChange={(e) => setCoupon(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
-                      placeholder="Coupon code e.g. ALIO10"
-                      className="flex-1 border-2 border-line rounded-xl px-3 py-2 uppercase focus:border-brand focus:outline-none"
-                    />
-                    <button
-                      onClick={applyCoupon}
-                      className="btn-flash btn-outline-flash text-brand border-brand hover:bg-brand hover:text-white px-5"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                  {couponMsg && (
-                    <p className={`text-xs mt-3 ${couponKind === 'ok' ? 'text-green-700' : 'text-red-600'}`}>{couponMsg}</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {step === 4 && (
-              <div className="flex flex-col gap-4">
-                <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
-                  <h2 className="font-bold mb-4">Payment</h2>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {PAY_METHODS.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => setPayMethod(m.id)}
-                        className={`text-left border-2 rounded-xl px-4 py-3 transition ${
-                          payMethod === m.id ? 'border-brand bg-brand/5' : 'border-line hover:border-brand'
-                        }`}
-                      >
-                        <p className="text-sm font-bold text-ink">{m.label}</p>
-                        <p className="text-xs text-muted">{m.hint}</p>
-                      </button>
-                    ))}
-                  </div>
-                  {payMethod === 'credit-card' && (
-                    <div className="mt-5 grid sm:grid-cols-2 gap-4">
-                      <label className="block text-sm sm:col-span-2">
-                        <span className="font-semibold text-ink">Card number *</span>
-                        <input
-                          value={card.number}
-                          onChange={(e) => setCard((c) => ({ ...c, number: e.target.value }))}
-                          placeholder="4242 4242 4242 4242"
-                          className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                        />
-                      </label>
-                      <label className="block text-sm">
-                        <span className="font-semibold text-ink">Expiry (MM/YY) *</span>
-                        <input
-                          value={card.expiry}
-                          onChange={(e) => setCard((c) => ({ ...c, expiry: e.target.value }))}
-                          placeholder="12/28"
-                          className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                        />
-                      </label>
-                      <label className="block text-sm">
-                        <span className="font-semibold text-ink">CVC *</span>
-                        <input
-                          value={card.cvc}
-                          onChange={(e) => setCard((c) => ({ ...c, cvc: e.target.value }))}
-                          placeholder="123"
-                          className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                        />
-                      </label>
-                    </div>
-                  )}
-                  <p className="text-xs text-muted mt-4">
-                    Demo checkout — the backend re-prices every item from the database and marks the order PAID with your
-                    chosen method. Stripe powers cards in a later phase.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {validation && <p className="text-sm text-red-600 text-center">{validation}</p>}
-            {error && !validation && <p className="text-sm text-red-600 text-center">{error}</p>}
-
-            <div className="flex gap-3">
-              {step > 1 && (
-                <button onClick={back} className="btn-flash btn-outline-flash text-brand border-brand px-6">
-                  ← Back
-                </button>
-              )}
-              {step < STEPS.length ? (
-                <button onClick={next} className="btn-flash btn-primary-flash flex-1">
-                  Continue to {STEPS[step].label}
-                </button>
-              ) : (
-                <button
-                  onClick={placeOrder}
-                  disabled={loading}
-                  className="btn-flash btn-primary-flash flex-1 disabled:opacity-60"
-                >
-                  {loading ? 'Placing Order…' : `Place Order · ${formatAED(finalTotal)}`}
-                </button>
-              )}
+        <div className="flex flex-col gap-6">
+          <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+            <h2 className="font-bold text-ink mb-4">Customer Information</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <label className="block text-sm">
+                <span className="font-semibold text-ink">Full Name *</span>
+                <input
+                  value={form.name}
+                  onChange={(e) => setField('name', e.target.value)}
+                  placeholder="Jane Doe"
+                  className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="font-semibold text-ink">Email *</span>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setField('email', e.target.value)}
+                  placeholder="jane@example.com"
+                  className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                />
+              </label>
+              <label className="block text-sm sm:col-span-2">
+                <span className="font-semibold text-ink">Phone *</span>
+                <input
+                  value={form.phone}
+                  onChange={(e) => setField('phone', e.target.value)}
+                  placeholder="+971 50 123 4567"
+                  className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                />
+              </label>
             </div>
           </div>
 
-          <aside className="bg-white border border-line rounded-2xl p-5 shadow-sm lg:sticky lg:top-32">
+          <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+            <h2 className="font-bold text-ink mb-4">Shipping Address</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <label className="block text-sm sm:col-span-2">
+                <span className="font-semibold text-ink">Address *</span>
+                <textarea
+                  value={form.address}
+                  onChange={(e) => setField('address', e.target.value)}
+                  rows={2}
+                  placeholder="Building, street, landmark"
+                  className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="font-semibold text-ink">City *</span>
+                <input
+                  value={form.city}
+                  onChange={(e) => setField('city', e.target.value)}
+                  placeholder="Dubai"
+                  className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="font-semibold text-ink">Country *</span>
+                <input
+                  value={form.country}
+                  onChange={(e) => setField('country', e.target.value)}
+                  placeholder="United Arab Emirates"
+                  className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
             <h2 className="font-bold text-ink mb-4">Order Summary</h2>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 border-b border-line pb-4">
               {items.map((it) => (
-                <li key={it.id} className="flex justify-between gap-2">
-                  <span className="text-ink line-clamp-1">
+                <li key={it.id} className="flex justify-between gap-3 text-sm">
+                  <span className="text-ink">
                     {it.name} × {it.qty}
                   </span>
                   <span className="font-semibold whitespace-nowrap">{formatAED(it.qty * it.price)}</span>
                 </li>
               ))}
             </ul>
-            <dl className="text-sm space-y-2 border-t border-line mt-4 pt-4">
+            <dl className="text-sm space-y-2 pt-4">
               <div className="flex justify-between">
                 <dt className="text-muted">Subtotal</dt>
                 <dd className="font-semibold">{formatAED(total)}</dd>
               </div>
-              {discount > 0 && (
-                <div className="flex justify-between text-green-600">
-                  <dt>Discount</dt>
-                  <dd>−{formatAED(discount)}</dd>
-                </div>
-              )}
               <div className="flex justify-between">
                 <dt className="text-muted">Shipping</dt>
-                <dd className={`font-semibold ${deliveryFee === 0 ? 'text-green-600' : ''}`}>
-                  {deliveryFee === 0 ? 'Free' : formatAED(deliveryFee)}
-                </dd>
+                <dd className="font-semibold">{formatAED(shipping)}</dd>
               </div>
-              {deliveryFee > 0 && (
-                <p className="text-[11px] text-muted">
-                  Free delivery over {formatAED(FREE_DELIVERY_OVER)} — add {formatAED(FREE_DELIVERY_OVER - total)} more.
-                </p>
-              )}
+              <div className="flex justify-between font-extrabold text-brand text-lg border-t border-line pt-3 mt-3">
+                <dt>TOTAL</dt>
+                <dd>{formatAED(finalTotal)}</dd>
+              </div>
             </dl>
-            <div className="flex justify-between font-extrabold text-brand text-lg border-t border-line pt-3 mt-3">
-              <span>Total</span>
-              <span>{formatAED(finalTotal)}</span>
-            </div>
-            <p className="text-[11px] text-muted text-center mt-4">🔒 Secure checkout · 3–5 working day delivery</p>
-          </aside>
+
+            {error && <p className="text-sm text-red-600 mt-4 text-center">{error}</p>}
+
+            <button
+              onClick={placeOrder}
+              disabled={loading}
+              className="btn-flash btn-primary-flash w-full mt-6 text-center disabled:opacity-60"
+            >
+              {loading ? 'Placing Order…' : 'PLACE ORDER'}
+            </button>
+            <p className="text-[11px] text-muted text-center mt-3">🔒 Secure checkout · 3–5 working day delivery</p>
+          </div>
         </div>
       </div>
     </section>

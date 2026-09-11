@@ -7,12 +7,11 @@ import type { Order, OrderStatus } from '@/lib/types';
 import { useAuth } from '@/components/providers';
 import { formatAED } from '@/lib/format';
 
-const ORDER_STEPS: OrderStatus[] = ['PLACED', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
+const ORDER_STEPS: OrderStatus[] = ['PENDING', 'PAID', 'SHIPPED', 'DELIVERED'];
 
 const STATUS_STYLE: Record<OrderStatus, string> = {
-  PLACED: 'bg-slate-100 text-slate-700 border-slate-300',
+  PENDING: 'bg-slate-100 text-slate-700 border-slate-300',
   PAID: 'bg-green-50 text-green-700 border-green-300',
-  PROCESSING: 'bg-amber-50 text-amber-700 border-amber-300',
   SHIPPED: 'bg-blue-50 text-blue-700 border-blue-300',
   DELIVERED: 'bg-emerald-50 text-emerald-700 border-emerald-300',
   CANCELLED: 'bg-red-50 text-red-600 border-red-300',
@@ -69,7 +68,7 @@ export default function OrdersPage() {
 
         <div className="flex flex-col gap-4">
           {orders.map((o, i) => {
-            const status = (o.status || 'PLACED') as OrderStatus;
+            const status = (o.status || 'PENDING') as OrderStatus;
             const cancelled = status === 'CANCELLED';
             const reached = ORDER_STEPS.indexOf(status);
             const key = o.id || String(i);
@@ -97,7 +96,7 @@ export default function OrdersPage() {
                   <div className="flex items-center gap-3">
                     <span
                       className={`border text-xs font-bold px-2.5 py-1 rounded-lg ${
-                        STATUS_STYLE[status] || STATUS_STYLE.PLACED
+                        STATUS_STYLE[status] || STATUS_STYLE.PENDING
                       }`}
                     >
                       {status}

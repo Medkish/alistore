@@ -26,24 +26,34 @@ function validateShipping(s) {
   const name = String(shipping.name || '').trim();
   const email = String(shipping.email || '').trim();
   const phone = String(shipping.phone || '').trim();
-  const address = String(shipping.address || '').trim();
+  const address = [shipping.address, shipping.city, shipping.country]
+    .map((part) => String(part || '').trim())
+    .filter(Boolean)
+    .join(', ');
   if (!name) errors.push('A contact name is required.');
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('A valid contact email is required.');
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('A valid contact email is required.');
   if (!phone || !PHONE_RE.test(phone)) errors.push('A valid phone number is required.');
   if (!address) errors.push('A shipping address is required.');
   return { errors, shipping: { name, email, phone, address } };
 }
 
+/* Accept both { items: [{ bookId, quantity }] } and the legacy { items: [{ id, qty }] }. */
+const normalizeItems = (arr) =>
+  (Array.isArray(arr) ? arr : []).map((it) => (it && typeof it === 'object' ? it : {}));
+
 async function create(req, res) {
-  const rawItems = req.body && Array.isArray(req.body.items) ? req.body.items : [];
-  const { errors, shipping } = validateShipping(req.body && req.body.shipping);
+  const body = req.body && typeof req.body === 'object' ? req.body : {};
+  /* totalAmount is NEVER trusted from the browser — prices are re-read from the database. */
+  const rawItems = normalizeItems(body.items);
+  const { errors, shipping } = validateShipping(body.shipping || body.shippingAddress);
   if (errors.length) return res.status(400).json({ error: errors.join(' ') });
+  if (!rawItems.length) return res.status(400).json({ error: 'Order is empty.' });
 
   try {
     const order = await orderService.create(req.user.id, rawItems, {
       shipping,
-      paymentMethod: cleanPaymentMethod(req.body && req.body.paymentMethod),
-      coupon: String((req.body && req.body.coupon) || '').trim()
+      paymentMethod: cleanPaymentMethod(body.paymentMethod),
+      coupon: String(body.coupon || '').trim()
     });
     res.status(201).json({ order });
   } catch (err) {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/components/providers';
 import { formatAED, formatNumber } from '@/lib/format';
@@ -459,22 +459,35 @@ function OrdersTab() {
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState('');
+  const [openId, setOpenId] = useState('');
 
   const load = useCallback(() => {
     api
-      .adminOrders(status || undefined)
+      .adminOrders()
       .then((res) => setOrders(res.orders))
       .catch((e) => setError((e as Error).message));
-  }, [status]);
+  }, []);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  const counts = useMemo(() => {
+    const map: Record<string, number> = { '': orders?.length || 0 };
+    for (const s of ORDER_STATUSES) map[s] = (orders || []).filter((o) => o.status === s).length;
+    return map;
+  }, [orders]);
+
+  const visible = useMemo(
+    () => (status ? (orders || []).filter((o) => o.status === status) : orders || []),
+    [orders, status],
+  );
+
   async function changeStatus(id: string, next: string) {
     setBusyId(id);
     try {
       await api.adminSetOrderStatus(id, next);
+      setOpenId('');
       load();
     } catch (e) {
       setError((e as Error).message);
@@ -494,6 +507,9 @@ function OrdersTab() {
             }`}
           >
             {s || 'All'}
+            <span className={`ml-1.5 text-[10px] ${status === s ? 'text-white/80' : 'text-muted'}`}>
+              {counts[s] ?? 0}
+            </span>
           </button>
         ))}
       </div>
@@ -502,43 +518,108 @@ function OrdersTab() {
 
       <div className="flex flex-col gap-4">
         {orders === null && <p className="text-sm text-muted">Loading orders…</p>}
-        {orders && !orders.length && <p className="text-sm text-muted">No orders in this state.</p>}
-        {orders?.map((o) => (
-          <div key={o.id} className="bg-white border border-line rounded-2xl p-5 shadow-sm">
-            <div className="flex flex-wrap justify-between gap-3 mb-3">
-              <div>
-                <p className="font-bold text-ink">{o.reference}</p>
-                <p className="text-xs text-muted">
-                  {o.user?.name} · {o.user?.email} · {new Date(o.placedAt || Date.now()).toLocaleString()}
-                </p>
-                <p className="text-xs text-muted mt-1">
-                  Ship to: {o.contact?.name} · {o.contact?.phone} · {o.contact?.address || 'n/a'}
-                </p>
+        {orders !== null && !visible.length && <p className="text-sm text-muted">No orders in this state.</p>}
+        {visible.map((o) => {
+          const expanded = openId === o.id;
+          const itemSubtotal = (o.items || []).reduce((s, it) => s + it.qty * (it.price || 0), 0);
+          return (
+            <div key={o.id} className="bg-white border border-line rounded-2xl p-5 shadow-sm">
+              <div className="flex flex-wrap justify-between gap-3 mb-3">
+                <div>
+                  <p className="font-bold text-ink">{o.reference}</p>
+                  <p className="text-xs text-muted">
+                    {o.user?.name} · {o.user?.email} · {new Date(o.placedAt || Date.now()).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted mt-1">
+                    Ship to: {o.contact?.name} · {o.contact?.phone} · {o.contact?.address || 'n/a'}
+                  </p>
+                </div>
+                <p className="font-extrabold text-brand">{formatAED(o.total)}</p>
               </div>
-              <p className="font-extrabold text-brand">{formatAED(o.total)}</p>
+              <p className="text-sm text-ink mb-3">
+                {o.items.map((it) => `${it.name} × ${it.qty}`).join(', ')}
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <select
+                  value={o.status}
+                  disabled={busyId === o.id}
+                  onChange={(e) => changeStatus(o.id as string, e.target.value)}
+                  className="border-2 border-brand rounded-xl px-3 py-2 text-sm font-semibold bg-white disabled:opacity-50"
+                >
+                  {ORDER_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs text-muted">
+                  {o.status === 'DELIVERED' ? 'Completed' : `Currently: ${o.status}`}
+                </span>
+                <button
+                  onClick={() => setOpenId(expanded ? '' : (o.id as string))}
+                  className="ml-auto text-xs font-bold text-accent-dark hover:underline"
+                >
+                  {expanded ? 'Hide details ↑' : 'View details ↓'}
+                </button>
+              </div>
+
+              {expanded && (
+                <div className="mt-4 border-t border-line pt-4 grid gap-4 lg:grid-cols-2">
+                  <div>
+                    <p className="text-xs font-bold text-muted uppercase tracking-wide mb-2">Items</p>
+                    <ul className="space-y-1.5 text-sm">
+                      {o.items.map((it, i) => (
+                        <li key={i} className="flex justify-between gap-3">
+                          <span className="text-ink">
+                            {it.name} × {it.qty}
+                          </span>
+                          <span className="font-semibold whitespace-nowrap">
+                            {formatAED(it.qty * (it.price || 0))}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    {(o.discountAmount ?? 0) > 0 && (
+                      <p className="flex justify-between text-sm text-green-600 mt-2">
+                        <span>Discount</span>
+                        <span>−{formatAED(o.discountAmount as number)}</span>
+                      </p>
+                    )}
+                    {o.couponCode && (
+                      <p className="text-[11px] text-muted mt-1">Coupon: {o.couponCode}</p>
+                    )}
+                    <p className="flex justify-between font-extrabold text-brand text-sm border-t border-line pt-2 mt-2">
+                      <span>Total</span>
+                      <span>{formatAED(o.total)}</span>
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-muted uppercase tracking-wide mb-2">Details</p>
+                    <p className="text-sm text-ink">
+                      Payment: <span className="font-semibold">{o.paymentMethod || '—'}</span>
+                    </p>
+                    <p className="text-sm text-ink">
+                      Paid:{' '}
+                      <span className="font-semibold">
+                        {o.paidAt ? new Date(o.paidAt).toLocaleString() : 'Pending'}
+                      </span>
+                    </p>
+                    <p className="text-sm text-ink mt-2">
+                      Contact:{' '}
+                      <span className="font-semibold">
+                        {o.contact?.name || '—'} · {o.contact?.email || '—'} · {o.contact?.phone || '—'}
+                      </span>
+                    </p>
+                    <p className="text-sm text-muted mt-1">
+                      {o.contact?.address || 'No shipping address recorded.'}
+                    </p>
+                    <p className="text-xs text-muted mt-3">Order value includes {formatAED(itemSubtotal)} in items.</p>
+                  </div>
+                </div>
+              )}
             </div>
-            <p className="text-sm text-ink mb-3">
-              {o.items.map((it) => `${it.name} × ${it.qty}`).join(', ')}
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <select
-                value={o.status}
-                disabled={busyId === o.id}
-                onChange={(e) => changeStatus(o.id as string, e.target.value)}
-                className="border-2 border-brand rounded-xl px-3 py-2 text-sm font-semibold bg-white disabled:opacity-50"
-              >
-                {ORDER_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-              <span className="text-xs text-muted">
-                {o.status === 'DELIVERED' ? 'Completed' : `Currently: ${o.status}`}
-              </span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -1053,7 +1134,7 @@ function ReportsTab() {
 
   if (error) return <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-4">{error}</p>;
 
-  const paid = (orders || []).filter((o) => !['CANCELLED', 'PLACED'].includes(o.status || ''));
+  const paid = (orders || []).filter((o) => !['CANCELLED', 'PENDING'].includes(o.status || ''));
   const revenue = stats?.revenue ?? paid.reduce((s, o) => s + o.total, 0);
   const avg = paid.length ? revenue / paid.length : 0;
 
@@ -1110,7 +1191,7 @@ function ReportsTab() {
               ))}
             </div>
           )}
-          <p className="text-xs text-muted mt-4">Based on orders in paid states (PAID / PROCESSING / SHIPPED / DELIVERED).</p>
+          <p className="text-xs text-muted mt-4">Based on orders in paid states (PAID / SHIPPED / DELIVERED).</p>
         </div>
 
         <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">

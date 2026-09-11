@@ -4,12 +4,11 @@ const { reserveStock } = require('./book.service');
 const discountService = require('./discount.service');
 const notificationsService = require('./notifications.service');
 
-const ORDER_STATUSES = ['PLACED', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+const ORDER_STATUSES = ['PENDING', 'PAID', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
 const TRANSITIONS = {
-  PLACED: ['PAID', 'SHIPPED', 'CANCELLED'],
-  PAID: ['PROCESSING', 'SHIPPED', 'CANCELLED'],
-  PROCESSING: ['SHIPPED', 'CANCELLED'],
+  PENDING: ['PAID', 'CANCELLED'],
+  PAID: ['SHIPPED', 'CANCELLED'],
   SHIPPED: ['DELIVERED', 'CANCELLED'],
   DELIVERED: [],
   CANCELLED: []
@@ -29,21 +28,22 @@ async function computeFromDb(items) {
   const entries = [];
   let subtotal = 0;
   for (const it of items) {
-    const slug = it.id || it.slug;
-    if (!slug) {
+    const id = it.bookId || it.book_id || it.id || it.slug;
+    if (!id) {
       const err = new Error('Each item needs a book id.');
       err.status = 400;
       throw err;
     }
-    const book = await prisma.book.findUnique({ where: { slug } });
+    const book = await prisma.book.findUnique({ where: { id } }).catch(() => null) ||
+                  await prisma.book.findUnique({ where: { slug: id } }).catch(() => null);
     if (!book) {
-      const err = new Error('Unknown book: ' + slug);
+      const err = new Error('Unknown book: ' + id);
       err.status = 400;
       throw err;
     }
-    const qty = Math.max(1, Number(it.qty) || 1);
+    const qty = Math.max(1, Number(it.quantity || it.qty) || 1);
     const price = Number(book.price);
-    entries.push({ bookId: book.id, slug, qty, price, title: book.title, image: book.cover });
+    entries.push({ bookId: book.id, slug: book.slug, qty, price, title: book.title, image: book.coverImage });
     subtotal += qty * price;
   }
   return { entries, subtotal };
@@ -74,7 +74,7 @@ function serializeOrder(order, includeUser) {
       title: oi.book ? oi.book.title : 'Book',
       price: Number(oi.price),
       qty: oi.qty,
-      image: oi.book ? oi.book.cover : ''
+      image: oi.book ? oi.book.coverImage : ''
     }))
   };
 }
@@ -97,10 +97,10 @@ async function create(userId, items, opts = {}) {
   const order = await prisma.order.create({
     data: {
       reference: newRef(),
-      status: opts.status || 'PAID',
+      status: opts.status || 'PENDING',
       total,
       paymentMethod: opts.paymentMethod || 'demo',
-      paidAt: opts.paidAt != null ? opts.paidAt : new Date(),
+      paidAt: opts.paidAt != null ? opts.paidAt : (opts.status === 'PAID' ? new Date() : null),
       couponCode,
       discountAmount,
       contactName: String(shipping.name || '').trim(),
@@ -115,7 +115,7 @@ async function create(userId, items, opts = {}) {
 
   await prisma.user.update({ where: { id: userId }, data: { cart: [] } });
   await notificationsService.create(userId, 'order_confirmed', 'Order confirmed', 'Your order ' + order.reference + ' was confirmed at ' + order.placedAt.toISOString() + '.');
-  if ((opts.status || 'PAID') !== 'PLACED') {
+  if ((opts.status || 'PENDING') === 'PAID') {
     await notificationsService.create(userId, 'payment_received', 'Payment received', 'We received the payment for order ' + order.reference + '.');
   }
   return serializeOrder(order);
@@ -201,7 +201,7 @@ async function revenue() {
   const counts = await prisma.order.aggregate({
     _sum: { total: true },
     _count: { _all: true },
-    where: { status: { in: ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'] } }
+    where: { status: { in: ['PAID', 'SHIPPED', 'DELIVERED'] } }
   });
   return { revenue: Number(counts._sum.total || 0), paidOrderCount: counts._count._all };
 }
@@ -210,7 +210,7 @@ async function revenue() {
    Content endpoints rely on this - never on client-side flags. */
 async function purchasedBookSlugs(userId) {
   const orders = await prisma.order.findMany({
-    where: { userId, status: { in: ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'] } },
+    where: { userId, status: { in: ['PAID', 'SHIPPED', 'DELIVERED'] } },
     include: { items: { include: { book: true } } }
   });
   const slugs = new Set();
