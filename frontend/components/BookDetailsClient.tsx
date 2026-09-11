@@ -21,8 +21,26 @@ export default function BookDetailsClient({ book }: { book: Book }) {
   const { add, items } = useCart();
   const { has, toggle } = useWishlist();
   const [qty, setQty] = useState(1);
-  const inCart = items.find((i) => i.id === book.id)?.qty ?? 0;
-  const liked = has(book.id);
+
+  const [live, setLive] = useState<Book | null>(null);
+  useEffect(() => {
+    let alive = true;
+    api
+      .getBook(book.id)
+      .then((res) => {
+        if (alive) setLive(res.book);
+      })
+      .catch(() => {
+        /* API offline — keep the static catalog book */
+      });
+    return () => {
+      alive = false;
+    };
+  }, [book.id]);
+
+  const b = live ?? book;
+  const inCart = items.find((i) => i.id === b.id)?.qty ?? 0;
+  const liked = has(b.id);
 
   const [rv, setRv] = useState<BookReviews>({ average: null, count: 0, purchased: false, submitted: false, status: null, reviews: [] });
   const [myRating, setMyRating] = useState(5);
@@ -32,11 +50,11 @@ export default function BookDetailsClient({ book }: { book: Book }) {
 
   const loadReviews = useCallback(async () => {
     try {
-      setRv(await api.getBookReviews(book.id));
+      setRv(await api.getBookReviews(b.id));
     } catch {
       /* offline */
     }
-  }, [book.id]);
+  }, [b.id]);
 
   useEffect(() => {
     loadReviews();
@@ -45,7 +63,7 @@ export default function BookDetailsClient({ book }: { book: Book }) {
   async function submitReview() {
     setPosting(true);
     try {
-      await api.submitReview(book.id, myRating, myText.trim());
+      await api.submitReview(b.id, myRating, myText.trim());
       setFlash('Thank you! Your review is awaiting approval.');
       await loadReviews();
     } catch (e) {
@@ -63,8 +81,8 @@ export default function BookDetailsClient({ book }: { book: Book }) {
           {/* image */}
           <div className="sticky top-36 bg-white rounded-3xl border border-line overflow-hidden flex items-center justify-center p-8">
             <Image
-              src={book.image}
-              alt={book.title}
+              src={b.image}
+              alt={b.title}
               width={320}
               height={440}
               className="object-contain max-h-[420px]"
@@ -73,56 +91,56 @@ export default function BookDetailsClient({ book }: { book: Book }) {
 
           {/* info */}
           <div>
-            <p className="text-xs font-bold text-accent-dark uppercase tracking-wide mb-1">By {book.author}</p>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-brand mb-2">{book.title}</h1>
-            {book.rating && (
+            <p className="text-xs font-bold text-accent-dark uppercase tracking-wide mb-1">By {b.author}</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-brand mb-2">{b.title}</h1>
+            {b.rating && (
               <p className="text-sm text-muted mb-3">
-                <Stars n={book.rating} /> {book.rating} / 5
+                <Stars n={b.rating} /> {b.rating} / 5
                 {rv.count > 0 && <span className="ml-2">· {rv.count} review{rv.count === 1 ? '' : 's'}</span>}
               </p>
             )}
-            <p className="text-brand font-extrabold text-2xl mb-4">{formatAED(book.price)}</p>
+            <p className="text-brand font-extrabold text-2xl mb-4">{formatAED(b.price)}</p>
 
-            {book.stock != null && (
+            {b.stock != null && (
               <p className="text-sm mb-6">
-                {book.stock === 0 ? (
+                {b.stock === 0 ? (
                   <span className="text-red-600 font-semibold">🔴 Out of Stock</span>
                 ) : (
                   <span className="text-green-700 font-semibold">
-                    {book.stock <= 10 ? '🟡' : '🟢'} In Stock · {book.stock} available
+                    {b.stock <= 10 ? '🟡' : '🟢'} In Stock · {b.stock} available
                   </span>
                 )}
               </p>
             )}
 
-            {book.pages && (
+            {b.pages && (
               <p className="text-xs text-muted mb-6">
-                Paperback · {book.pages} pages
+                Paperback · {b.pages} pages
               </p>
             )}
 
             <p className="text-sm text-ink leading-relaxed mb-6">
               <span className="font-bold text-ink block mb-1">Description</span>
-              {book.description}
+              {b.description}
             </p>
 
             <div className="flex flex-wrap gap-3 items-center mb-6">
               <QuantityStepper
                 qty={qty}
-                onInc={() => setQty((q) => (book.stock == null || q < book.stock ? q + 1 : q))}
+                onInc={() => setQty((q) => (b.stock == null || q < b.stock ? q + 1 : q))}
                 onDec={() => setQty((q) => Math.max(1, q - 1))}
               />
               <button
                 onClick={() => {
-                  for (let i = 0; i < qty; i++) add(book.id, book.title, book.price, book.image);
+                  for (let i = 0; i < qty; i++) add(b.id, b.title, b.price, b.image);
                 }}
-                disabled={book.stock === 0}
+                disabled={b.stock === 0}
                 className="btn-flash btn-primary-flash disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add to Cart
               </button>
               <button
-                onClick={() => toggle(book.id)}
+                onClick={() => toggle(b.id)}
                 aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
                 className={`btn-flash px-4 py-2.5 text-sm border-2 transition ${
                   liked
@@ -223,7 +241,7 @@ export default function BookDetailsClient({ book }: { book: Book }) {
           ) : (
             <p className="text-xs text-muted mb-6">
               {rv.submitted
-                ? 'You reviewed this book.'
+                ? 'You reviewed this b.'
                 : rv.purchased
                   ? 'Your review was submitted.'
                   : 'Purchase this book to post a verified review.'}
