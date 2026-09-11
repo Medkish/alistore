@@ -1,0 +1,35 @@
+{
+  "title": "Java",
+  "excerpt": "Free sample — Java intermediate course. Chapter 1 begins: \"The JVM & Tooling\".",
+  "chapter": "Chapter 1 · Free Preview",
+  "page": 12,
+  "objectives": [
+    "Explain the core ideas behind javac and JDK.",
+    "Write and run working Java code that uses javac, JDK, Maven.",
+    "Recognise and avoid the common pitfalls associated with JIT."
+  ],
+  "notes": [
+    "Note — The JVM & Tooling: javac / JDK / Maven / JIT are the heart of this chapter. Read the sample, then type it yourself.",
+    "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+    "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+  ],
+  "keyTerms": [
+    "javac",
+    "JDK",
+    "Maven",
+    "JIT"
+  ],
+  "samples": [
+    {
+      "title": "Worked sample",
+      "language": "Java",
+      "code": "javac Hello.java && java Hello",
+      "output": "Hello, Java"
+    }
+  ],
+  "translatedNote": "هذا الفصل تمهيدي مجاني. تُفتح بقية الفصول فور شراء الكتاب. — Ce chapitre est un aperçu gratuit. — यह अध्याय निःशुल्क पूर्वावलोकन है।",
+  "paragraphs": [
+    "javac Hello.java && java Hello",
+    "Hello, Java"
+  ]
+}

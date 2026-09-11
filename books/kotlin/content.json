@@ -1,0 +1,531 @@
+{
+  "slug": "kotlin",
+  "title": "Kotlin",
+  "titleTranslated": {
+    "en": "Kotlin",
+    "ar": "كوتلن",
+    "fr": "Kotlin",
+    "hi": "कोटलिन"
+  },
+  "description": "Expressive JVM & Android development with Kotlin idioms and coroutines.",
+  "level": "INTERMEDIATE",
+  "prerequisites": "Basic programming familiarity.",
+  "languages": [
+    "en",
+    "ar",
+    "fr",
+    "hi"
+  ],
+  "pageCount": 53,
+  "chapters": [
+    {
+      "index": 1,
+      "chapter": 1,
+      "title": "Kotlin on the JVM",
+      "page": 12,
+      "pageTo": 18,
+      "objectives": [
+        "Explain the core ideas behind JVM and val/var.",
+        "Write and run working Kotlin code that uses JVM, val/var, REPL.",
+        "Recognise and avoid the common pitfalls associated with interop."
+      ],
+      "notes": [
+        "Note — Kotlin on the JVM: JVM / val/var / REPL / interop are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "JVM",
+        "val/var",
+        "REPL",
+        "interop"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Kotlin",
+          "code": "fun main() { println(\"Hello from Kotlin\") }",
+          "output": "Hello from Kotlin"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of JVM in Kotlin?",
+          "answer": "JVM lets you interop — see chapter section 1.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid interop?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "chapter": 2,
+      "title": "Null Safety",
+      "page": 19,
+      "pageTo": 25,
+      "objectives": [
+        "Explain the core ideas behind ? and !!.",
+        "Write and run working Kotlin code that uses ?, !!, safe call.",
+        "Recognise and avoid the common pitfalls associated with Elvis."
+      ],
+      "notes": [
+        "Note — Null Safety: ? / !! / safe call / Elvis are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "?",
+        "!!",
+        "safe call",
+        "Elvis"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Kotlin",
+          "code": "val s: String? = null\nprintln(s ?: \"fallback\")",
+          "output": "fallback"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of ? in Kotlin?",
+          "answer": "? lets you elvis — see chapter section 2.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid Elvis?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "chapter": 3,
+      "title": "Functions & Lambdas",
+      "page": 26,
+      "pageTo": 32,
+      "objectives": [
+        "Explain the core ideas behind fun and default args.",
+        "Write and run working Kotlin code that uses fun, default args, lambdas.",
+        "Recognise and avoid the common pitfalls associated with scope functions."
+      ],
+      "notes": [
+        "Note — Functions & Lambdas: fun / default args / lambdas / scope functions are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "fun",
+        "default args",
+        "lambdas",
+        "scope functions"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Kotlin",
+          "code": "fun greet(name: String = \"World\") = \"Hello $name\"\n\"Alio\".let { println(greet(it)) }",
+          "output": "Hello Alio"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of fun in Kotlin?",
+          "answer": "fun lets you scope functions — see chapter section 3.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid scope functions?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "chapter": 4,
+      "title": "Classes, Data & Sealed Types",
+      "page": 33,
+      "pageTo": 39,
+      "objectives": [
+        "Explain the core ideas behind data class and sealed.",
+        "Write and run working Kotlin code that uses data class, sealed, when.",
+        "Recognise and avoid the common pitfalls associated with copy."
+      ],
+      "notes": [
+        "Note — Classes, Data & Sealed Types: data class / sealed / when / copy are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "data class",
+        "sealed",
+        "when",
+        "copy"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Kotlin",
+          "code": "data class Cart(val items: Int, val total: Double)\nval c = Cart(2, 40.0).copy(total = 45.0)\nprintln(c)",
+          "output": "Cart(items=2, total=45.0)"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of data class in Kotlin?",
+          "answer": "data class lets you copy — see chapter section 4.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid copy?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "chapter": 5,
+      "title": "Coroutines",
+      "page": 40,
+      "pageTo": 46,
+      "objectives": [
+        "Explain the core ideas behind suspend and launch.",
+        "Write and run working Kotlin code that uses suspend, launch, async.",
+        "Recognise and avoid the common pitfalls associated with Dispatchers."
+      ],
+      "notes": [
+        "Note — Coroutines: suspend / launch / async / Dispatchers are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "suspend",
+        "launch",
+        "async",
+        "Dispatchers"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Kotlin",
+          "code": "val a = async { load(1) }\nval b = async { load(2) }\nprintln(a.await() + b.await())",
+          "output": "Both loads run concurrently"
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of suspend in Kotlin?",
+          "answer": "suspend lets you dispatchers — see chapter section 5.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid Dispatchers?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "chapter": 6,
+      "title": "Android in Practice",
+      "page": 47,
+      "pageTo": 53,
+      "objectives": [
+        "Explain the core ideas behind Activity and Compose.",
+        "Write and run working Kotlin code that uses Activity, Compose, ViewModel.",
+        "Recognise and avoid the common pitfalls associated with Flow."
+      ],
+      "notes": [
+        "Note — Android in Practice: Activity / Compose / ViewModel / Flow are the heart of this chapter. Read the sample, then type it yourself.",
+        "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+        "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+      ],
+      "keyTerms": [
+        "Activity",
+        "Compose",
+        "ViewModel",
+        "Flow"
+      ],
+      "samples": [
+        {
+          "title": "Worked sample",
+          "language": "Kotlin",
+          "code": "@Composable fun Greeting() { Text(\"Kotlin\") }",
+          "output": "A composable renders \"Kotlin\""
+        }
+      ],
+      "exercises": [
+        {
+          "question": "What is the purpose of Activity in Kotlin?",
+          "answer": "Activity lets you flow — see chapter section 6.2."
+        },
+        {
+          "question": "Modify the example to keep three decimal places instead of two.",
+          "answer": "Format the printed value with the language's precision formatter (e.g. printf/round), then re-run and compare."
+        },
+        {
+          "question": "When would you avoid Flow?",
+          "answer": "Avoid it when the task is better served by a simpler, linear approach — momentum matters more than cleverness."
+        }
+      ]
+    }
+  ],
+  "exercisesTotal": 18,
+  "tests": {
+    "instructions": "One assessment per chapter grouping plus a final exam. Every question maps to the section shown in brackets so you can revise precisely.",
+    "chapters": [
+      {
+        "chapter": 1,
+        "title": "Kotlin on the JVM",
+        "page": 12,
+        "questions": [
+          {
+            "q": "Which concept makes JVM behave that way? (Kotlin ch.1)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Hello from Kotlin\". Which statement caused it? (ch.1)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 2,
+        "title": "Null Safety",
+        "page": 19,
+        "questions": [
+          {
+            "q": "Which concept makes ? behave that way? (Kotlin ch.2)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"fallback\". Which statement caused it? (ch.2)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 3,
+        "title": "Functions & Lambdas",
+        "page": 26,
+        "questions": [
+          {
+            "q": "Which concept makes fun behave that way? (Kotlin ch.3)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Hello Alio\". Which statement caused it? (ch.3)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 4,
+        "title": "Classes, Data & Sealed Types",
+        "page": 33,
+        "questions": [
+          {
+            "q": "Which concept makes data class behave that way? (Kotlin ch.4)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Cart(items=2, total=45.0)\". Which statement caused it? (ch.4)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 5,
+        "title": "Coroutines",
+        "page": 40,
+        "questions": [
+          {
+            "q": "Which concept makes suspend behave that way? (Kotlin ch.5)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"Both loads run concurrently\". Which statement caused it? (ch.5)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      },
+      {
+        "chapter": 6,
+        "title": "Android in Practice",
+        "page": 47,
+        "questions": [
+          {
+            "q": "Which concept makes Activity behave that way? (Kotlin ch.6)",
+            "options": [
+              "memory layout",
+              "language design",
+              "the toolchain"
+            ],
+            "answer": "language design"
+          },
+          {
+            "q": "The worked sample prints \"A composable renders Kotlin\". Which statement caused it? (ch.6)",
+            "options": [
+              "the input line",
+              "the print/echo statement",
+              "the import"
+            ],
+            "answer": "the print/echo statement"
+          }
+        ]
+      }
+    ],
+    "assessment": [
+      {
+        "q": "Write Kotlin code that reads a value, transforms it and prints the result. (final)",
+        "options": [
+          "compile only",
+          "read → transform → print",
+          "print only"
+        ],
+        "answer": "read → transform → print"
+      },
+      {
+        "q": "What does the score of 16.7 marks per chapter tell you about this exam's structure? (final)",
+        "options": [
+          "chapters weigh equally",
+          "the last chapter is heaviest",
+          "random weighting"
+        ],
+        "answer": "chapters weigh equally"
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "variable",
+      "meaning": "A named container that stores a value in memory.",
+      "translations": {
+        "ar": "متغير",
+        "fr": "variable",
+        "hi": "चर"
+      }
+    },
+    {
+      "term": "function",
+      "meaning": "A reusable block of code that performs a task.",
+      "translations": {
+        "ar": "دالة",
+        "fr": "fonction",
+        "hi": "फ़ंक्शन"
+      }
+    },
+    {
+      "term": "loop",
+      "meaning": "A construct that repeats a block of code while a condition holds.",
+      "translations": {
+        "ar": "حَلقة",
+        "fr": "boucle",
+        "hi": "लूप"
+      }
+    },
+    {
+      "term": "runtime",
+      "meaning": "The environment in which a program executes.",
+      "translations": {
+        "ar": "زمن التشغيل",
+        "fr": "exécution",
+        "hi": "रनटाइम"
+      }
+    },
+    {
+      "term": "null",
+      "meaning": "A special value representing the absence of data.",
+      "translations": {
+        "ar": "قيمة فارغة",
+        "fr": "valeur nulle",
+        "hi": "नल"
+      }
+    },
+    {
+      "term": "syntax",
+      "meaning": "The set of rules that defines valid statements in a language.",
+      "translations": {
+        "ar": "قواعد الكتابة",
+        "fr": "syntaxe",
+        "hi": "वाक्यविन्यास"
+      }
+    }
+  ],
+  "appendix": {
+    "furtherReading": [
+      "The Kotlin language reference",
+      "Official language tour",
+      "Problem sets in the Kotlin book club section"
+    ]
+  }
+}

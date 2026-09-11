@@ -1,0 +1,35 @@
+{
+  "title": "Kotlin",
+  "excerpt": "Free sample — Kotlin intermediate course. Chapter 1 begins: \"Kotlin on the JVM\".",
+  "chapter": "Chapter 1 · Free Preview",
+  "page": 12,
+  "objectives": [
+    "Explain the core ideas behind JVM and val/var.",
+    "Write and run working Kotlin code that uses JVM, val/var, REPL.",
+    "Recognise and avoid the common pitfalls associated with interop."
+  ],
+  "notes": [
+    "Note — Kotlin on the JVM: JVM / val/var / REPL / interop are the heart of this chapter. Read the sample, then type it yourself.",
+    "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+    "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+  ],
+  "keyTerms": [
+    "JVM",
+    "val/var",
+    "REPL",
+    "interop"
+  ],
+  "samples": [
+    {
+      "title": "Worked sample",
+      "language": "Kotlin",
+      "code": "fun main() { println(\"Hello from Kotlin\") }",
+      "output": "Hello from Kotlin"
+    }
+  ],
+  "translatedNote": "هذا الفصل تمهيدي مجاني. تُفتح بقية الفصول فور شراء الكتاب. — Ce chapitre est un aperçu gratuit. — यह अध्याय निःशुल्क पूर्वावलोकन है।",
+  "paragraphs": [
+    "fun main() { println(\"Hello from Kotlin\") }",
+    "Hello from Kotlin"
+  ]
+}

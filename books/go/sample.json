@@ -1,0 +1,35 @@
+{
+  "title": "Go",
+  "excerpt": "Free sample — Go intermediate course. Chapter 1 begins: \"Why Go\".",
+  "chapter": "Chapter 1 · Free Preview",
+  "page": 12,
+  "objectives": [
+    "Explain the core ideas behind gofmt and single binary.",
+    "Write and run working Go code that uses gofmt, single binary, simplicity.",
+    "Recognise and avoid the common pitfalls associated with tooling."
+  ],
+  "notes": [
+    "Note — Why Go: gofmt / single binary / simplicity / tooling are the heart of this chapter. Read the sample, then type it yourself.",
+    "Good practice: keep every example short and runnable; add a comment that records the expected output exactly.",
+    "International standard: every topic points to its section in the appendix and lists revisable key terms at the end."
+  ],
+  "keyTerms": [
+    "gofmt",
+    "single binary",
+    "simplicity",
+    "tooling"
+  ],
+  "samples": [
+    {
+      "title": "Worked sample",
+      "language": "Go",
+      "code": "package main\nimport \"fmt\"\nfunc main() { fmt.Println(\"Hello, Go\") }",
+      "output": "Hello, Go"
+    }
+  ],
+  "translatedNote": "هذا الفصل تمهيدي مجاني. تُفتح بقية الفصول فور شراء الكتاب. — Ce chapitre est un aperçu gratuit. — यह अध्याय निःशुल्क पूर्वावलोकन है।",
+  "paragraphs": [
+    "package main\nimport \"fmt\"\nfunc main() { fmt.Println(\"Hello, Go\") }",
+    "Hello, Go"
+  ]
+}

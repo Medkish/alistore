@@ -1,0 +1,36 @@
+{
+  "title": "Kotlin",
+  "pageCount": 53,
+  "chapters": [
+    {
+      "title": "Kotlin on the JVM",
+      "page": 12,
+      "pageTo": 18
+    },
+    {
+      "title": "Null Safety",
+      "page": 19,
+      "pageTo": 25
+    },
+    {
+      "title": "Functions & Lambdas",
+      "page": 26,
+      "pageTo": 32
+    },
+    {
+      "title": "Classes, Data & Sealed Types",
+      "page": 33,
+      "pageTo": 39
+    },
+    {
+      "title": "Coroutines",
+      "page": 40,
+      "pageTo": 46
+    },
+    {
+      "title": "Android in Practice",
+      "page": 47,
+      "pageTo": 53
+    }
+  ]
+}

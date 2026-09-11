@@ -1,0 +1,41 @@
+{
+  "title": "Java",
+  "pageCount": 60,
+  "chapters": [
+    {
+      "title": "The JVM & Tooling",
+      "page": 12,
+      "pageTo": 18
+    },
+    {
+      "title": "OOP Fundamentals",
+      "page": 19,
+      "pageTo": 25
+    },
+    {
+      "title": "Collections Framework",
+      "page": 26,
+      "pageTo": 32
+    },
+    {
+      "title": "Streams & Lambda",
+      "page": 33,
+      "pageTo": 39
+    },
+    {
+      "title": "Exceptions & Logging",
+      "page": 40,
+      "pageTo": 46
+    },
+    {
+      "title": "Concurrency",
+      "page": 47,
+      "pageTo": 53
+    },
+    {
+      "title": "Enterprise Patterns",
+      "page": 54,
+      "pageTo": 60
+    }
+  ]
+}

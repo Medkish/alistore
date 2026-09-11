@@ -1,0 +1,36 @@
+{
+  "title": "Rust",
+  "pageCount": 53,
+  "chapters": [
+    {
+      "title": "Ownership",
+      "page": 12,
+      "pageTo": 18
+    },
+    {
+      "title": "Borrowing & Lifetimes",
+      "page": 19,
+      "pageTo": 25
+    },
+    {
+      "title": "Patterns & Enums",
+      "page": 26,
+      "pageTo": 32
+    },
+    {
+      "title": "Traits & Generics",
+      "page": 33,
+      "pageTo": 39
+    },
+    {
+      "title": "Error Handling",
+      "page": 40,
+      "pageTo": 46
+    },
+    {
+      "title": "Concurrency Without Fear",
+      "page": 47,
+      "pageTo": 53
+    }
+  ]
+}
