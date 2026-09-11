@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/components/providers';
 import { formatAED, formatNumber } from '@/lib/format';
@@ -191,139 +191,144 @@ export default function AdminOrdersPage() {
           <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-4 mb-4">{error}</p>
         )}
 
-        <div className="flex flex-col gap-4">
-          {orders === null && (
-            <div className="py-12 text-center text-muted text-sm">Loading orders…</div>
-          )}
-          {orders !== null && !orders.length && (
-            <div className="py-12 text-center text-muted text-sm">No orders match your filters.</div>
-          )}
-          {orders?.map((o) => {
-            const expanded = openId === o.id;
-            const currentStatus = (o.status || 'PENDING') as OrderStatus;
-            const nextMoves = ORDER_TRANSITIONS[currentStatus] || [];
-            const itemSubtotal = (o.items || []).reduce((s, it) => s + it.qty * (it.price || 0), 0);
+        {orders === null && (
+          <div className="py-12 text-center text-muted text-sm bg-white border border-line rounded-2xl">Loading orders…</div>
+        )}
+        {orders !== null && !orders.length && (
+          <div className="py-12 text-center text-muted text-sm bg-white border border-line rounded-2xl">No orders match your filters.</div>
+        )}
 
-            return (
-              <div key={o.id} className="bg-white border border-line rounded-2xl shadow-sm overflow-hidden">
-                <div className="p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-bold text-ink text-lg">{o.reference}</p>
-                        <span className={`border text-[11px] font-bold px-2 py-0.5 rounded-lg ${STATUS_COLOR[currentStatus] || ''}`}>
-                          {currentStatus}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted">
-                        {o.user?.name} · {o.user?.email} · {new Date(o.placedAt || Date.now()).toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted mt-1">
-                        Ship to: {o.contact?.name} · {o.contact?.phone} · {o.contact?.address || 'n/a'}
-                      </p>
-                    </div>
-                    <p className="text-xl font-extrabold text-brand shrink-0">{formatAED(o.total)}</p>
-                  </div>
+        {orders !== null && orders.length > 0 && (
+          <div className="bg-white border border-line rounded-2xl overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-line text-left text-[11px] uppercase tracking-wide text-muted">
+                    <th className="px-4 py-3 font-bold">Order</th>
+                    <th className="px-4 py-3 font-bold">Customer</th>
+                    <th className="px-4 py-3 font-bold text-right">Total</th>
+                    <th className="px-4 py-3 font-bold">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((o) => {
+                    const expanded = openId === o.id;
+                    const currentStatus = (o.status || 'PENDING') as OrderStatus;
+                    const nextMoves = ORDER_TRANSITIONS[currentStatus] || [];
+                    const itemSubtotal = (o.items || []).reduce((s, it) => s + it.qty * (it.price || 0), 0);
 
-                  <p className="text-sm text-ink mb-3">
-                    {o.items.map((it) => `${it.name} × ${it.qty}`).join(', ')}
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    {nextMoves.map((next) => (
-                      <button
-                        key={next}
-                        disabled={busyId === o.id}
-                        onClick={() => changeStatus(o.id || '', next)}
-                        className={`px-3 py-1.5 rounded-lg text-[11px] font-bold text-white transition disabled:opacity-50 ${ACTION_STYLE[next] || 'bg-slate-400'}`}
-                      >
-                        {busyId === o.id ? '…' : ACTION_LABEL[next] || next}
-                      </button>
-                    ))}
-                    {nextMoves.length === 0 && (
-                      <span className="text-xs text-muted italic">
-                        {currentStatus === 'DELIVERED' ? 'Completed' : 'Order closed'}
-                      </span>
-                    )}
-                    <button
-                      onClick={() => setOpenId(expanded ? '' : (o.id as string))}
-                      className="ml-auto text-xs font-bold text-accent-dark hover:underline"
-                    >
-                      {expanded ? 'Hide details ↑' : 'View details ↓'}
-                    </button>
-                  </div>
-                </div>
-
-                {expanded && (
-                  <div className="border-t border-line bg-slate-50/60 px-5 py-4 grid gap-5 lg:grid-cols-2">
-                    <div>
-                      <p className="text-xs font-bold text-muted uppercase tracking-wide mb-2">Items</p>
-                      <ul className="space-y-1.5 text-sm">
-                        {o.items.map((it, i) => (
-                          <li key={i} className="flex justify-between gap-3">
-                            <span className="text-ink">{it.name} × {it.qty}</span>
-                            <span className="font-semibold whitespace-nowrap">{formatAED(it.qty * (it.price || 0))}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <dl className="text-sm mt-3 space-y-1">
-                        <div className="flex justify-between">
-                          <dt className="text-muted">Items subtotal</dt>
-                          <dd className="font-semibold">{formatAED(itemSubtotal)}</dd>
-                        </div>
-                        {(o.discountAmount ?? 0) > 0 && (
-                          <div className="flex justify-between text-green-600">
-                            <dt>{o.couponCode ? `Discount (${o.couponCode})` : 'Discount'}</dt>
-                            <dd>−{formatAED(o.discountAmount as number)}</dd>
+                    return (
+                      <FragmentRow key={o.id} expanded={expanded}>
+                        <td className="px-4 py-3 font-bold text-ink align-top">
+                          {o.reference}
+                          <span className="block text-[11px] font-normal text-muted mt-0.5">
+                            {new Date(o.placedAt || Date.now()).toLocaleDateString(undefined, {
+                              year: 'numeric', month: 'short', day: 'numeric',
+                            })}
+                            {' · '}
+                            {new Date(o.placedAt || Date.now()).toLocaleTimeString(undefined, {
+                              hour: '2-digit', minute: '2-digit',
+                            })}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 align-top">
+                          <span className="font-semibold text-ink">
+                            {o.user?.name || o.contact?.name || '—'}
+                          </span>
+                          <span className="block text-[11px] text-muted mt-0.5">
+                            {o.user?.email || o.contact?.email || '—'}
+                          </span>
+                          <span className="block text-[11px] text-muted">
+                            🚚 {o.contact?.address || 'no address'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right font-extrabold text-brand align-top whitespace-nowrap">
+                          {formatAED(o.total)}
+                        </td>
+                        <td className="px-4 py-3 align-top">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`border text-[11px] font-bold px-2 py-0.5 rounded-lg ${STATUS_COLOR[currentStatus] || ''}`}>
+                              {currentStatus}
+                            </span>
+                            {nextMoves.length === 0 && (
+                              <span className="text-[11px] text-muted italic">
+                                {currentStatus === 'DELIVERED' ? 'Completed' : 'Closed'}
+                              </span>
+                            )}
+                            <ScrollArea>
+                              {nextMoves.map((next) => (
+                                <button
+                                  key={next}
+                                  disabled={busyId === o.id}
+                                  onClick={() => changeStatus(o.id || '', next)}
+                                  className={`px-2 py-1 rounded-lg text-[10px] font-bold text-white transition disabled:opacity-50 whitespace-nowrap ${ACTION_STYLE[next] || 'bg-slate-400'}`}
+                                >
+                                  {busyId === o.id ? '…' : ACTION_LABEL[next] || next}
+                                </button>
+                              ))}
+                            </ScrollArea>
+                            <button
+                              onClick={() => setOpenId(expanded ? '' : (o.id as string))}
+                              className="text-[11px] font-bold text-accent-dark hover:underline whitespace-nowrap shrink-0"
+                            >
+                              {expanded ? 'Hide ↑' : 'View ↓'}
+                            </button>
                           </div>
-                        )}
-                        <div className="flex justify-between font-extrabold text-brand border-t border-line pt-2 mt-2">
-                          <dt>Total</dt>
-                          <dd>{formatAED(o.total)}</dd>
-                        </div>
-                      </dl>
-                    </div>
 
-                    <div>
-                      <p className="text-xs font-bold text-muted uppercase tracking-wide mb-2">Customer Details</p>
-                      <div className="text-sm space-y-1.5">
-                        <p>
-                          <span className="text-muted">User:</span>{' '}
-                          <span className="font-semibold text-ink">{o.user?.name || '—'}</span>{' '}
-                          <span className="text-muted">({o.user?.email || '—'})</span>
-                        </p>
-                        <p>
-                          <span className="text-muted">Contact:</span>{' '}
-                          <span className="font-semibold text-ink">{o.contact?.name || '—'}</span>{' '}
-                          <span className="text-muted">{o.contact?.phone || '—'}</span>
-                        </p>
-                        <p className="text-muted">{o.contact?.address || 'No shipping address.'}</p>
-                        <div className="border-t border-line pt-2 mt-2">
-                          <p>
-                            <span className="text-muted">Payment:</span>{' '}
-                            <span className="font-semibold text-ink">{o.paymentMethod || '—'}</span>
-                          </p>
-                          <p>
-                            <span className="text-muted">Paid:</span>{' '}
-                            <span className="font-semibold text-ink">
-                              {o.paidAt ? new Date(o.paidAt).toLocaleString() : 'Pending'}
-                            </span>
-                          </p>
-                          <p>
-                            <span className="text-muted">Placed:</span>{' '}
-                            <span className="font-semibold text-ink">
-                              {o.placedAt ? new Date(o.placedAt).toLocaleString() : '—'}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                          {expanded && (
+                            <div className="mt-3 border-t border-line pt-3 grid gap-4 lg:grid-cols-2">
+                              <div>
+                                <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-1.5">Items</p>
+                                <ul className="space-y-1 text-xs">
+                                  {o.items.map((it, i) => (
+                                    <li key={i} className="flex justify-between gap-3">
+                                      <span className="text-ink">{it.name} × {it.qty}</span>
+                                      <span className="font-semibold whitespace-nowrap">{formatAED(it.qty * (it.price || 0))}</span>
+                                    </li>
+                                  ))}
+                                  {(o.discountAmount ?? 0) > 0 && (
+                                    <li className="flex justify-between text-green-600">
+                                      <span>{o.couponCode ? `Discount (${o.couponCode})` : 'Discount'}</span>
+                                      <span>−{formatAED(o.discountAmount as number)}</span>
+                                    </li>
+                                  )}
+                                  <li className="flex justify-between font-extrabold text-brand border-t border-line pt-1.5 mt-1.5">
+                                    <span>Total</span>
+                                    <span>{formatAED(o.total)}</span>
+                                  </li>
+                                </ul>
+                              </div>
+                              <div className="text-xs space-y-1">
+                                <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-1.5">Details</p>
+                                <p>
+                                  <span className="text-muted">Payment:</span>{' '}
+                                  <span className="font-semibold text-ink">{o.paymentMethod || '—'}</span>
+                                </p>
+                                <p>
+                                  <span className="text-muted">Paid:</span>{' '}
+                                  <span className="font-semibold text-ink">
+                                    {o.paidAt ? new Date(o.paidAt).toLocaleString() : 'Pending'}
+                                  </span>
+                                </p>
+                                <p>
+                                  <span className="text-muted">Contact:</span>{' '}
+                                  <span className="font-semibold text-ink">
+                                    {o.contact?.name || '—'} · {o.contact?.phone || '—'}
+                                  </span>
+                                </p>
+                                <p className="text-muted">{o.contact?.address || 'No shipping address.'}</p>
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      </FragmentRow>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-3 mt-8 text-sm">
@@ -351,4 +356,12 @@ export default function AdminOrdersPage() {
       </div>
     </section>
   );
+}
+
+function FragmentRow({ children }: { expanded: boolean; children: ReactNode }) {
+  return <tr className="border-b border-line last:border-0 align-top hover:bg-slate-50/60 transition">{children}</tr>;
+}
+
+function ScrollArea({ children }: { children: ReactNode }) {
+  return <span className="flex gap-1 flex-wrap max-w-[220px]">{children}</span>;
 }
