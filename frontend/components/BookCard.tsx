@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/components/providers';
@@ -17,6 +18,18 @@ interface BookCardProps {
 
 export default function BookCard({ id, title, author, price, image, prevPrice, sale }: BookCardProps) {
   const { add } = useCart();
+  const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    if (!added) return;
+    const t = setTimeout(() => setAdded(false), 1600);
+    return () => clearTimeout(t);
+  }, [added]);
+
+  function handleAdd() {
+    add(id, title, price, image);
+    setAdded(true);
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-line p-4 flex flex-col gap-3 text-center shadow-sm hover:shadow-lg transition group">
@@ -49,10 +62,13 @@ export default function BookCard({ id, title, author, price, image, prevPrice, s
           View
         </Link>
         <button
-          onClick={() => add(id, title, price, image)}
-          className="btn-flash btn-primary-flash flex-1 text-sm py-2.5"
+          onClick={handleAdd}
+          disabled={added}
+          className={`btn-flash text-sm py-2.5 flex-1 transition ${
+            added ? 'bg-green-600 text-white' : 'btn-primary-flash'
+          }`}
         >
-          Add Cart
+          {added ? '✓ Added' : 'Add Cart'}
         </button>
       </div>
     </div>

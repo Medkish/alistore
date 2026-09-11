@@ -21,6 +21,7 @@ export default function BookDetailsClient({ book }: { book: Book }) {
   const { add, items } = useCart();
   const { has, toggle } = useWishlist();
   const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
 
   const [live, setLive] = useState<Book | null>(null);
   useEffect(() => {
@@ -133,11 +134,13 @@ export default function BookDetailsClient({ book }: { book: Book }) {
               <button
                 onClick={() => {
                   for (let i = 0; i < qty; i++) add(b.id, b.title, b.price, b.image);
+                  setAdded(true);
+                  window.setTimeout(() => setAdded(false), 1600);
                 }}
                 disabled={b.stock === 0}
-                className="btn-flash btn-primary-flash disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`btn-flash transition ${b.stock === 0 ? 'disabled:opacity-50 disabled:cursor-not-allowed' : added ? 'bg-green-600 text-white' : 'btn-primary-flash'}`}
               >
-                Add to Cart
+                {added ? `✓ ${qty} Added` : 'Add to Cart'}
               </button>
               <button
                 onClick={() => toggle(b.id)}
