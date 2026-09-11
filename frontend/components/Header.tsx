@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart, useAuth } from '@/components/providers';
+import { useCart, useAuth, useWishlist } from '@/components/providers';
 import { api } from '@/lib/api';
 import { formatAED } from '@/lib/format';
 import type { NotificationItem } from '@/lib/types';
 
 export default function Header() {
   const { count, total } = useCart();
+  const { count: wishCount } = useWishlist();
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -181,6 +182,16 @@ export default function Header() {
                 )}
               </div>
             )}
+            <Link href="/wishlist/" className="flex items-center gap-2 hover:opacity-80" aria-label="Wishlist">
+              <span className="relative shrink-0">
+                ❤️
+                {wishCount > 0 && (
+                  <span className="absolute -top-2 -right-3 bg-red-500 text-white rounded-full text-[10px] font-bold px-1.5">
+                    {wishCount}
+                  </span>
+                )}
+              </span>
+            </Link>
             <Link href="/cart/" className="flex items-center gap-2 hover:opacity-80">
               <span className="relative shrink-0">
                 🛒

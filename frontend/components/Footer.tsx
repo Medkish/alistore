@@ -3,7 +3,7 @@ import Link from 'next/link';
 const columns = [
   { title: 'About Us', links: ['Vision', 'Articles', 'Careers', 'Service terms', 'Donate'] },
   { title: 'Discover', links: [{ l: 'Home', h: '/' }, { l: 'Books', h: '/books/' }, 'Authors', 'Subjects', 'Advanced Search'] },
-  { title: 'My Account', links: ['Sign In', { l: 'View Cart', h: '/cart/' }, 'My Wishlist', 'Track My Order'] },
+  { title: 'My Account', links: [{ l: 'Sign In', h: '/login/' }, { l: 'View Cart', h: '/cart/' }, { l: 'My Wishlist', h: '/wishlist/' }, { l: 'My Orders', h: '/orders/' }, { l: 'Notifications', h: '/notifications/' }] },
   { title: 'Help', links: ['Help center', 'Report a problem', 'Suggesting edits', 'Contact us'] },
 ];
 

@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { useCart } from '@/components/providers';
+import { useCart, useWishlist } from '@/components/providers';
 import QuantityStepper from '@/components/QuantityStepper';
 import { api } from '@/lib/api';
 import { formatAED } from '@/lib/format';
@@ -19,8 +19,10 @@ function Stars({ n, size = 'text-lg' }: { n: number; size?: string }) {
 
 export default function BookDetailsClient({ book }: { book: Book }) {
   const { add, items } = useCart();
+  const { has, toggle } = useWishlist();
   const [qty, setQty] = useState(1);
   const inCart = items.find((i) => i.id === book.id)?.qty ?? 0;
+  const liked = has(book.id);
 
   const [rv, setRv] = useState<BookReviews>({ average: null, count: 0, purchased: false, submitted: false, status: null, reviews: [] });
   const [myRating, setMyRating] = useState(5);
@@ -113,6 +115,15 @@ export default function BookDetailsClient({ book }: { book: Book }) {
                 className="btn-flash btn-primary-flash"
               >
                 Add to Cart
+              </button>
+              <button
+                onClick={() => toggle(book.id)}
+                aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
+                className={`shrink-0 h-12 w-12 rounded-xl border-2 text-xl transition ${
+                  liked ? 'border-red-300 bg-red-50' : 'border-line bg-white hover:border-accent'
+                }`}
+              >
+                {liked ? '♥' : '♡'}
               </button>
               <Link href="/checkout/" className="btn-flash btn-outline-flash text-brand border-brand hover:bg-brand hover:text-white">
                 Buy the Book First

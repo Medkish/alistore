@@ -118,6 +118,10 @@ export const api = {
       method: 'POST',
       body: id ? { id } : {},
     }),
+  updateProfile: (name: string, mobile: string) =>
+    request<{ user: User }>('/me/profile', { method: 'PUT', body: { name, mobile } }),
+  changePassword: (current: string, next: string) =>
+    request<{ ok: boolean }>('/me/password', { method: 'POST', body: { current, next } }),
   donate: (amount: number, method: string) =>
     request<{ reference: string; amount: number }>('/donations', { method: 'POST', body: { amount, method } }),
   subscribe: (body: { plan: string; period: string; email: string; nextBilling: string }) =>

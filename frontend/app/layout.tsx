@@ -22,9 +22,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen flex flex-col">
         <AuthProvider>
           <CartProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
+            <WishlistProvider>
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </WishlistProvider>
           </CartProvider>
         </AuthProvider>
       </body>
