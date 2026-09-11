@@ -21,9 +21,10 @@ const PAY_METHODS = [
 ];
 
 const STEPS = [
-  { id: 1, label: 'Shipping' },
-  { id: 2, label: 'Payment' },
-  { id: 3, label: 'Review' },
+  { id: 1, label: 'Customer Info' },
+  { id: 2, label: 'Shipping Address' },
+  { id: 3, label: 'Order Summary' },
+  { id: 4, label: 'Payment' },
 ];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,13 +40,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState('');
   const [snapshot, setSnapshot] = useState<{ items: CartItem[]; discount: number; deliveryFee: number; subtotal: number } | null>(null);
 
-  const [shipping, setShipping] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: '',
-    address: '',
-    city: '',
-  });
+  const [customer, setCustomer] = useState({ name: user?.name || '', email: user?.email || '', phone: '' });
+  const [address, setAddress] = useState({ line1: '', city: '', country: 'UAE', zip: '' });
   const [payMethod, setPayMethod] = useState('credit-card');
   const [card, setCard] = useState({ number: '', expiry: '', cvc: '' });
   const [coupon, setCoupon] = useState('');
@@ -57,28 +53,14 @@ export default function CheckoutPage() {
   const deliveryFee = total >= FREE_DELIVERY_OVER ? 0 : DELIVERY_FEE;
   const finalTotal = Math.max(0, total - discount) + deliveryFee;
 
-  function setShip(field: keyof typeof shipping, value: string) {
-    setShipping((s) => ({ ...s, [field]: value }));
+  function setCust(field: keyof typeof customer, value: string) {
+    setCustomer((s) => ({ ...s, [field]: value }));
     setValidation('');
   }
 
-  function validateShipping(): boolean {
-    if (!shipping.name.trim()) return fail('Full name is required.');
-    if (!EMAIL_RE.test(shipping.email.trim())) return fail('Enter a valid email address.');
-    if (shipping.phone.trim().replace(/\D/g, '').length < 7) return fail('Enter a valid phone number.');
-    if (!shipping.address.trim()) return fail('Shipping address is required.');
-    if (!shipping.city.trim()) return fail('City is required.');
-    return true;
-  }
-
-  function validatePayment(): boolean {
-    if (payMethod === 'credit-card') {
-      const digits = card.number.replace(/\D/g, '');
-      if (digits.length < 12) return fail('Enter a valid card number.');
-      if (!/^\d{2}\/\d{2}$/.test(card.expiry.trim())) return fail('Expiry must be MM/YY.');
-      if (!/^\d{3,4}$/.test(card.cvc.trim())) return fail('CVC must be 3 or 4 digits.');
-    }
-    return true;
+  function setAddr(field: keyof typeof address, value: string) {
+    setAddress((s) => ({ ...s, [field]: value }));
+    setValidation('');
   }
 
   function fail(msg: string): boolean {
@@ -87,11 +69,32 @@ export default function CheckoutPage() {
     return false;
   }
 
+  function validateStep(current: number): boolean {
+    if (current === 1) {
+      if (!customer.name.trim()) return fail('Full name is required.');
+      if (!EMAIL_RE.test(customer.email.trim())) return fail('Enter a valid email address.');
+      if (customer.phone.trim().replace(/\D/g, '').length < 7) return fail('Enter a valid phone number.');
+      return true;
+    }
+    if (current === 2) {
+      if (!address.line1.trim()) return fail('Street address is required.');
+      if (!address.city.trim()) return fail('City is required.');
+      if (!address.country.trim()) return fail('Country is required.');
+      return true;
+    }
+    if (current === 4 && payMethod === 'credit-card') {
+      const digits = card.number.replace(/\D/g, '');
+      if (digits.length < 12) return fail('Enter a valid card number.');
+      if (!/^\d{2}\/\d{2}$/.test(card.expiry.trim())) return fail('Expiry must be MM/YY.');
+      if (!/^\d{3,4}$/.test(card.cvc.trim())) return fail('CVC must be 3 or 4 digits.');
+    }
+    return true;
+  }
+
   function next() {
     setValidation('');
-    if (step === 1 && !validateShipping()) return;
-    if (step === 2 && !validatePayment()) return;
-    setStep((s) => Math.min(3, s + 1));
+    if (!validateStep(step)) return;
+    setStep((s) => Math.min(STEPS.length, s + 1));
   }
 
   function back() {
@@ -125,8 +128,13 @@ export default function CheckoutPage() {
     setError('');
     setLoading(true);
     try {
-      const fullAddress = [shipping.address, shipping.city].filter(Boolean).join(', ');
-      const res = await api.placeOrder(items, { ...shipping, address: fullAddress }, payMethod, coupon.trim());
+      const fullAddress = [address.line1, address.city, address.country].filter(Boolean).join(', ');
+      const res = await api.placeOrder(
+        items,
+        { ...customer, address: fullAddress },
+        payMethod,
+        coupon.trim(),
+      );
       setSnapshot({ items: [...items], discount, deliveryFee, subtotal: total });
       setRef(res.order.reference || res.order.id || 'ALI-ORD-' + Date.now());
       clear();
@@ -199,9 +207,9 @@ export default function CheckoutPage() {
               </p>
               <p>
                 <span className="font-semibold text-ink block">Ship to</span>
-                {shipping.name}
+                {customer.name}
                 <br />
-                {[shipping.address, shipping.city].filter(Boolean).join(', ')}
+                {[address.line1, address.city, address.country].filter(Boolean).join(', ')}
               </p>
             </div>
           </div>
@@ -252,13 +260,14 @@ export default function CheckoutPage() {
           <div className="flex flex-col gap-4">
             {step === 1 && (
               <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
-                <h2 className="font-bold mb-4">Shipping Details</h2>
+                <h2 className="font-bold mb-4">Customer Information</h2>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <label className="block text-sm">
                     <span className="font-semibold text-ink">Full Name *</span>
                     <input
-                      value={shipping.name}
-                      onChange={(e) => setShip('name', e.target.value)}
+                      value={customer.name}
+                      onChange={(e) => setCust('name', e.target.value)}
+                      placeholder="Jane Doe"
                       className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
                     />
                   </label>
@@ -266,36 +275,18 @@ export default function CheckoutPage() {
                     <span className="font-semibold text-ink">Email *</span>
                     <input
                       type="email"
-                      value={shipping.email}
-                      onChange={(e) => setShip('email', e.target.value)}
-                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                    />
-                  </label>
-                  <label className="block text-sm">
-                    <span className="font-semibold text-ink">Phone *</span>
-                    <input
-                      value={shipping.phone}
-                      onChange={(e) => setShip('phone', e.target.value)}
-                      placeholder="+971..."
-                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
-                    />
-                  </label>
-                  <label className="block text-sm">
-                    <span className="font-semibold text-ink">City *</span>
-                    <input
-                      value={shipping.city}
-                      onChange={(e) => setShip('city', e.target.value)}
-                      placeholder="Dubai"
+                      value={customer.email}
+                      onChange={(e) => setCust('email', e.target.value)}
+                      placeholder="jane@example.com"
                       className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
                     />
                   </label>
                   <label className="block text-sm sm:col-span-2">
-                    <span className="font-semibold text-ink">Shipping Address *</span>
-                    <textarea
-                      value={shipping.address}
-                      onChange={(e) => setShip('address', e.target.value)}
-                      rows={2}
-                      placeholder="Street, building, landmark"
+                    <span className="font-semibold text-ink">Phone *</span>
+                    <input
+                      value={customer.phone}
+                      onChange={(e) => setCust('phone', e.target.value)}
+                      placeholder="+971 50 123 4567"
                       className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
                     />
                   </label>
@@ -304,9 +295,96 @@ export default function CheckoutPage() {
             )}
 
             {step === 2 && (
+              <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+                <h2 className="font-bold mb-4">Shipping Address</h2>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <label className="block text-sm sm:col-span-2">
+                    <span className="font-semibold text-ink">Street Address *</span>
+                    <textarea
+                      value={address.line1}
+                      onChange={(e) => setAddr('line1', e.target.value)}
+                      rows={2}
+                      placeholder="Building, street, landmark"
+                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                    />
+                  </label>
+                  <label className="block text-sm">
+                    <span className="font-semibold text-ink">City *</span>
+                    <input
+                      value={address.city}
+                      onChange={(e) => setAddr('city', e.target.value)}
+                      placeholder="Dubai"
+                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                    />
+                  </label>
+                  <label className="block text-sm">
+                    <span className="font-semibold text-ink">Country *</span>
+                    <input
+                      value={address.country}
+                      onChange={(e) => setAddr('country', e.target.value)}
+                      placeholder="United Arab Emirates"
+                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                    />
+                  </label>
+                  <label className="block text-sm">
+                    <span className="font-semibold text-ink">ZIP / Postal Code</span>
+                    <input
+                      value={address.zip}
+                      onChange={(e) => setAddr('zip', e.target.value)}
+                      placeholder="00000"
+                      className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
               <div className="flex flex-col gap-4">
                 <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
-                  <h2 className="font-bold mb-4">Payment Method</h2>
+                  <h2 className="font-bold mb-4">Order Summary</h2>
+                  <div className="flex flex-wrap items-baseline justify-between mb-3">
+                    <p className="text-sm text-muted">
+                      Delivering to <strong className="text-ink">{customer.name}</strong> ·{' '}
+                      {[address.line1, address.city, address.country].filter(Boolean).join(', ')}
+                    </p>
+                  </div>
+                  <ul className="space-y-2 border-b border-line pb-4">
+                    {items.map((it) => (
+                      <li key={it.id} className="flex justify-between text-sm">
+                        <span className="text-ink">
+                          {it.name} × {it.qty}
+                        </span>
+                        <span className="font-semibold">{formatAED(it.qty * it.price)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex gap-3 mt-4">
+                    <input
+                      value={coupon}
+                      onChange={(e) => setCoupon(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
+                      placeholder="Coupon code e.g. ALIO10"
+                      className="flex-1 border-2 border-line rounded-xl px-3 py-2 uppercase focus:border-brand focus:outline-none"
+                    />
+                    <button
+                      onClick={applyCoupon}
+                      className="btn-flash btn-outline-flash text-brand border-brand hover:bg-brand hover:text-white px-5"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  {couponMsg && (
+                    <p className={`text-xs mt-3 ${couponKind === 'ok' ? 'text-green-700' : 'text-red-600'}`}>{couponMsg}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="flex flex-col gap-4">
+                <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
+                  <h2 className="font-bold mb-4">Payment</h2>
                   <div className="grid sm:grid-cols-2 gap-3">
                     {PAY_METHODS.map((m) => (
                       <button
@@ -357,60 +435,6 @@ export default function CheckoutPage() {
                     chosen method. Stripe powers cards in a later phase.
                   </p>
                 </div>
-
-                <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
-                  <h2 className="font-bold mb-4">Coupon</h2>
-                  <div className="flex gap-3">
-                    <input
-                      value={coupon}
-                      onChange={(e) => setCoupon(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
-                      placeholder="e.g. ALIO10"
-                      className="flex-1 border-2 border-line rounded-xl px-3 py-2 uppercase focus:border-brand focus:outline-none"
-                    />
-                    <button
-                      onClick={applyCoupon}
-                      className="btn-flash btn-outline-flash text-brand border-brand hover:bg-brand hover:text-white px-5"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                  {couponMsg && (
-                    <p className={`text-xs mt-3 ${couponKind === 'ok' ? 'text-green-700' : 'text-red-600'}`}>{couponMsg}</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
-                <h2 className="font-bold mb-4">Review your order</h2>
-                <ul className="space-y-2 mb-4 border-b border-line pb-4">
-                  {items.map((it) => (
-                    <li key={it.id} className="flex justify-between text-sm">
-                      <span className="text-ink">{it.name} × {it.qty}</span>
-                      <span className="font-semibold">{formatAED(it.qty * it.price)}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="grid sm:grid-cols-2 gap-4 text-sm text-muted">
-                  <p>
-                    <span className="font-semibold text-ink block">Ship to</span>
-                    {shipping.name} · {shipping.phone}
-                    <br />
-                    {[shipping.address, shipping.city].filter(Boolean).join(', ')}
-                  </p>
-                  <p>
-                    <span className="font-semibold text-ink block">Payment</span>
-                    {PAY_METHODS.find((m) => m.id === payMethod)?.label || payMethod}
-                    {discount > 0 && coupon && (
-                      <>
-                        <br />
-                        Coupon {coupon} applies
-                      </>
-                    )}
-                  </p>
-                </div>
               </div>
             )}
 
@@ -423,7 +447,7 @@ export default function CheckoutPage() {
                   ← Back
                 </button>
               )}
-              {step < 3 ? (
+              {step < STEPS.length ? (
                 <button onClick={next} className="btn-flash btn-primary-flash flex-1">
                   Continue to {STEPS[step].label}
                 </button>
@@ -463,7 +487,7 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex justify-between">
-                <dt className="text-muted">Delivery</dt>
+                <dt className="text-muted">Shipping</dt>
                 <dd className={`font-semibold ${deliveryFee === 0 ? 'text-green-600' : ''}`}>
                   {deliveryFee === 0 ? 'Free' : formatAED(deliveryFee)}
                 </dd>
