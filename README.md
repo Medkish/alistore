@@ -107,7 +107,7 @@ random tokens in the `Session` table.
 
 ## Deployment
 
-Live URL: `https://aliotessie.is-a.dev/` (GitHub Pages at `medkish.github.io`).
+Live URL: `https://medkish.github.io/alistore/`.
 
 The static build in `frontend/out/` is committed to the `gh-pages` branch and served
 from its root. To update the live site after changing the app:
