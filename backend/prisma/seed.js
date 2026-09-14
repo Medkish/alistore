@@ -21,7 +21,15 @@ const METADATA = {
   typescript: { isbn: '978-1-688-00012-7', edition: '1st Edition', pages: 360 },
   csharp: { isbn: '978-1-688-00013-4', edition: '2nd Edition', pages: 340 },
   dart: { isbn: '978-1-688-00014-1', edition: '1st Edition', pages: 320 },
-  shell: { isbn: '978-1-688-00015-8', edition: '1st Edition', pages: 300 }
+  shell: { isbn: '978-1-688-00015-8', edition: '1st Edition', pages: 300 },
+  c: { isbn: '978-1-688-00016-5', edition: '2nd Edition', pages: 370 },
+  r: { isbn: '978-1-688-00017-2', edition: '1st Edition', pages: 305 },
+  perl: { isbn: '978-1-688-00018-9', edition: '2nd Edition', pages: 285 },
+  haskell: { isbn: '978-1-688-00019-6', edition: '1st Edition', pages: 335 },
+  sql: { isbn: '978-1-688-00020-2', edition: '2nd Edition', pages: 320 },
+  matlab: { isbn: '978-1-688-00021-9', edition: '1st Edition', pages: 350 },
+  scala: { isbn: '978-1-688-00022-6', edition: '1st Edition', pages: 340 },
+  lua: { isbn: '978-1-688-00023-3', edition: '1st Edition', pages: 280 }
 };
 
 const CATEGORIES = [
@@ -48,7 +56,15 @@ const BOOK_CATEGORY = {
   typescript: 'javascript',
   csharp: 'programming',
   dart: 'frontend',
-  shell: 'backend'
+  shell: 'backend',
+  c: 'programming',
+  r: 'programming',
+  perl: 'web-development',
+  haskell: 'programming',
+  sql: 'web-development',
+  matlab: 'programming',
+  scala: 'backend',
+  lua: 'backend'
 };
 
 const BOOKS = [
@@ -261,6 +277,118 @@ const BOOKS = [
     publishedAt: '2025-08-01T00:00:00Z',
     featured: false,
     bestseller: false
+  },
+  {
+    slug: 'c',
+    title: 'C Programming',
+    author: 'Kamara',
+    description: 'The classic systems language — pointers, memory, structs and building fast software from scratch.',
+    price: 40,
+    prevPrice: 50,
+    stock: 12,
+    rating: 4.7,
+    coverImage: 'images/programming3.jpeg',
+    publishedAt: '2026-02-01T00:00:00Z',
+    featured: true,
+    bestseller: false
+  },
+  {
+    slug: 'r',
+    title: 'R',
+    author: 'Tessie',
+    description: 'Statistical computing and data science with R — tidyverse, ggplot2 and reproducible analysis.',
+    price: 40,
+    prevPrice: 50,
+    stock: 8,
+    rating: 4.5,
+    coverImage: 'images/programming4.jpeg',
+    publishedAt: '2026-03-01T00:00:00Z',
+    featured: true,
+    bestseller: false
+  },
+  {
+    slug: 'perl',
+    title: 'Perl',
+    author: 'Kamara',
+    description: 'The practical extraction and reporting language — regex, one-liners, CGI and server automation.',
+    price: 35,
+    prevPrice: 45,
+    stock: 10,
+    rating: 4.4,
+    coverImage: 'images/programming5.jpeg',
+    publishedAt: '2026-05-01T00:00:00Z',
+    featured: false,
+    bestseller: false
+  },
+  {
+    slug: 'haskell',
+    title: 'Haskell',
+    author: 'Tessie',
+    description: 'Pure functional programming — types, laziness, monads and building correct concurrent systems.',
+    price: 40,
+    prevPrice: 50,
+    stock: 7,
+    rating: 4.6,
+    coverImage: 'images/programming6.jpeg',
+    publishedAt: '2026-07-01T00:00:00Z',
+    featured: true,
+    bestseller: false
+  },
+  {
+    slug: 'sql',
+    title: 'SQL',
+    author: 'Kamara',
+    description: 'Master database querying — joins, indexes, transactions and designing normalized schemas.',
+    price: 38,
+    prevPrice: 45,
+    stock: 12,
+    rating: 4.5,
+    coverImage: 'images/programming2.jpeg',
+    publishedAt: '2026-04-01T00:00:00Z',
+    featured: true,
+    bestseller: false
+  },
+  {
+    slug: 'matlab',
+    title: 'MATLAB',
+    author: 'Tessie',
+    description: 'Numerical computing, matrices, simulation and data visualization with MATLAB.',
+    price: 45,
+    prevPrice: 55,
+    stock: 9,
+    rating: 4.6,
+    coverImage: 'images/programming4.jpeg',
+    publishedAt: '2026-06-01T00:00:00Z',
+    featured: false,
+    bestseller: false
+  },
+  {
+    slug: 'scala',
+    title: 'Scala',
+    author: 'Kamara',
+    description: 'Scalable functional and object-oriented programming on the JVM with Scala.',
+    price: 42,
+    prevPrice: 50,
+    stock: 8,
+    rating: 4.7,
+    coverImage: 'images/programming1.jpeg',
+    publishedAt: '2026-08-01T00:00:00Z',
+    featured: true,
+    bestseller: false
+  },
+  {
+    slug: 'lua',
+    title: 'Lua',
+    author: 'Tessie',
+    description: 'Lightweight scripting for games and embedded systems — tables, coroutines and the C API.',
+    price: 30,
+    prevPrice: 38,
+    stock: 11,
+    rating: 4.5,
+    coverImage: 'images/programming6.jpeg',
+    publishedAt: '2026-09-01T00:00:00Z',
+    featured: false,
+    bestseller: false
   }
 ];
 
@@ -312,9 +440,9 @@ async function main() {
   const adminPassword = bcrypt.hashSync('admin123', 10);
   await prisma.user.upsert({
     where: { email: 'admin@aliostore.com' },
-    update: {},
+    update: { name: 'Kamara' },
     create: {
-      name: 'Store Admin',
+      name: 'Kamara',
       email: 'admin@aliostore.com',
       mobile: '+971500000001',
       passwordHash: adminPassword,

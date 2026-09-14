@@ -9,8 +9,11 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
+    "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "node prisma/seed.js",
-    "admin:create": "node prisma/create-admin.js"
+    "admin:create": "node prisma/create-admin.js",
+    "db:backup": "node scripts/db-backup.js",
+    "db:restore": "node scripts/db-restore.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

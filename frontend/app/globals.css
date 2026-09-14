@@ -12,12 +12,28 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
   background: #f7f9fc;
   color: var(--color-ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
 }
 
 section[id] {
@@ -54,7 +70,6 @@ section[id] {
 
 .btn-outline-flash {
   background: transparent;
-  color: #ffffff;
   border: 2px solid var(--color-accent);
 }
 

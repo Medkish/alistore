@@ -48,7 +48,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-4 py-4 text-sm opacity-70">
-          © 2026 AlioStore by Alio & Palma Cooperative. All rights reserved.
+          AlioStore — Read smart.
         </div>
       </div>
     </footer>

@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import VisitTracker from '@/components/VisitTracker';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
+import BackButton from '@/components/BackButton';
 
 export const metadata: Metadata = {
   applicationName: 'AlioStore',
@@ -43,7 +44,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <VisitTracker />
               <ServiceWorkerRegister />
               <Header />
-              <main className="flex-1">{children}</main>
+              <main className="flex-1">
+                <BackButton />
+                {children}
+              </main>
               <Footer />
             </WishlistProvider>
           </CartProvider>

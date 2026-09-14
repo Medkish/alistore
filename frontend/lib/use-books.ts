@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, type BookFilters } from '@/lib/api';
 import { CATALOG } from '@/lib/catalog';
 import type { Book } from '@/lib/types';
@@ -60,11 +60,17 @@ export function useBooks(filters: BookFilters) {
   const [total, setTotal] = useState(CATALOG.length);
   const [totalPages, setTotalPages] = useState(1);
   const [apiLive, setApiLive] = useState<boolean | null>(null);
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
+  const loadedRef = useRef(1);
+  const [loadedPages, setLoadedPages] = useState(1);
 
   useEffect(() => {
     let alive = true;
+    loadedRef.current = 1;
+    setLoadedPages(1);
     api
-      .getBooks({ ...filters, pageSize: filters.pageSize || 12 })
+      .getBooks({ ...filters, page: 1, pageSize: filters.pageSize || 12 })
       .then((res) => {
         if (!alive) return;
         const mapped = res.books.map(normalize);
@@ -86,11 +92,31 @@ export function useBooks(filters: BookFilters) {
     return () => {
       alive = false;
     };
-  }, [JSON.stringify(filters), filters.page]);
+  }, [JSON.stringify(filters)]);
 
+  const loadMore = useCallback(() => {
+    if (apiLive !== true) return;
+    const nextPage = loadedRef.current + 1;
+    api
+      .getBooks({ ...filtersRef.current, page: nextPage, pageSize: 12 })
+      .then((res) => {
+        const mapped = res.books.map(normalize);
+        setBooks((prev) => {
+          const seen = new Set(prev.map((b) => b.id));
+          return [...prev, ...mapped.filter((b) => !seen.has(b.id))];
+        });
+        loadedRef.current = nextPage;
+        setLoadedPages(nextPage);
+        setTotal(res.total);
+        setTotalPages(Math.max(1, res.totalPages));
+      })
+      .catch(() => setApiLive(false));
+  }, [apiLive]);
+
+  const hasMore = apiLive === true && loadedPages < totalPages;
   const reload = useCallback(() => {
     setApiLive((v) => v);
   }, []);
 
-  return { books, total, totalPages, apiLive, reload };
+  return { books, total, totalPages, apiLive, reload, loadMore, hasMore, loadedPages };
 }

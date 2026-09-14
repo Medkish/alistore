@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useCart, useWishlist } from '@/components/providers';
 import QuantityStepper from '@/components/QuantityStepper';
 import { api } from '@/lib/api';
+import { trackProductView } from '@/lib/visitor';
 import { formatAED } from '@/lib/format';
 import type { Book, BookReviews } from '@/lib/types';
 
@@ -37,6 +38,10 @@ export default function BookDetailsClient({ book }: { book: Book }) {
     return () => {
       alive = false;
     };
+  }, [book.id]);
+
+  useEffect(() => {
+    trackProductView(book.id);
   }, [book.id]);
 
   const b = live ?? book;

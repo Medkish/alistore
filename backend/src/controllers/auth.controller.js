@@ -39,4 +39,20 @@ async function logout(req, res) {
   res.json({ ok: true });
 }
 
-module.exports = { register, login, me, logout };
+async function forgotPassword(req, res) {
+  const body = req.body || {};
+  const result = await authService.forgotPassword({ email: String(body.email || '').trim() });
+  res.json(result);
+}
+
+async function resetPassword(req, res) {
+  const body = req.body || {};
+  const result = await authService.resetPassword({
+    email: String(body.email || '').trim(),
+    code: String(body.code || '').trim(),
+    password: String(body.password || '')
+  });
+  res.json(result);
+}
+
+module.exports = { register, login, me, logout, forgotPassword, resetPassword };

@@ -28,7 +28,6 @@ function Books() {
   const [price, setPrice] = useState(0);
   const [rating, setRating] = useState(0);
   const [sort, setSort] = useState('newest');
-  const [page, setPage] = useState(1);
 
   const filters = useMemo(() => {
     const p = PRICE_OPTIONS[price] || PRICE_OPTIONS[0];
@@ -40,16 +39,14 @@ function Books() {
       maxPrice: p.max,
       minRating: r.min,
       sort,
-      page,
       pageSize: 12,
     };
-  }, [debouncedQ, category, price, rating, sort, page]);
+  }, [debouncedQ, category, price, rating, sort]);
 
-  const { books, total, totalPages, apiLive } = useBooks(filters);
+  const { books, total, totalPages, apiLive, loadMore, hasMore } = useBooks(filters);
 
   function applySearch() {
     setDebouncedQ(q.trim());
-    setPage(1);
   }
 
   function resetFilters() {
@@ -59,7 +56,6 @@ function Books() {
     setPrice(0);
     setRating(0);
     setSort('newest');
-    setPage(1);
   }
 
   return (
@@ -89,10 +85,7 @@ function Books() {
         <div className="flex flex-wrap justify-center items-center gap-2 mb-4 text-sm">
           <select
             value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              setPage(1);
-            }}
+            onChange={(e) => setCategory(e.target.value)}
             className="border-2 border-line rounded-xl px-3 py-2 bg-white focus:border-brand focus:outline-none"
           >
             {CATEGORY_OPTIONS.map((c) => (
@@ -103,10 +96,7 @@ function Books() {
           </select>
           <select
             value={price}
-            onChange={(e) => {
-              setPrice(Number(e.target.value));
-              setPage(1);
-            }}
+            onChange={(e) => setPrice(Number(e.target.value))}
             className="border-2 border-line rounded-xl px-3 py-2 bg-white focus:border-brand focus:outline-none"
           >
             {PRICE_OPTIONS.map((p, i) => (
@@ -117,10 +107,7 @@ function Books() {
           </select>
           <select
             value={rating}
-            onChange={(e) => {
-              setRating(Number(e.target.value));
-              setPage(1);
-            }}
+            onChange={(e) => setRating(Number(e.target.value))}
             className="border-2 border-line rounded-xl px-3 py-2 bg-white focus:border-brand focus:outline-none"
           >
             {RATING_OPTIONS.map((r, i) => (
@@ -131,10 +118,7 @@ function Books() {
           </select>
           <select
             value={sort}
-            onChange={(e) => {
-              setSort(e.target.value);
-              setPage(1);
-            }}
+            onChange={(e) => setSort(e.target.value)}
             className="border-2 border-line rounded-xl px-3 py-2 bg-white focus:border-brand focus:outline-none"
           >
             {SORT_OPTIONS.map((s) => (
@@ -151,7 +135,7 @@ function Books() {
         </div>
 
         <p className="text-center text-xs text-muted mb-8">
-          {apiLive === true && `Live catalog · ${total} books from the AlioStore API`}
+          {apiLive === true && `Live catalog · showing ${books.length} of ${total} books from the AlioStore API`}
           {apiLive === false && `Offline catalog · ${total} local books (API unreachable)`}
           {apiLive === null && 'Connecting to catalog…'}
         </p>
@@ -166,26 +150,21 @@ function Books() {
           <p className="text-center text-muted mt-12">No books match your filters. Try different terms.</p>
         )}
 
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-4 mt-10 text-sm">
+        {hasMore && (
+          <div className="flex justify-center mt-10">
             <button
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="btn-flash btn-outline-flash text-brand border-brand disabled:opacity-40 px-5"
+              onClick={loadMore}
+              className="btn-flash btn-primary-flash px-8 py-3 rounded-xl shadow hover:-translate-y-0.5 transition"
             >
-              ← Prev
-            </button>
-            <span className="font-semibold text-ink">
-              Page {page} of {totalPages}
-            </span>
-            <button
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => p + 1)}
-              className="btn-flash btn-outline-flash text-brand border-brand disabled:opacity-40 px-5"
-            >
-              Next →
+              View More Books ↓
             </button>
           </div>
+        )}
+
+        {apiLive === true && !hasMore && (
+          <p className="text-center text-xs text-muted mt-10">
+            You've seen all {totalPages > 1 ? total : books.length} book{total === 1 ? '' : 's'} in this collection.
+          </p>
         )}
       </div>
     </section>

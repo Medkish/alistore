@@ -2,6 +2,10 @@ const bcrypt = require('bcryptjs');
 const prisma = require('../lib/prisma');
 const notificationsService = require('../services/notifications.service');
 
+async function current(req, res) {
+  res.json({ user: { id: req.user.id, name: req.user.name, email: req.user.email, mobile: req.user.mobile || '', role: req.user.role || 'CUSTOMER' } });
+}
+
 async function profile(req, res, next) {
   try {
     const name = String((req.body && req.body.name) || '').trim();
@@ -79,4 +83,4 @@ async function markRead(req, res, next) {
   }
 }
 
-module.exports = { notifications, markRead, profile, password };
+module.exports = { current, notifications, markRead, profile, password };

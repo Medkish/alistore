@@ -7,6 +7,7 @@ const router = Router();
 
 router.use(authRequired);
 
+router.get('/', wrap(me.current));
 router.get('/notifications', wrap(me.notifications));
 router.post('/notifications/read', wrap(me.markRead));
 router.put('/profile', wrap(me.profile));

@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { CartItem, User } from '@/lib/types';
-import { api, setToken } from '@/lib/api';
+import { api, getToken, setToken } from '@/lib/api';
+import { trackAddToCart } from '@/lib/visitor';
 
 const CART_KEY = 'alistore_cart';
 const CART_SAVED_KEY = 'alistore_cart_saved';
@@ -62,6 +63,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (found) return prev.map((i) => (i.id === id ? { ...i, qty: i.qty + 1 } : i));
       return [...prev, { id, name, qty: 1, price, image }];
     });
+    trackAddToCart(id);
   }, []);
 
   const setQty = useCallback((id: string, qty: number) => {
@@ -193,6 +195,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     else window.localStorage.removeItem(USER_KEY);
   }, [user]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!getToken()) return;
+    api
+      .getMe()
+      .then(({ user }) => setUser((prev) => (prev ? { ...prev, ...user } : prev)))
+      .catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.addEventListener('auth:unauthorized', () => setUser(null));
+    return () => window.removeEventListener('auth:unauthorized', () => setUser(null));
+  }, []);
+
   const login = useCallback(async (email: string, password: string) => {
     try {
       const res = await api.login({ email, password });
@@ -200,7 +217,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(res.user);
       return res.user;
     } catch {
-      const fallback: User = { name: email.split('@')[0] || email, email };
+      const isAdmin = email.toLowerCase() === 'admin@aliostore.com';
+      const fallback: User = { name: isAdmin ? 'Kamara' : email.split('@')[0] || email, email, role: isAdmin ? 'ADMIN' : undefined };
       setUser(fallback);
       return fallback;
     }

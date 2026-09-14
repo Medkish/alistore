@@ -8,8 +8,47 @@ import { api } from '@/lib/api';
 import { formatAED } from '@/lib/format';
 import type { CartItem } from '@/lib/types';
 
-const DELIVERY_FEE = 10;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const UAE = 'United Arab Emirates';
+const FREE_DELIVERY_OVER = 150;
+const GCC_COUNTRIES = ['Saudi Arabia', 'Bahrain', 'Kuwait', 'Oman', 'Qatar'];
+
+const COUNTRY_SUGGESTIONS = [
+  UAE,
+  'Saudi Arabia',
+  'Bahrain',
+  'Kuwait',
+  'Oman',
+  'Qatar',
+  'United Kingdom',
+  'United States',
+  'Canada',
+  'Australia',
+  'India',
+  'Egypt',
+  'Nigeria',
+  'Pakistan',
+  'Germany',
+  'France',
+];
+
+function isUAE(c: string) {
+  const v = c.trim().toLowerCase();
+  return v === 'uae' || v === 'united arab emirates' || v === 'emirates';
+}
+
+function isGCC(c: string) {
+  const v = c.trim().toLowerCase();
+  return GCC_COUNTRIES.some((x) => x.toLowerCase() === v);
+}
+
+/* Client-side estimate only — the server re-quotes the price from the country. */
+function shippingFor(country: string, amountAfterDiscount: number): number {
+  if (isUAE(country)) return amountAfterDiscount >= FREE_DELIVERY_OVER ? 0 : 10;
+  if (isGCC(country)) return 25;
+  return 45;
+}
 
 export default function CheckoutPage() {
   const { items, total, clear } = useCart();
@@ -33,7 +72,8 @@ export default function CheckoutPage() {
   const [discount, setDiscount] = useState({ code: '', amount: 0 });
   const router = useRouter();
 
-  const shipping = DELIVERY_FEE;
+  const codAllowed = isUAE(form.country);
+  const shipping = shippingFor(form.country, total - discount.amount);
   const finalTotal = total - discount.amount + shipping;
 
   async function applyCoupon() {
@@ -58,6 +98,12 @@ export default function CheckoutPage() {
   function setField(field: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
     setError('');
+  }
+
+  function setCountry(value: string) {
+    setForm((f) => ({ ...f, country: value }));
+    setError('');
+    if (!isUAE(value) && payMethod === 'cash-on-delivery') setPayMethod('card');
   }
 
   function validate(): boolean {
@@ -87,14 +133,16 @@ export default function CheckoutPage() {
           name: form.name.trim(),
           email: form.email.trim(),
           phone: form.phone.trim(),
-          address: [form.address.trim(), form.city.trim(), form.country.trim()].filter(Boolean).join(', '),
+          address: form.address.trim(),
+          city: form.city.trim(),
+          country: form.country.trim(),
         },
         payMethod,
         discount.code,
       );
       const ref = res.order.reference || res.order.id || 'ALI-ORD-' + Date.now();
       const id = res.order.id || '';
-      const amount = finalTotal.toFixed(2);
+      const amount = ((res.order.total ?? finalTotal) as number).toFixed(2);
       clear();
       if (payMethod === 'card' && id) {
         try {
@@ -204,29 +252,50 @@ export default function CheckoutPage() {
                 <span className="font-semibold text-ink">Country *</span>
                 <input
                   value={form.country}
-                  onChange={(e) => setField('country', e.target.value)}
+                  onChange={(e) => setCountry(e.target.value)}
+                  list="country-options"
                   placeholder="United Arab Emirates"
                   className="mt-1 w-full border-2 border-line rounded-xl px-3 py-2 focus:border-brand focus:outline-none"
                 />
+                <datalist id="country-options">
+                  {COUNTRY_SUGGESTIONS.map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
+                {!isUAE(form.country) && (
+                  <span className="block text-[11px] text-muted mt-1">
+                    International delivery — shipping calculated in AED at checkout.
+                  </span>
+                )}
               </label>
             </div>
           </div>
 
           <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
             <h2 className="font-bold text-ink mb-4">Payment Method</h2>
+            {!codAllowed && (
+              <p className="text-[11px] text-muted bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3">
+                Cash on Delivery is only available in the United Arab Emirates — online card payment is enabled for your country.
+              </p>
+            )}
             <div className="flex flex-col sm:flex-row gap-3">
               {(
                 [
                   { value: 'card', label: '💳 Card', hint: 'Simulated online payment — confirmed instantly' },
-                  { value: 'cash-on-delivery', label: '💵 Cash on Delivery', hint: 'Pay when your order arrives' },
+                  { value: 'cash-on-delivery', label: '💵 Cash on Delivery', hint: 'Pay when your order arrives — UAE only' },
                 ] as const
               ).map((p) => (
                 <button
                   key={p.value}
                   type="button"
                   onClick={() => setPayMethod(p.value)}
+                  disabled={!codAllowed && p.value === 'cash-on-delivery'}
                   className={`flex-1 border-2 rounded-2xl px-4 py-3 text-left transition ${
-                    payMethod === p.value ? 'border-brand bg-brand/5' : 'border-line hover:border-brand/40'
+                    p.value === 'cash-on-delivery' && !codAllowed
+                      ? 'opacity-40 cursor-not-allowed'
+                      : payMethod === p.value
+                        ? 'border-brand bg-brand/5'
+                        : 'border-line hover:border-brand/40'
                   }`}
                 >
                   <span className="block font-bold text-ink text-sm">{p.label}</span>
@@ -286,8 +355,8 @@ export default function CheckoutPage() {
                 <dd className="font-semibold">{formatAED(total)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-muted">Shipping</dt>
-                <dd className="font-semibold">{formatAED(shipping)}</dd>
+                <dt className="text-muted">Shipping{isUAE(form.country) ? ` (free over AED ${FREE_DELIVERY_OVER})` : ''}</dt>
+                <dd className="font-semibold">{shipping === 0 ? 'Free' : formatAED(shipping)}</dd>
               </div>
               {discount.amount > 0 && (
                 <div className="flex justify-between text-green-600">

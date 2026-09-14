@@ -1,5 +1,13 @@
 require('dotenv').config();
 
+process.on('unhandledRejection', function (reason) {
+  console.error('[unhandledRejection] Keeping the server alive:', reason);
+});
+process.on('uncaughtException', function (err) {
+  console.error('[uncaughtException]', err);
+  process.exit(1);
+});
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -63,9 +71,13 @@ const FRONTEND_PUBLIC = path.join(__dirname, '..', '..', 'frontend', 'public');
 const UPLOADS = path.join(FRONTEND_PUBLIC, 'images');
 
 app.use('/images', express.static(UPLOADS, { maxAge: '7d' }));
+app.use('/alistore/images', express.static(UPLOADS, { maxAge: '7d' }));
 
 if (fs.existsSync(FRONTEND_OUT)) {
-  app.use(express.static(FRONTEND_OUT));
+  app.use('/alistore', express.static(FRONTEND_OUT));
+  app.get('/', function (req, res) {
+    res.redirect('/alistore/');
+  });
   app.get('*', function (req, res) {
     res.sendFile(path.join(FRONTEND_OUT, 'index.html'));
   });

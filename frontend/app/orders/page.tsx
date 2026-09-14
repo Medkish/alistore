@@ -4,25 +4,21 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Order, OrderStatus } from '@/lib/types';
+import { TRACK_LABELS } from '@/lib/types';
 import { useAuth } from '@/components/providers';
 import { formatAED } from '@/lib/format';
 
-const ORDER_STEPS: OrderStatus[] = ['PENDING', 'PAID', 'SHIPPED', 'DELIVERED'];
+const ORDER_STEPS: OrderStatus[] = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'];
 
-const STEP_LABELS: Record<OrderStatus, string> = {
-  PENDING: 'Order Placed',
-  PAID: 'Payment Confirmed',
-  SHIPPED: 'Shipped',
-  DELIVERED: 'Delivered',
-  CANCELLED: 'Cancelled',
-};
-
-const STATUS_STYLE: Record<OrderStatus, string> = {
+const STATUS_STYLE: Record<string, string> = {
   PENDING: 'bg-slate-100 text-slate-700 border-slate-300',
-  PAID: 'bg-green-50 text-green-700 border-green-300',
+  CONFIRMED: 'bg-amber-50 text-amber-700 border-amber-300',
+  PROCESSING: 'bg-indigo-50 text-indigo-700 border-indigo-300',
   SHIPPED: 'bg-blue-50 text-blue-700 border-blue-300',
+  OUT_FOR_DELIVERY: 'bg-purple-50 text-purple-700 border-purple-300',
   DELIVERED: 'bg-emerald-50 text-emerald-700 border-emerald-300',
   CANCELLED: 'bg-red-50 text-red-600 border-red-300',
+  REFUNDED: 'bg-rose-50 text-rose-600 border-rose-300',
 };
 
 export default function OrdersPage() {
@@ -162,7 +158,7 @@ export default function OrdersPage() {
                                       : 'bg-white text-muted border-line'
                                 }`}
                               >
-                                {icon} {STEP_LABELS[step]}
+                                {icon} {TRACK_LABELS[step] || step}
                               </span>
                               {idx < ORDER_STEPS.length - 1 && (
                                 <span className={`h-px w-4 ${reached > idx ? 'bg-green-600' : 'bg-line'}`} />

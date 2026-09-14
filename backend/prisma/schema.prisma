@@ -15,16 +15,21 @@ model User {
   passwordHash  String
   role          String         @default("CUSTOMER")
   cart          Json?
+  addresses     Json?
+  notes         String         @default("")
+  blocked       Boolean        @default(false)
+  lastActive    DateTime       @default(now())
   orders        Order[]
   sessions      Session[]
-  donations     Donation[]
   subscriptions Subscription[]
   actions       ActionLog[]
   reviews       Review[]
   notifications Notification[]
+  visitEvents   VisitEvent[]
   createdAt     DateTime       @default(now())
 
   @@index([email])
+  @@index([blocked])
 }
 
 model Session {
@@ -38,10 +43,13 @@ model Session {
 }
 
 model Category {
-  id    String @id @default(cuid())
-  name  String @unique
-  slug  String @unique
-  books Book[]
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String    @default("")
+  image       String    @default("")
+  active      Boolean   @default(true)
+  books       Book[]
 }
 
 model Book {
@@ -53,6 +61,7 @@ model Book {
   price         Decimal     @db.Decimal(10, 2)
   prevPrice     Decimal?    @db.Decimal(10, 2)
   stock         Int         @default(0)
+  lowStockThreshold Int     @default(10)
   rating        Decimal     @default(4.5) @db.Decimal(2, 1)
   coverImage    String
   featured      Boolean     @default(false)
@@ -72,6 +81,8 @@ model Book {
   category      Category    @relation(fields: [categoryId], references: [id])
   orderItems    OrderItem[]
   reviews       Review[]
+  inventoryTransactions InventoryTransaction[]
+  visitEvents   VisitEvent[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
@@ -85,6 +96,9 @@ model Order {
   reference         String        @unique
   status            String        @default("PENDING")
   total             Decimal       @db.Decimal(10, 2)
+  subtotal          Decimal       @default(0) @db.Decimal(10, 2)
+  shippingCost      Decimal       @default(0) @db.Decimal(10, 2)
+  tax               Decimal       @default(0) @db.Decimal(10, 2)
   paymentStatus     PaymentStatus @default(UNPAID)
   paymentProvider   String        @default("demo")
   paymentReference  String        @default("")
@@ -95,9 +109,14 @@ model Order {
   contactEmail    String      @default("")
   contactPhone    String      @default("")
   contactAddress  String      @default("")
+  trackingNumber  String      @default("")
+  trackingProvider String     @default("")
+  estimatedDelivery DateTime?
+  notes           String      @default("")
   userId          String
   user            User        @relation(fields: [userId], references: [id])
   items           OrderItem[]
+  trackingEvents  TrackingEvent[]
   placedAt        DateTime    @default(now())
 
   @@index([userId])
@@ -111,6 +130,12 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+  PAYPAL
 }
 
 model OrderItem {
@@ -129,15 +154,83 @@ model OrderItem {
 }
 
 model Donation {
-  id        String   @id @default(cuid())
-  reference String   @unique
-  amount    Decimal  @db.Decimal(10, 2)
-  method    String   @default("card")
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  at        DateTime @default(now())
+  id             String          @id @default(cuid())
+  donationNumber String          @unique
+
+  userId        String?
+
+  donorName     String?
+  donorEmail    String?
+  isAnonymous   Boolean         @default(false)
+  showOnWall    Boolean         @default(false)
+
+  amount        Decimal         @db.Decimal(10, 2)
+  currency      String          @default("AED")
+  feesAmount    Decimal?        @db.Decimal(10, 2)
+  coverFees     Boolean         @default(false)
+
+  recurring     Boolean         @default(false)
+  purpose       String?
+  message       String?
+  messageStatus String          @default("pending") // none | pending | approved | hidden
+  country       String?
+
+  status        PaymentStatus   @default(PENDING)
+  paymentMethod PaymentMethod?
+
+  transactionId String?
+  provider      String?
+
+  paidAt        DateTime?
+
+  campaignId    String?
+  campaign      Campaign?       @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  refunds       DonationRefund[]
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
   @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([campaignId])
+}
+
+model DonationRefund {
+  id             String   @id @default(cuid())
+  donationId     String
+  donation       Donation @relation(fields: [donationId], references: [id], onDelete: Cascade)
+  donationNumber String
+  amount         Decimal  @db.Decimal(10, 2)
+  reason         String   @default("")
+  actorId        String?
+  actorName      String   @default("Admin")
+  refundedAt     DateTime @default(now())
+
+  @@index([donationId])
+}
+
+model Campaign {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  description String    @default("")
+  banner      String?
+  purpose     String?
+  goal        Decimal   @db.Decimal(12, 2)
+  currency    String    @default("AED")
+  status      String    @default("ACTIVE") // ACTIVE | PAUSED | ENDED
+  featured    Boolean   @default(false)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  donations Donation[]
+
+  @@index([status])
+  @@index([featured])
 }
 
 model Subscription {
@@ -173,6 +266,8 @@ model Discount {
   value     Decimal  @db.Decimal(10, 2)
   minOrder  Decimal  @default(0) @db.Decimal(10, 2)
   active    Boolean  @default(true)
+  maxUses   Int?
+  usedCount Int      @default(0)
   expiresAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -208,4 +303,66 @@ model Notification {
 
   @@index([userId])
   @@index([read])
+}
+
+enum InventoryTransactionType {
+  STOCK_IN
+  STOCK_OUT
+  ADJUSTMENT
+  SALE
+  RETURN
+  DAMAGE
+}
+
+model InventoryTransaction {
+  id        String   @id @default(cuid())
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id])
+  quantity  Int
+  type      InventoryTransactionType
+  reason    String   @default("")
+  createdBy String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([bookId])
+  @@index([createdAt])
+}
+
+model TrackingEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    String
+  note      String   @default("")
+  at        DateTime @default(now())
+
+  @@index([orderId])
+  @@index([at])
+}
+
+model StoreSetting {
+  id        String   @id
+  data      Json
+  updatedAt DateTime @updatedAt
+}
+
+model VisitEvent {
+  id        String   @id @default(cuid())
+  visitorId String
+  event     String   @default("page_view") // page_view | product_view | add_to_cart
+  path      String   @default("")
+  referrer  String   @default("")
+  device    String   @default("")
+  browser   String   @default("")
+  ip        String   @default("")
+  bookId    String?
+  book      Book?    @relation(fields: [bookId], references: [id], onDelete: SetNull)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([visitorId])
+  @@index([event])
+  @@index([bookId])
+  @@index([createdAt])
 }

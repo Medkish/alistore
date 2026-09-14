@@ -1,9 +1,15 @@
 node_modules/
 backend/data/
+backend/*.pid
+backend/backups/
 *.log
 .env
 .env.local
 backend/.env
 frontend/.next/
 frontend/out/
-.DS_Store.github/workflows/
+.DS_Store
+!.github/workflows/
+.github/workflows/*.local.yml
+
+*.tsbuildinfo

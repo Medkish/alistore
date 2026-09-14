@@ -1,6 +1,8 @@
 const prisma = require('../lib/prisma');
+const { normalizeImage } = require('../utils/image');
 
 function serialize(book) {
+  const image = normalizeImage(book.coverImage);
   return {
     id: book.slug,
     slug: book.slug,
@@ -10,10 +12,11 @@ function serialize(book) {
     price: Number(book.price),
     prevPrice: book.prevPrice == null ? null : Number(book.prevPrice),
     stock: book.stock,
+    lowStockThreshold: book.lowStockThreshold ?? 10,
     rating: Number(book.rating),
     publicationDate: book.publishedAt ? book.publishedAt.toISOString() : null,
-    image: book.coverImage,
-    coverImage: book.coverImage,
+    image: image,
+    coverImage: image,
     category: book.category ? { id: book.category.id, name: book.category.name, slug: book.category.slug } : null,
     featured: book.featured,
     bestseller: book.bestseller,
@@ -24,7 +27,10 @@ function serialize(book) {
     format: book.format || 'EPUB + PDF',
     pages: book.pages ?? null,
     toc: Array.isArray(book.toc) ? book.toc : [],
-    sampleAvailable: !!(book.samplePath && book.samplePath.trim())
+    sampleAvailable: !!(book.samplePath && book.samplePath.trim()),
+    published: book.published,
+    publishedAt: book.publishedAt ? book.publishedAt.toISOString() : null,
+    updatedAt: book.updatedAt ? book.updatedAt.toISOString() : null
   };
 }
 
@@ -42,20 +48,32 @@ function parseNum(v) {
   return Number.isFinite(n) ? n : undefined;
 }
 
-async function list({ search, category, author, minPrice, maxPrice, minRating, inStock, sort, page, pageSize }) {
+async function list({ search, category, author, minPrice, maxPrice, minRating, inStock, sort, page, pageSize, featured, bestseller, published, isbn }) {
   const where = {};
   const s = String(search || '').trim();
   if (s) {
     where.OR = [
       { title: { contains: s, mode: 'insensitive' } },
       { author: { contains: s, mode: 'insensitive' } },
-      { description: { contains: s, mode: 'insensitive' } }
+      { description: { contains: s, mode: 'insensitive' } },
+      { isbn: { contains: s, mode: 'insensitive' } }
     ];
   }
   const a = String(author || '').trim();
   if (a) where.author = { contains: a, mode: 'insensitive' };
   if (inStock === true || inStock === 'true') where.stock = { gt: 0 };
   if (inStock === false || inStock === 'false') where.stock = 0;
+  const f = String(featured || '');
+  if (f === 'true') where.featured = true;
+  else if (f === 'false') where.featured = false;
+  const bs = String(bestseller || '');
+  if (bs === 'true') where.bestseller = true;
+  else if (bs === 'false') where.bestseller = false;
+  const pub = String(published || '');
+  if (pub === 'true') where.published = true;
+  else if (pub === 'false') where.published = false;
+  const ib = String(isbn || '').trim();
+  if (ib) where.isbn = { contains: ib, mode: 'insensitive' };
   if (category) {
     const cat = await prisma.category.findUnique({ where: { slug: category } });
     if (!cat) {
@@ -108,10 +126,11 @@ async function getBySlug(slug) {
 
 async function listCategories() {
   const categories = await prisma.category.findMany({
+    where: { active: true },
     orderBy: { name: 'asc' },
     include: { _count: { select: { books: true } } }
   });
-  return categories.map((c) => ({ id: c.id, name: c.name, slug: c.slug, bookCount: c._count.books }));
+  return categories.map((c) => ({ id: c.id, name: c.name, slug: c.slug, description: c.description, image: normalizeImage(c.image), bookCount: c._count.books }));
 }
 
 async function ensureCategory(slugOrName) {
@@ -142,6 +161,7 @@ async function createBook(data) {
       price: parseFloat(data.price),
       prevPrice: data.prevPrice != null && data.prevPrice !== '' ? parseFloat(data.prevPrice) : null,
       stock: parseInt(data.stock || 0, 10),
+      lowStockThreshold: parseInt(data.lowStockThreshold || 10, 10),
       rating: parseFloat(data.rating || 4.5),
       coverImage: String(data.coverImage || data.image || '').trim(),
       featured: !!data.featured,
@@ -165,6 +185,7 @@ async function updateBook(slug, data) {
   if (data.price != null) patch.price = parseFloat(data.price);
   if (data.prevPrice != null) patch.prevPrice = data.prevPrice === '' ? null : parseFloat(data.prevPrice);
   if (data.stock != null) patch.stock = parseInt(data.stock, 10);
+  if (data.lowStockThreshold != null) patch.lowStockThreshold = parseInt(data.lowStockThreshold, 10);
   if (data.rating != null) patch.rating = parseFloat(data.rating);
   if (data.coverImage != null) patch.coverImage = String(data.coverImage).trim();
   if (data.featured != null) patch.featured = !!data.featured;
@@ -190,7 +211,7 @@ async function deleteBook(slug) {
   return { ok: true };
 }
 
-async function reserveStock(items) {
+async function reserveStock(items, opts = {}) {
   for (const it of items) {
     if (!it.bookId) continue;
     const book = await prisma.book.findUnique({ where: { id: it.bookId } });
@@ -200,6 +221,9 @@ async function reserveStock(items) {
       throw err;
     }
     await prisma.book.update({ where: { id: it.bookId }, data: { stock: { decrement: it.qty } } });
+    await prisma.inventoryTransaction.create({
+      data: { bookId: it.bookId, quantity: -it.qty, type: 'SALE', reason: opts.reason || 'Sale', createdBy: opts.createdBy || '' }
+    });
   }
 }
 

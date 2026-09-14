@@ -34,7 +34,17 @@ function validateShipping(s) {
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('A valid contact email is required.');
   if (!phone || !PHONE_RE.test(phone)) errors.push('A valid phone number is required.');
   if (!address) errors.push('A shipping address is required.');
-  return { errors, shipping: { name, email, phone, address } };
+  return {
+    errors,
+    shipping: {
+      name,
+      email,
+      phone,
+      address,
+      city: String(shipping.city || '').trim(),
+      country: String(shipping.country || '').trim()
+    }
+  };
 }
 
 /* Accept both { items: [{ bookId, quantity }] } and the legacy { items: [{ id, qty }] }. */
@@ -53,7 +63,8 @@ async function create(req, res) {
     const order = await orderService.create(req.user.id, rawItems, {
       shipping,
       paymentMethod: cleanPaymentMethod(body.paymentMethod),
-      coupon: String(body.coupon || '').trim()
+      coupon: String(body.coupon || '').trim(),
+      userEmail: req.user.email
     });
     res.status(201).json({ order });
   } catch (err) {

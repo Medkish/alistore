@@ -7,6 +7,7 @@ async function findValid(code) {
   if (!d) return { valid: false, error: 'That coupon does not exist.' };
   if (!d.active) return { valid: false, error: 'That coupon is no longer active.' };
   if (d.expiresAt && d.expiresAt < new Date()) return { valid: false, error: 'That coupon has expired.' };
+  if (d.maxUses != null && d.usedCount >= d.maxUses) return { valid: false, error: 'That coupon has reached its usage limit.' };
   return { valid: true, code: d.code, type: d.type, value: Number(d.value), minOrder: Number(d.minOrder) };
 }
 
@@ -28,4 +29,10 @@ async function apply(code, subtotal) {
   return { valid: d.valid, code: d.code || '', discount, error: d.valid ? '' : d.error };
 }
 
-module.exports = { findValid, compute, apply };
+async function incrementUse(code) {
+  const c = String(code || '').trim().toUpperCase();
+  if (!c) return;
+  await prisma.discount.updateMany({ where: { code: c }, data: { usedCount: { increment: 1 } } }).catch(() => undefined);
+}
+
+module.exports = { findValid, compute, apply, incrementUse };

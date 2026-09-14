@@ -58,6 +58,8 @@ export default function Header() {
   const nav = [
     { href: '/', label: 'Home' },
     { href: '/books/', label: 'Books' },
+    { href: '/subscribe/', label: 'Subscribe' },
+    { href: '/donate/', label: 'Donate' },
     { href: '/orders/', label: 'My Orders' },
     { href: '/profile/', label: 'Profile' },
     ...(user?.role === 'ADMIN' ? [{ href: '/admin/', label: 'Admin' }] : []),
