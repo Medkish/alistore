@@ -1,4 +1,4 @@
-const CACHE = 'alistore-v2';
+const CACHE = 'alistore-v3';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -17,6 +17,9 @@ self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
 
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
@@ -25,30 +28,20 @@ self.addEventListener('fetch', (event) => {
           caches.open(CACHE).then((cache) => cache.put(request, clone));
           return response;
         })
-        .catch(() =>
-          caches
-            .match(request)
-            .then((cached) => cached || caches.match('/alistore/'))
-        )
+        .catch(() => caches.match(request).then((cached) => cached || caches.match('/alistore/')))
     );
     return;
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const network = fetch(request)
-        .then((response) => {
-          if (response && response.ok) {
-            const url = new URL(request.url);
-            if (url.origin === self.location.origin) {
-              const clone = response.clone();
-              caches.open(CACHE).then((cache) => cache.put(request, clone));
-            }
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || network;
-    })
+    fetch(request)
+      .then((response) => {
+        if (response && response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(request))
   );
 });
