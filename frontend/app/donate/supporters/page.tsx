@@ -90,13 +90,13 @@ export default function SupportersPage() {
             <h2 className="font-extrabold text-ink mb-4 uppercase text-sm">💛 Recent Supporters</h2>
             <ul className="flex flex-col gap-3">
               {data?.recent.map((s, i) => (
-                <li key={i} className="flex items-center justify-between gap-3 text-sm">
-                  <p className="font-bold text-ink">
+                <li key={i} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
+                  <p className="font-bold text-ink min-w-0 break-words">
                     <span className="mr-1.5">❤️</span>
                     {s.name}
                   </p>
-                  <p className="font-bold text-muted whitespace-nowrap">
-                    {formatAED(s.amount || 0)}
+                  <p className="font-bold text-muted max-w-full">
+                    <span className="whitespace-nowrap">{formatAED(s.amount || 0)}</span>
                     {s.campaign ? <span className="text-[10px] font-semibold ml-1 text-accent-dark">· {s.campaign}</span> : null}
                   </p>
                 </li>
@@ -110,8 +110,8 @@ export default function SupportersPage() {
             <p className="text-[11px] text-muted mb-4">The amazing people giving every month to keep AlioStore growing.</p>
             <ul className="flex flex-col gap-3">
               {data?.monthly.map((s, i) => (
-                <li key={i} className="flex items-center justify-between gap-3 text-sm">
-                  <p className="font-bold text-ink">{s.name}</p>
+                <li key={i} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
+                  <p className="font-bold text-ink min-w-0 break-words">{s.name}</p>
                   <p className="font-extrabold text-accent-dark whitespace-nowrap">{formatAED(s.total)} / mo</p>
                 </li>
               ))}
@@ -127,10 +127,10 @@ export default function SupportersPage() {
             <p className="text-[11px] text-muted mb-4">Generous hearts who prefer to stay unnamed — we honour that.</p>
             <ul className="flex flex-col gap-3">
               {data?.anonymous.map((s, i) => (
-                <li key={i} className="flex items-center justify-between gap-3 text-sm">
+                <li key={i} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
                   <p className="font-bold text-ink">❤️ Anonymous</p>
-                  <p className="font-bold text-muted whitespace-nowrap">
-                    {formatAED(s.amount || 0)}
+                  <p className="font-bold text-muted max-w-full">
+                    <span className="whitespace-nowrap">{formatAED(s.amount || 0)}</span>
                     {s.purpose ? <span className="text-[10px] font-semibold ml-1 text-accent-dark">· {s.purpose}</span> : null}
                   </p>
                 </li>

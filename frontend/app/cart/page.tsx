@@ -58,7 +58,7 @@ export default function CartPage() {
               return (
                 <div
                   key={it.id}
-                  className="bg-white border border-line rounded-2xl p-4 flex gap-4 items-center shadow-sm"
+                  className="bg-white border border-line rounded-2xl p-4 flex flex-wrap items-center gap-3 sm:gap-4 shadow-sm"
                 >
                   <Link href={`/books/${it.id}/`} className="shrink-0">
                     {it.image && (
@@ -66,7 +66,7 @@ export default function CartPage() {
                     )}
                   </Link>
                   <div className="flex-1 min-w-0">
-                    <Link href={`/books/${it.id}/`} className="font-bold hover:text-accent-dark line-clamp-1">
+                    <Link href={`/books/${it.id}/`} className="font-bold hover:text-accent-dark line-clamp-2">
                       {it.name}
                     </Link>
                     <p className="text-sm text-brand font-semibold mt-0.5">
@@ -80,11 +80,14 @@ export default function CartPage() {
                     {overStock && <p className="text-xs text-red-600 font-semibold mt-1">⚠ Only {stock} in stock</p>}
                     <button
                       onClick={() => saveForLater(it.id)}
-                      className="text-xs text-muted hover:text-accent-dark underline mr-3 mt-1"
+                      className="text-xs text-muted hover:text-accent-dark underline mr-3 mt-1 py-2 -my-1"
                     >
                       Save for later
                     </button>
-                    <button onClick={() => remove(it.id)} className="text-xs text-muted hover:text-red-600 underline mt-1">
+                    <button
+                      onClick={() => remove(it.id)}
+                      className="text-xs text-muted hover:text-red-600 underline mt-1 py-2 -my-1"
+                    >
                       Remove
                     </button>
                   </div>
@@ -93,7 +96,9 @@ export default function CartPage() {
                     onInc={() => setQty(it.id, stock == null || it.qty < stock ? it.qty + 1 : it.qty)}
                     onDec={() => setQty(it.id, it.qty - 1)}
                   />
-                  <p className="font-extrabold text-brand whitespace-nowrap w-20 text-right">{formatAED(it.qty * it.price)}</p>
+                  <p className="font-extrabold text-brand whitespace-nowrap text-right shrink-0 min-w-20 max-sm:ml-auto">
+                    {formatAED(it.qty * it.price)}
+                  </p>
                 </div>
               );
             })}
@@ -103,27 +108,27 @@ export default function CartPage() {
                 <h2 className="font-bold text-ink mb-3">Saved for later ({saved.length})</h2>
                 <div className="flex flex-col gap-3">
                   {saved.map((it) => (
-                    <div key={it.id} className="bg-white border border-line rounded-2xl p-3 flex items-center gap-3 shadow-sm">
+                    <div key={it.id} className="bg-white border border-line rounded-2xl p-3 flex flex-wrap items-center gap-3 shadow-sm">
                       <Link href={`/books/${it.id}/`} className="shrink-0">
                         {it.image && (
                           <Image src={it.image} alt={it.name} width={48} height={64} className="object-contain rounded" />
                         )}
                       </Link>
                       <div className="flex-1 min-w-0">
-                        <Link href={`/books/${it.id}/`} className="font-semibold text-sm hover:text-accent-dark line-clamp-1">
+                        <Link href={`/books/${it.id}/`} className="font-semibold text-sm hover:text-accent-dark line-clamp-2">
                           {it.name}
                         </Link>
                         <p className="text-xs text-muted">{formatAED(it.price)}</p>
                       </div>
                       <button
                         onClick={() => moveToCart(it.id)}
-                        className="text-xs font-bold text-accent-dark hover:underline shrink-0"
+                        className="text-xs font-bold text-accent-dark hover:underline shrink-0 max-sm:ml-auto py-2.5 px-2 -my-1"
                       >
                         Move to cart
                       </button>
                       <button
                         onClick={() => removeSaved(it.id)}
-                        className="text-xs text-muted hover:text-red-600 underline shrink-0"
+                        className="text-xs text-muted hover:text-red-600 underline shrink-0 py-2.5 px-2 -my-1"
                       >
                         Remove
                       </button>

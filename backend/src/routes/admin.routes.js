@@ -37,6 +37,7 @@ router.patch('/users/:id/notes', wrap(admin.setUserNotes));
 router.get('/carts', wrap(admin.listCarts));
 router.get('/payments', wrap(admin.listPayments));
 router.get('/analytics', wrap(admin.analytics));
+router.get('/analytics/visitors', wrap(admin.analyticsVisitors));
 
 /* Donations (kept separate from orders — see /api/donations) */
 const donationCtrl = require('../controllers/donation.controller');

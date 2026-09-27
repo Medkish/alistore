@@ -503,6 +503,37 @@ export interface AnalyticsSummary {
   }[];
 }
 
+export interface AnalyticsLogin {
+  id: string;
+  at: string;
+  name: string;
+  email: string;
+  role: string;
+  device: string;
+  browser: string;
+  ip: string;
+}
+
+export interface AnalyticsVisitor {
+  visitorId: string;
+  user: { id: string; name: string; email: string } | null;
+  firstSeen: string | null;
+  lastSeen: string | null;
+  sessions: number;
+  activeMinutes: number;
+  pageViews: number;
+  productViews: number;
+  addToCarts: number;
+  logins: number;
+  device: string;
+  browser: string;
+}
+
+export interface AnalyticsVisitors {
+  logins: AnalyticsLogin[];
+  visitors: AnalyticsVisitor[];
+}
+
 /* --------------------- Website content --------------------- */
 export type HomepageSectionKey = 'hero' | 'categories' | 'featured' | 'newBooks' | 'bestsellers' | 'promotion' | 'newsletter';
 

@@ -128,7 +128,7 @@ function Books() {
             ))}
           </select>
           {resetFilters && (
-            <button onClick={resetFilters} className="text-xs font-semibold text-muted hover:text-red-600 underline">
+            <button onClick={resetFilters} className="text-xs font-semibold text-muted hover:text-red-600 underline py-2.5 px-1 -my-1.5">
               Reset
             </button>
           )}

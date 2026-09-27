@@ -10,7 +10,7 @@ export default async function BookPage({ params }: { params: Promise<{ id: strin
   const book = CATALOG.find((b) => b.id === id);
   if (!book) {
     return (
-      <div className="py-24 text-center text-muted">
+      <div className="py-16 sm:py-24 text-center text-muted">
         <h1 className="text-2xl font-bold mb-2">Book not found</h1>
         <a href="/books/" className="underline text-accent-dark">
           Browse all books

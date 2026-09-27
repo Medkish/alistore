@@ -70,31 +70,49 @@ const FRONTEND_OUT = path.join(__dirname, '..', '..', 'frontend', 'out');
 const FRONTEND_PUBLIC = path.join(__dirname, '..', '..', 'frontend', 'public');
 const UPLOADS = path.join(FRONTEND_PUBLIC, 'images');
 
-app.use('/images', express.static(UPLOADS, { maxAge: '7d' }));
-app.use('/alistore/images', express.static(UPLOADS, { maxAge: '7d' }));
+/* Book covers and uploads are replaced in place under stable filenames
+ * (cover-<slug>.jpg), so a long max-age pins stale artwork in the browser for
+ * days and no ordinary refresh will pick up a redesign. Revalidate instead:
+ * the ETag/Last-Modified pair answers with a bodyless 304, so freshness costs
+ * a round trip rather than a re-download. */
+const imageStatic = {
+  etag: true,
+  lastModified: true,
+  setHeaders(res) {
+    res.setHeader('Cache-Control', 'no-cache');
+  },
+};
+
+app.use('/images', express.static(UPLOADS, imageStatic));
+app.use('/alistore/images', express.static(UPLOADS, imageStatic));
 
 if (fs.existsSync(FRONTEND_OUT)) {
-  app.use('/alistore', express.static(FRONTEND_OUT));
+  app.use('/alistore', express.static(FRONTEND_OUT, { extensions: ['html'] }));
   app.get('/', function (req, res) {
     res.redirect('/alistore/');
   });
+  // Unknown paths must 404 rather than soft-fall back to the homepage.
   app.get('*', function (req, res) {
-    res.sendFile(path.join(FRONTEND_OUT, 'index.html'));
+    res.status(404).sendFile(path.join(FRONTEND_OUT, '404.html'), function (err) {
+      if (err) res.status(404).type('text/plain').send('Not found');
+    });
   });
 }
 
 app.use(errorHandler);
 
 const PORT = Number(process.env.PORT) || 4000;
+const HOST = '0.0.0.0';
 
 prisma
   .$connect()
   .then(function () {
-    app.listen(PORT, function () {
+    app.listen(PORT, HOST, () => {
       console.log('AlioStore backend running:');
-      console.log('  API:      http://localhost:' + PORT + '/api/health');
+      console.log(`  API:      http://localhost:${PORT}/api/health`);
+      console.log(`  Network:  http://${HOST}:${PORT}/api/health`);
       if (fs.existsSync(FRONTEND_OUT)) {
-        console.log('  Frontend: http://localhost:' + PORT + '/');
+        console.log(`  Frontend: http://localhost:${PORT}/`);
       }
     });
   })

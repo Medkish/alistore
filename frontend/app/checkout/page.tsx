@@ -333,7 +333,7 @@ export default function CheckoutPage() {
                     setDiscount({ code: '', amount: 0 });
                     setCouponInput('');
                   }}
-                  className="text-[11px] text-red-500 mt-1 hover:underline"
+                  className="text-[11px] text-red-500 mt-1 hover:underline py-2.5 px-1 -my-1.5"
                 >
                   Remove coupon
                 </button>

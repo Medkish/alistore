@@ -1,15 +1,13 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { CartProvider, AuthProvider, WishlistProvider } from '@/components/providers';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import { CartProvider, AuthProvider } from '@/components/providers';
+import { SiteHeader, SiteFooter } from '@/components/SiteChrome';
 import VisitTracker from '@/components/VisitTracker';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
-import BackButton from '@/components/BackButton';
 
 export const metadata: Metadata = {
-  applicationName: 'AlioStore',
-  title: 'AlioStore - Online Books & Programming Resources',
+  applicationName: 'Code-Me',
+  title: 'Code-Me - Online Books & Programming Resources',
   description:
     'Your online bookstore for programming and tech. Browse, buy and read books on any device.',
   manifest: '/alistore/manifest.webmanifest',
@@ -23,33 +21,32 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'AlioStore',
+    title: 'Code-Me',
     statusBarStyle: 'default',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#142a56',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#142a56' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a1730' },
+  ],
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-dvh flex flex-col">
         <AuthProvider>
           <CartProvider>
-            <WishlistProvider>
-              <VisitTracker />
-              <ServiceWorkerRegister />
-              <Header />
-              <main className="flex-1">
-                <BackButton />
-                {children}
-              </main>
-              <Footer />
-            </WishlistProvider>
+            <VisitTracker />
+            <ServiceWorkerRegister />
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
           </CartProvider>
         </AuthProvider>
       </body>

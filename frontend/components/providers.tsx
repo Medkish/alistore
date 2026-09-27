@@ -7,7 +7,6 @@ import { trackAddToCart } from '@/lib/visitor';
 
 const CART_KEY = 'alistore_cart';
 const CART_SAVED_KEY = 'alistore_cart_saved';
-const WISHLIST_KEY = 'alistore_wishlist';
 const USER_KEY = 'alistore_user';
 
 interface CartContextValue {
@@ -115,53 +114,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 export function useCart(): CartContextValue {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCart must be used within CartProvider');
-  return ctx;
-}
-
-/* ----------------------- Wishlist ----------------------- */
-
-interface WishlistContextValue {
-  ids: string[];
-  toggle: (id: string) => void;
-  has: (id: string) => boolean;
-  count: number;
-  clear: () => void;
-}
-
-const WishlistContext = createContext<WishlistContextValue | null>(null);
-
-export function WishlistProvider({ children }: { children: React.ReactNode }) {
-  const [ids, setIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const raw = window.localStorage.getItem(WISHLIST_KEY);
-      if (raw) setIds(JSON.parse(raw) as string[]);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(ids));
-  }, [ids]);
-
-  const toggle = useCallback((id: string) => {
-    setIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-  }, []);
-
-  const has = useCallback((id: string) => ids.includes(id), [ids]);
-  const clear = useCallback(() => setIds([]), []);
-  const count = ids.length;
-
-  return <WishlistContext.Provider value={{ ids, toggle, has, count, clear }}>{children}</WishlistContext.Provider>;
-}
-
-export function useWishlist(): WishlistContextValue {
-  const ctx = useContext(WishlistContext);
-  if (!ctx) throw new Error('useWishlist must be used within WishlistProvider');
   return ctx;
 }
 

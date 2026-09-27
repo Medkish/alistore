@@ -9,7 +9,7 @@ import { formatAED } from '@/lib/format';
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={<section className="py-24 text-center text-muted text-sm">Loading…</section>}>
+    <Suspense fallback={<section className="py-16 sm:py-24 text-center text-muted text-sm">Loading…</section>}>
       <PaymentResult />
     </Suspense>
   );
@@ -44,12 +44,12 @@ function PaymentResult() {
   return (
     <section className="py-10 md:py-16">
       <div className="mx-auto max-w-md px-4">
-        <div className="bg-white border border-line rounded-3xl p-8 text-center shadow-sm">
+        <div className="bg-white border border-line rounded-3xl p-6 sm:p-8 text-center shadow-sm">
           <p className="text-5xl mb-4">{paid ? '🎉' : '🕐'}</p>
           <h1 className="text-2xl font-extrabold text-brand mb-2">
             {paid ? 'PAYMENT SUCCESSFUL' : 'ORDER PLACED'}
           </h1>
-          {order && <p className="text-ink font-bold mb-1">Order: #{order}</p>}
+          {order && <p className="text-ink font-bold mb-1 break-all">Order: #{order}</p>}
           <p className="text-muted text-sm mb-4">Amount: <span className="font-bold text-ink">{formatAED(amount)}</span></p>
 
           {paid ? (
@@ -66,7 +66,7 @@ function PaymentResult() {
                 <button
                   onClick={retryPayment}
                   disabled={busy}
-                  className="text-xs font-bold text-accent-dark hover:underline disabled:opacity-60"
+                  className="btn-flash btn-outline-flash text-brand border-brand text-xs font-bold disabled:opacity-60"
                 >
                   {busy ? 'Confirming…' : 'TRY PAYMENT AGAIN'}
                 </button>

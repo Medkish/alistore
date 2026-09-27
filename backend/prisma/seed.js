@@ -77,7 +77,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 12,
     rating: 4.8,
-    coverImage: 'images/programming1.jpeg',
+    coverImage: '/alistore/images/cover-python.jpg',
     publishedAt: '2024-06-01T00:00:00Z',
     featured: true,
     bestseller: true
@@ -91,7 +91,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 15,
     rating: 4.7,
-    coverImage: 'images/programming2.jpeg',
+    coverImage: '/alistore/images/cover-javascript.jpg',
     publishedAt: '2024-03-15T00:00:00Z',
     featured: true,
     bestseller: true
@@ -105,7 +105,7 @@ const BOOKS = [
     prevPrice: 39.99,
     stock: 12,
     rating: 4.9,
-    coverImage: 'images/product-item1.jpg',
+    coverImage: '/alistore/images/cover-javascript-deep-dive.jpg',
     publishedAt: '2025-01-20T00:00:00Z',
     featured: false,
     bestseller: true
@@ -119,7 +119,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 8,
     rating: 4.6,
-    coverImage: 'images/programming3.jpeg',
+    coverImage: '/alistore/images/cover-ruby.jpg',
     publishedAt: '2023-11-05T00:00:00Z',
     featured: false,
     bestseller: true
@@ -133,7 +133,7 @@ const BOOKS = [
     prevPrice: 45,
     stock: 14,
     rating: 4.7,
-    coverImage: 'images/programming4.jpeg',
+    coverImage: '/alistore/images/cover-cpp.jpg',
     publishedAt: '2024-09-12T00:00:00Z',
     featured: false,
     bestseller: true
@@ -147,7 +147,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 6,
     rating: 4.5,
-    coverImage: 'images/programming5.jpeg',
+    coverImage: '/alistore/images/cover-swift.jpg',
     publishedAt: '2024-02-28T00:00:00Z',
     featured: true,
     bestseller: false
@@ -161,7 +161,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 9,
     rating: 4.6,
-    coverImage: 'images/programming6.jpeg',
+    coverImage: '/alistore/images/cover-kotlin.jpg',
     publishedAt: '2024-05-10T00:00:00Z',
     featured: true,
     bestseller: false
@@ -175,7 +175,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 11,
     rating: 4.4,
-    coverImage: 'images/programming1.jpeg',
+    coverImage: '/alistore/images/cover-php.jpg',
     publishedAt: '2023-08-19T00:00:00Z',
     featured: false,
     bestseller: false
@@ -189,7 +189,7 @@ const BOOKS = [
     prevPrice: 55,
     stock: 10,
     rating: 4.7,
-    coverImage: 'images/programming5.jpeg',
+    coverImage: '/alistore/images/cover-java.jpg',
     publishedAt: '2024-01-25T00:00:00Z',
     featured: true,
     bestseller: false
@@ -203,7 +203,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 7,
     rating: 4.6,
-    coverImage: 'images/programming3.jpeg',
+    coverImage: '/alistore/images/cover-go.jpg',
     publishedAt: '2024-07-08T00:00:00Z',
     featured: false,
     bestseller: false
@@ -217,7 +217,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 25,
     rating: 4.9,
-    coverImage: 'images/product4.jpg',
+    coverImage: '/alistore/images/cover-rust.jpg',
     publishedAt: '2025-03-01T00:00:00Z',
     featured: true,
     bestseller: true
@@ -231,7 +231,7 @@ const BOOKS = [
     prevPrice: 49.99,
     stock: 10,
     rating: 4.8,
-    coverImage: 'images/programming2.jpeg',
+    coverImage: '/alistore/images/cover-typescript.jpg',
     publishedAt: '2025-05-10T00:00:00Z',
     featured: true,
     bestseller: true
@@ -245,7 +245,7 @@ const BOOKS = [
     prevPrice: 52,
     stock: 9,
     rating: 4.7,
-    coverImage: 'images/programming4.jpeg',
+    coverImage: '/alistore/images/cover-csharp.jpg',
     publishedAt: '2025-06-01T00:00:00Z',
     featured: true,
     bestseller: false
@@ -259,7 +259,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 8,
     rating: 4.6,
-    coverImage: 'images/programming6.jpeg',
+    coverImage: '/alistore/images/cover-dart.jpg',
     publishedAt: '2025-07-15T00:00:00Z',
     featured: true,
     bestseller: false
@@ -273,7 +273,7 @@ const BOOKS = [
     prevPrice: 45,
     stock: 5,
     rating: 4.5,
-    coverImage: 'images/programming5.jpeg',
+    coverImage: '/alistore/images/cover-shell.jpg',
     publishedAt: '2025-08-01T00:00:00Z',
     featured: false,
     bestseller: false
@@ -287,7 +287,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 12,
     rating: 4.7,
-    coverImage: 'images/programming3.jpeg',
+    coverImage: '/alistore/images/cover-c.jpg',
     publishedAt: '2026-02-01T00:00:00Z',
     featured: true,
     bestseller: false
@@ -301,7 +301,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 8,
     rating: 4.5,
-    coverImage: 'images/programming4.jpeg',
+    coverImage: '/alistore/images/cover-r.jpg',
     publishedAt: '2026-03-01T00:00:00Z',
     featured: true,
     bestseller: false
@@ -315,7 +315,7 @@ const BOOKS = [
     prevPrice: 45,
     stock: 10,
     rating: 4.4,
-    coverImage: 'images/programming5.jpeg',
+    coverImage: '/alistore/images/cover-perl.jpg',
     publishedAt: '2026-05-01T00:00:00Z',
     featured: false,
     bestseller: false
@@ -329,7 +329,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 7,
     rating: 4.6,
-    coverImage: 'images/programming6.jpeg',
+    coverImage: '/alistore/images/cover-haskell.jpg',
     publishedAt: '2026-07-01T00:00:00Z',
     featured: true,
     bestseller: false
@@ -343,7 +343,7 @@ const BOOKS = [
     prevPrice: 45,
     stock: 12,
     rating: 4.5,
-    coverImage: 'images/programming2.jpeg',
+    coverImage: '/alistore/images/cover-sql.jpg',
     publishedAt: '2026-04-01T00:00:00Z',
     featured: true,
     bestseller: false
@@ -357,7 +357,7 @@ const BOOKS = [
     prevPrice: 55,
     stock: 9,
     rating: 4.6,
-    coverImage: 'images/programming4.jpeg',
+    coverImage: '/alistore/images/cover-matlab.jpg',
     publishedAt: '2026-06-01T00:00:00Z',
     featured: false,
     bestseller: false
@@ -371,7 +371,7 @@ const BOOKS = [
     prevPrice: 50,
     stock: 8,
     rating: 4.7,
-    coverImage: 'images/programming1.jpeg',
+    coverImage: '/alistore/images/cover-scala.jpg',
     publishedAt: '2026-08-01T00:00:00Z',
     featured: true,
     bestseller: false
@@ -385,7 +385,7 @@ const BOOKS = [
     prevPrice: 38,
     stock: 11,
     rating: 4.5,
-    coverImage: 'images/programming6.jpeg',
+    coverImage: '/alistore/images/cover-lua.jpg',
     publishedAt: '2026-09-01T00:00:00Z',
     featured: false,
     bestseller: false

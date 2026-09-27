@@ -67,7 +67,7 @@ export default function TrackPage() {
           <div className="bg-white border border-line rounded-2xl p-6 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-4">
               <div>
-                <p className="font-extrabold text-brand">Order {order.reference}</p>
+                <p className="font-extrabold text-brand break-all">Order {order.reference}</p>
                 <p className="text-xs text-muted">
                   Placed {order.placedAt ? new Date(order.placedAt).toLocaleString() : '—'}
                 </p>
@@ -128,7 +128,7 @@ export default function TrackPage() {
             {order.trackingNumber && (
               <div className="mt-5 bg-slate-50 rounded-xl p-3 text-sm">
                 <p className="text-xs text-muted uppercase font-bold tracking-wide mb-1">Carrier Tracking</p>
-                <p className="font-bold text-ink">{order.trackingNumber}</p>
+                <p className="font-bold text-ink break-all">{order.trackingNumber}</p>
                 <p className="text-xs text-muted">
                   {order.trackingProvider || 'Shipping provider'}
                   {order.estimatedDelivery ? ` · Estimated delivery ${new Date(order.estimatedDelivery).toLocaleDateString()}` : ''}

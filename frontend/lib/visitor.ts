@@ -1,4 +1,4 @@
-import { API_BASE as BASE } from '@/lib/api';
+import { API_BASE as BASE, getToken } from '@/lib/api';
 
 const VISITOR_KEY = 'alistore_visitor';
 const DEDUPE_MS = 5000;
@@ -35,9 +35,12 @@ async function send(data: TrackEvent) {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 3000);
+    const token = getToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json', 'X-Visitor-Id': getVisitorId() };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     await fetch(`${BASE}/api/analytics/events`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Visitor-Id': getVisitorId() },
+      headers,
       body: JSON.stringify({
         event: data.event,
         path: data.path || window.location.pathname,

@@ -9,7 +9,7 @@ import { formatAED } from '@/lib/format';
 
 export default function PaymentFailedPage() {
   return (
-    <Suspense fallback={<section className="py-24 text-center text-muted text-sm">Loading…</section>}>
+    <Suspense fallback={<section className="py-16 sm:py-24 text-center text-muted text-sm">Loading…</section>}>
       <PaymentResult />
     </Suspense>
   );
@@ -48,12 +48,12 @@ function PaymentResult() {
   return (
     <section className="py-10 md:py-16">
       <div className="mx-auto max-w-md px-4">
-        <div className="bg-white border border-line rounded-3xl p-8 text-center shadow-sm">
+        <div className="bg-white border border-line rounded-3xl p-6 sm:p-8 text-center shadow-sm">
           <p className="text-5xl mb-4">❌</p>
           <h1 className="text-2xl font-extrabold text-brand mb-2">PAYMENT FAILED</h1>
           <p className="text-muted text-sm mb-1">Payment could not be completed.</p>
           {order ? (
-            <p className="text-muted text-xs mb-1">Order: #{order}</p>
+            <p className="text-muted text-xs mb-1 break-all">Order: #{order}</p>
           ) : (
             <p className="text-muted text-xs mb-1">Your order has not been created.</p>
           )}

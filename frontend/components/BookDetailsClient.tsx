@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { useCart, useWishlist } from '@/components/providers';
+import { useCart } from '@/components/providers';
 import QuantityStepper from '@/components/QuantityStepper';
 import { api } from '@/lib/api';
 import { trackProductView } from '@/lib/visitor';
@@ -20,7 +20,6 @@ function Stars({ n, size = 'text-lg' }: { n: number; size?: string }) {
 
 export default function BookDetailsClient({ book }: { book: Book }) {
   const { add, items } = useCart();
-  const { has, toggle } = useWishlist();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -46,7 +45,6 @@ export default function BookDetailsClient({ book }: { book: Book }) {
 
   const b = live ?? book;
   const inCart = items.find((i) => i.id === b.id)?.qty ?? 0;
-  const liked = has(b.id);
 
   const [rv, setRv] = useState<BookReviews>({ average: null, count: 0, purchased: false, submitted: false, status: null, reviews: [] });
   const [myRating, setMyRating] = useState(5);
@@ -85,7 +83,7 @@ export default function BookDetailsClient({ book }: { book: Book }) {
       <section className="py-10 md:py-16">
         <div className="mx-auto max-w-6xl px-4 grid md:grid-cols-2 gap-10 items-start">
           {/* image */}
-          <div className="sticky top-36 bg-white rounded-3xl border border-line overflow-hidden flex items-center justify-center p-8">
+          <div className="md:sticky md:top-36 bg-white rounded-3xl border border-line overflow-hidden flex items-center justify-center p-4 sm:p-8">
             <Image
               src={b.image}
               alt={b.title}
@@ -147,17 +145,6 @@ export default function BookDetailsClient({ book }: { book: Book }) {
               >
                 {added ? `✓ ${qty} Added` : 'Add to Cart'}
               </button>
-              <button
-                onClick={() => toggle(b.id)}
-                aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
-                className={`btn-flash px-4 py-2.5 text-sm border-2 transition ${
-                  liked
-                    ? 'border-red-300 bg-red-50 text-red-600 font-bold'
-                    : 'border-line bg-white text-ink hover:border-accent'
-                }`}
-              >
-                {liked ? '♥ In Wishlist' : '♡ Add to Wishlist'}
-              </button>
               <Link href="/checkout/" className="btn-flash btn-outline-flash text-brand border-brand hover:bg-brand hover:text-white text-sm">
                 Buy the Book First
               </Link>
@@ -210,7 +197,7 @@ export default function BookDetailsClient({ book }: { book: Book }) {
                   <button
                     key={i}
                     onClick={() => setMyRating(i)}
-                    className={i <= myRating ? 'text-amber-500' : 'text-line'}
+                    className={`p-1 -m-1 ${i <= myRating ? 'text-amber-500' : 'text-line'}`}
                     aria-label={`${i} stars`}
                   >
                     ★

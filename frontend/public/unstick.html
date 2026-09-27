@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AliStore &mdash; reset site data</title>
+<style>
+  body { background:#0b1220; color:#e2e8f0; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; margin:0; padding:40px 24px; }
+  .wrap { max-width:680px; margin:0 auto; }
+  h1 { font-size:24px; margin:0 0 6px; }
+  p.lead { color:#94a3b8; margin:0 0 28px; line-height:1.65; }
+  .card { background:#111c33; border:1px solid #1e2d4a; border-radius:12px; padding:22px 24px; margin-bottom:18px; }
+  h2 { font-size:15px; margin:0 0 12px; text-transform:uppercase; letter-spacing:.09em; color:#7c8aa3; font-weight:700; }
+  button { background:#2563eb; color:#fff; border:0; border-radius:8px; padding:12px 20px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; }
+  button:hover { background:#1d4ed8; }
+  button:disabled { background:#334155; cursor:default; }
+  a.btn { display:inline-block; background:#059669; color:#fff; text-decoration:none; border-radius:8px; padding:12px 20px; font-size:15px; font-weight:600; }
+  pre { background:#0a1220; border:1px solid #1e2d4a; border-radius:8px; padding:14px; font-size:12.5px; color:#cbd5e1; overflow-x:auto; white-space:pre-wrap; margin:0; }
+  .ok { color:#34d399; } .bad { color:#f87171; } .mut { color:#64748b; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>AliStore &mdash; reset site data</h1>
+  <p class="lead">
+    An earlier version of this site's service worker cached every response, including book
+    covers, and reloaded the page whenever it updated. Some browsers are still running it and
+    can be holding a large stale cache that hides the real cover images. This page removes
+    every service worker and every cached response for <code>localhost:4000</code>, then
+    re-registers the corrected worker. It is safe to run more than once.
+  </p>
+
+  <div class="card">
+    <h2>Step 1 &mdash; clear workers and caches</h2>
+    <div class="row">
+      <button id="go">Run the reset</button>
+      <span id="state" class="mut">not run yet</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Step 2 &mdash; open the books page</h2>
+    <p class="mut" style="margin:0 0 14px; line-height:1.6">
+      After the reset, load the books page. If covers still do not appear, press
+      <strong>Ctrl+Shift+R</strong> (or Cmd+Shift+R) once to bypass the browser's own cache.
+    </p>
+    <a class="btn" href="/alistore/books/" id="books">Open books</a>
+  </div>
+
+  <div class="card">
+    <h2>Log</h2>
+    <pre id="log">waiting...</pre>
+  </div>
+</div>
+
+<script>
+(function () {
+  var logEl = document.getElementById('log');
+  var stateEl = document.getElementById('state');
+  var btn = document.getElementById('go');
+  var lines = [];
+  function log(msg, cls) {
+    lines.push(cls ? '<span class="' + cls + '">' + msg + '</span>' : msg);
+    logEl.innerHTML = lines.join('\n');
+  }
+  function withTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise(function (_, reject) { setTimeout(function () { reject(new Error('timed out after ' + ms + 'ms')); }, ms); })
+    ]);
+  }
+  // Each step is settled independently so one stall cannot hide the rest of the run.
+  function step(label, fn) {
+    return function () {
+      return withTimeout(Promise.resolve().then(fn), 10000)
+        .then(function (v) { log(label + ': ok' + (v === undefined ? '' : ' (' + v + ')')); return v; })
+        .catch(function (e) { log(label + ': FAILED - ' + e.message, 'bad'); return null; });
+    };
+  }
+
+  btn.addEventListener('click', function () {
+    btn.disabled = true;
+    stateEl.textContent = 'working...';
+    stateEl.className = 'mut';
+    lines = [];
+    log('Controlled by a worker at load time: ' + (navigator.serviceWorker ? String(!!navigator.serviceWorker.controller) : 'n/a'));
+
+    var tasks = [];
+    if (window.caches) {
+      tasks.push(step('Listed caches', function () { return caches.keys().then(function (k) { return k.length ? k.join(', ') : 'none'; }); }));
+      tasks.push(step('Deleted every cache', function () {
+        return caches.keys().then(function (keys) { return Promise.all(keys.map(function (k) { return caches.delete(k); })); })
+          .then(function () { return caches.keys(); })
+          .then(function (after) { return after.length ? after.join(', ') : 'all gone'; });
+      }));
+    } else {
+      log('This browser has no Cache Storage support.', 'mut');
+    }
+
+    if (navigator.serviceWorker) {
+      tasks.push(step('Unregistered every worker', function () {
+        return navigator.serviceWorker.getRegistrations()
+          .then(function (regs) { return Promise.all(regs.map(function (r) { return r.unregister(); })); })
+          .then(function () { return navigator.serviceWorker.getRegistrations(); })
+          .then(function (after) { return after.length ? after.length + ' still registered' : 'all gone'; });
+      }));
+      tasks.push(step('Registered the corrected worker', function () {
+        return navigator.serviceWorker.register('/alistore/sw.js', { scope: '/alistore/' }).then(function (r) { return r.scope; });
+      }));
+    } else {
+      log('This browser has no service worker support.', 'mut');
+    }
+
+    tasks.push(step('Saved the cleanup flag', function () {
+      localStorage.setItem('alistore:sw-cleaned:v6', '1');
+      return 'alistore:sw-cleaned:v6';
+    }));
+
+    // Run every step even if one of them fails.
+    var failures = 0;
+    tasks.reduce(function (chain, t) {
+      return chain.then(function () { return t(); }).catch(function () { failures++; });
+    }, Promise.resolve()).then(function () {
+      stateEl.textContent = failures ? 'finished with errors' : 'done';
+      stateEl.className = failures ? 'bad' : 'ok';
+      btn.disabled = false;
+      log(failures ? 'Some steps failed. Close this tab, reopen the books page and press Ctrl+Shift+R once.' : 'Finished. Now open the books page below.', failures ? 'bad' : 'ok');
+    });
+  });
+})();
+</script>
+</body>
+</html>

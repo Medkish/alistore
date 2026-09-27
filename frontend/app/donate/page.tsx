@@ -164,7 +164,7 @@ export default function DonatePage() {
     return (
       <section className="py-10 md:py-16">
         <div className="mx-auto max-w-lg px-4">
-          <div className="bg-white border border-line rounded-3xl p-10 shadow-sm text-center">
+          <div className="bg-white border border-line rounded-3xl p-6 sm:p-10 shadow-sm text-center">
             <p className="text-5xl mb-4">🎉</p>
             <h1 className="text-2xl md:text-3xl font-extrabold text-brand mb-3 uppercase">Thank You!</h1>
             <p className="text-ink font-bold mb-1">
@@ -174,7 +174,7 @@ export default function DonatePage() {
               Your support helps us continue building opportunities for people learning programming.
             </p>
             <p className="text-[11px] text-muted mt-5">
-              Donation ID: <span className="font-bold text-ink">{done.donationNumber}</span>
+              Donation ID: <span className="font-bold text-ink break-all">{done.donationNumber}</span>
             </p>
             <div className="flex flex-wrap justify-center gap-3 mt-7">
               {loggedIn ? (
@@ -232,6 +232,22 @@ export default function DonatePage() {
             </li>
           ))}
         </ol>
+
+        {/* Compact progress for phones, where the 6-step rail above is hidden. */}
+        <div className="md:hidden mb-6">
+          <div className="flex items-center justify-between text-[11px] font-bold text-muted mb-2">
+            <span className="text-brand">
+              Step {step + 1} of {STEPS.length}
+            </span>
+            <span className="truncate pl-3">{STEPS[step]}</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-surface-2 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-brand transition-all duration-300"
+              style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+            />
+          </div>
+        </div>
 
         <div className="bg-white border border-line rounded-3xl p-6 md:p-8 shadow-sm">
           {step === 0 && (

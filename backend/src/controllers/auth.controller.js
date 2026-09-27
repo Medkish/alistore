@@ -1,5 +1,7 @@
 const authService = require('../services/auth.service');
+const prisma = require('../lib/prisma');
 const { requireFields } = require('../middleware/validate.middleware');
+const { detectDevice, detectBrowser } = require('../utils/device');
 
 async function register(req, res) {
   const body = req.body || {};
@@ -27,6 +29,24 @@ async function login(req, res) {
     email: String(body.email).trim().toLowerCase(),
     password: String(body.password)
   });
+  try {
+    const ua = String(req.headers['user-agent'] || '');
+    const rawIp = String(req.ip || '');
+    await prisma.actionLog.create({
+      data: {
+        actorId: result.user.id,
+        type: 'LOGIN',
+        detail: 'Signed in',
+        data: {
+          device: detectDevice(ua),
+          browser: detectBrowser(ua),
+          ip: rawIp.replace(/\.\d+$/, '.0').slice(0, 45)
+        }
+      }
+    });
+  } catch {
+    /* login tracking must never break sign-in */
+  }
   res.json(result);
 }
 

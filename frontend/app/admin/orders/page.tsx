@@ -1,416 +1,449 @@
 'use client';
 
-import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { api } from '@/lib/api';
-import { useAuth } from '@/components/providers';
-import { formatAED, formatNumber } from '@/lib/format';
+import { ORDER_TRANSITIONS, ORDER_STATUSES, TRACK_LABELS } from '@/lib/types';
+import type { Order } from '@/lib/types';
+import { formatDateTime, humanise, money, orderTone, paymentTone, relativeTime, useAdminData } from '@/lib/admin';
 import {
-  ORDER_STATUSES,
-  ORDER_TRANSITIONS,
-  type Order,
-  type OrderStatus,
-} from '@/lib/types';
+  Btn,
+  EmptyState,
+  ErrorNote,
+  Field,
+  Loading,
+  Modal,
+  Panel,
+  Pill,
+  Select,
+  TextArea,
+  useToast,
+} from '@/components/admin/ui';
 
-const PAGE_SIZE = 15;
-const SHIPPING_FEE = 10;
-
-const STATUS_COLOR: Record<string, string> = {
-  PENDING:  'bg-slate-100 text-slate-700 border-slate-300',
-  PAID:     'bg-green-50 text-green-700 border-green-300',
-  SHIPPED:  'bg-blue-50 text-blue-700 border-blue-300',
-  DELIVERED:'bg-emerald-50 text-emerald-700 border-emerald-300',
-  CANCELLED:'bg-red-50 text-red-600 border-red-300',
-};
-
-const PAYMENT_COLOR: Record<string, string> = {
-  UNPAID:   'bg-slate-100 text-slate-600 border-slate-300',
-  PENDING:  'bg-amber-50 text-amber-700 border-amber-300',
-  PAID:     'bg-green-50 text-green-700 border-green-300',
-  FAILED:   'bg-red-50 text-red-600 border-red-300',
-  REFUNDED: 'bg-purple-50 text-purple-700 border-purple-300',
-};
-
-const ACTION_LABEL: Record<string, string> = {
-  PAID:     'MARK AS PAID',
-  SHIPPED:  'MARK AS SHIPPED',
-  DELIVERED:'MARK AS DELIVERED',
-  CANCELLED:'CANCEL ORDER',
-};
-
-const ACTION_STYLE: Record<string, string> = {
-  PAID:     'bg-green-600 hover:bg-green-700',
-  SHIPPED:  'bg-blue-600 hover:bg-blue-700',
-  DELIVERED:'bg-emerald-600 hover:bg-emerald-700',
-  CANCELLED:'bg-red-600 hover:bg-red-700',
-};
+const STATUS_TABS: { value: string; label: string }[] = [
+  { value: '', label: 'All' },
+  { value: 'PENDING', label: 'Pending' },
+  { value: 'CONFIRMED', label: 'Confirmed' },
+  { value: 'PROCESSING', label: 'Processing' },
+  { value: 'SHIPPED', label: 'Shipped' },
+  { value: 'DELIVERED', label: 'Delivered' },
+  { value: 'CANCELLED', label: 'Cancelled' },
+];
 
 export default function AdminOrdersPage() {
-  const { user } = useAuth();
-  const [orders, setOrders] = useState<Order[] | null>(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
   const [status, setStatus] = useState('');
-  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
-  const [error, setError] = useState('');
-  const [busyId, setBusyId] = useState('');
-  const [openId, setOpenId] = useState('');
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const toast = useToast();
 
-  const load = useCallback(() => {
-    api
-      .adminOrders({ status, search, page, pageSize: PAGE_SIZE })
-      .then((res) => {
-        setOrders(res.orders);
-        setTotalPages(res.totalPages);
-        setTotal(res.total);
-      })
-      .catch((e) => setError((e as Error).message));
-  }, [status, search, page]);
+  const orders = useAdminData(
+    () => api.adminOrders({ status: status || undefined, search: query || undefined, page, pageSize: 20 }),
+    [status, query, page],
+  );
 
-  useEffect(() => { load(); }, [load]);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<{ status: string; note: string; tracking: string; provider: string; eta: string; notes: string }>({
+    status: '',
+    note: '',
+    tracking: '',
+    provider: '',
+    eta: '',
+    notes: '',
+  });
 
-  const counts = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const s of ORDER_STATUSES) map[s] = 0;
-    for (const o of orders || []) {
-      if (map[o.status!] !== undefined) map[o.status!]++;
-    }
-    return map;
-  }, [orders]);
+  const list = orders.data?.orders || [];
+  const detail = list.find((o) => o.id === openId) || null;
 
-  if (!user || user.role !== 'ADMIN') {
-    return (
-      <section className="py-16 text-center">
-        <p className="text-muted">Access denied.</p>
-        <Link href="/login/" className="btn-flash btn-primary-flash mt-4 inline-block">Login as Admin</Link>
-      </section>
-    );
+  function openOrder(o: Order) {
+    setOpenId(o.id || null);
+    setDraft({
+      status: o.status || '',
+      note: '',
+      tracking: o.trackingNumber || '',
+      provider: o.trackingProvider || '',
+      eta: o.estimatedDelivery || '',
+      notes: o.notes || '',
+    });
   }
 
-  function applyFilter(nextStatus: string) {
-    setStatus(nextStatus);
-    setPage(1);
-  }
-
-  function runSearch() {
-    setPage(1);
-    setSearch(searchInput.trim());
-  }
-
-  async function changeStatus(id: string, next: string) {
+  async function run(id: string, fn: () => Promise<unknown>, success: string) {
     setBusyId(id);
     try {
-      await api.adminSetOrderStatus(id, next);
-      setOpenId('');
-      load();
-    } catch (e) {
-      setError((e as Error).message);
+      await fn();
+      toast.ok(success);
+      orders.reload();
+      return true;
+    } catch (err) {
+      toast.err(err instanceof Error ? err.message : 'That update failed.');
+      return false;
+    } finally {
+      setBusyId(null);
     }
-    setBusyId('');
   }
 
+  const changeStatus = async () => {
+    if (!detail?.id || !draft.status) return;
+    const done = await run(detail.id, () => api.adminSetOrderStatus(detail.id!, draft.status, draft.note || undefined), 'Status updated.');
+    if (done) {
+      setDraft((d) => ({ ...d, note: '' }));
+      setOpenId(null);
+    }
+  };
+
+  const saveTracking = async () => {
+    if (!detail?.id) return;
+    const done = await run(
+      detail.id,
+      () =>
+        api.adminSetOrderTracking(detail.id!, {
+          trackingNumber: draft.tracking.trim() || undefined,
+          trackingProvider: draft.provider.trim() || undefined,
+          estimatedDelivery: draft.eta || undefined,
+        }),
+      'Tracking saved.',
+    );
+    if (done) setOpenId(null);
+  };
+
+  const saveNotes = async () => {
+    if (!detail?.id) return;
+    const done = await run(detail.id, () => api.adminSetOrderNotes(detail.id!, draft.notes), 'Notes saved.');
+    if (done) setOpenId(null);
+  };
+
+  const refund = async () => {
+    if (!detail?.id) return;
+    const done = await run(detail.id, () => api.adminRefundOrder(detail.id!), 'Refund recorded.');
+    if (done) setOpenId(null);
+  };
+
+  const transitions = detail?.status ? ORDER_TRANSITIONS[detail.status] || [] : [];
+
   return (
-    <section className="py-10 md:py-16">
-      <div className="mx-auto max-w-5xl px-4">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <Link href="/admin/" className="text-xs font-semibold text-accent-dark hover:underline mb-1 block">
-              ← Admin Dashboard
-            </Link>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-brand">Order Management</h1>
-            <p className="text-sm text-muted mt-1">
-              {total > 0 ? `${formatNumber(total)} order${total === 1 ? '' : 's'} total` : 'No orders yet'}
-            </p>
-          </div>
-        </div>
+    <div className="space-y-4 sm:space-y-5">
+      <header>
+        <h1 className="text-xl font-extrabold text-ink sm:text-2xl">Orders</h1>
+        <p className="mt-1 text-sm text-muted">
+          {orders.data ? `${orders.data.total} order${orders.data.total === 1 ? '' : 's'}` : 'Loading orders'}
+          {orders.data && orders.data.totalPages > 1 && ` · page ${orders.data.page} of ${orders.data.totalPages}`}
+        </p>
+      </header>
 
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
-          {ORDER_STATUSES.map((s) => (
-            <button
-              key={s}
-              onClick={() => applyFilter(s)}
-              className={`rounded-2xl border p-3 text-center transition ${
-                status === s ? 'border-brand bg-brand text-white' : 'border-line bg-white hover:border-brand'
-              }`}
-            >
-              <p className={`text-2xl font-extrabold ${status === s ? 'text-white' : 'text-brand'}`}>
-                {counts[s]}
-              </p>
-              <p className={`text-[11px] font-bold mt-0.5 ${status === s ? 'text-white/80' : 'text-muted'}`}>{s}</p>
-            </button>
-          ))}
-        </div>
-
-        <div className="flex flex-col gap-3 mb-5">
-          <div className="flex gap-2 overflow-x-auto">
-            <button
-              onClick={() => applyFilter('')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition ${
-                status === '' ? 'bg-brand text-white' : 'bg-white border border-line text-ink'
-              }`}
-            >
-              All
-              <span className={`ml-1.5 text-[10px] ${status === '' ? 'text-white/80' : 'text-muted'}`}>
-                {orders?.length ?? total}
-              </span>
-            </button>
-            {ORDER_STATUSES.map((s) => (
+      <Panel bodyClassName="p-3 sm:p-4">
+        <div className="space-y-3">
+          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+            {STATUS_TABS.map((tab) => (
               <button
-                key={s}
-                onClick={() => applyFilter(s)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition ${
-                  status === s ? 'bg-brand text-white' : 'bg-white border border-line text-ink'
-                }`}
+                key={tab.value || 'all'}
+                onClick={() => {
+                  setStatus(tab.value);
+                  setPage(1);
+                }}
+                className={`chip shrink-0 ${status === tab.value ? 'chip-active' : ''}`}
               >
-                {s}
-                <span className={`ml-1.5 text-[10px] ${status === s ? 'text-white/80' : 'text-muted'}`}>
-                  {counts[s]}
-                </span>
+                {tab.label}
               </button>
             ))}
           </div>
-          <div className="flex gap-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setQuery(search.trim());
+              setPage(1);
+            }}
+            className="flex gap-2"
+          >
             <input
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && runSearch()}
-              placeholder="Search by order #, customer name or email"
-              className="flex-1 border-2 border-line rounded-xl px-3 py-2 text-sm focus:border-brand focus:outline-none"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search reference, name or email"
+              aria-label="Search orders"
+              className="field min-h-11"
             />
-            <button
-              onClick={runSearch}
-              className="px-5 py-2 rounded-xl bg-brand text-white text-sm font-bold hover:bg-accent-dark transition"
-            >
+            <Btn type="submit" className="shrink-0">
               Search
-            </button>
-            {(search || status) && (
-              <button
-                onClick={() => { setSearch(''); setSearchInput(''); setStatus(''); setPage(1); }}
-                className="px-4 py-2 rounded-xl border border-line text-sm font-semibold hover:bg-slate-50 transition"
-              >
-                Clear
-              </button>
+            </Btn>
+          </form>
+        </div>
+      </Panel>
+
+      {orders.loading && <Loading label="Loading orders" />}
+      {orders.error && <ErrorNote message={orders.error} onRetry={orders.reload} />}
+      {!orders.loading && !orders.error && list.length === 0 && (
+        <EmptyState title="No orders match those filters" hint="Try a different status or clear the search." />
+      )}
+
+      {!orders.loading && !orders.error && list.length > 0 && (
+        <ul className="space-y-3">
+          {list.map((o) => {
+            const id = o.id || o.reference || '';
+            return (
+              <li key={id} className="card p-3 sm:p-4">
+                <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => openOrder(o)}
+                        className="min-h-11 text-left text-sm font-extrabold break-all text-brand hover:underline"
+                      >
+                        {o.reference}
+                      </button>
+                      <Pill tone={paymentTone(o.paymentStatus)}>{humanise(o.paymentStatus)}</Pill>
+                      <Pill tone={orderTone(o.status)}>{TRACK_LABELS[o.status || ''] || humanise(o.status)}</Pill>
+                    </div>
+                    <p className="mt-1 truncate text-sm text-ink">
+                      {o.contact?.name || o.user?.name || 'Guest'}
+                      {o.contact?.email && <span className="text-muted"> · {o.contact.email}</span>}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted">
+                      {o.items?.length || 0} item{(o.items?.length || 0) === 1 ? '' : 's'} ·{' '}
+                      {relativeTime(o.placedAt)} · {o.paymentMethod || 'unknown payment'}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="text-lg font-extrabold tabular-nums text-ink">{money(o.total)}</span>
+                    <Btn variant="outline" className="!px-3 !text-xs" onClick={() => openOrder(o)}>
+                      Manage
+                    </Btn>
+                  </div>
+                </div>
+
+                {o.items && o.items.length > 0 && (
+                  <ul className="mt-3 flex flex-wrap gap-1.5 border-t border-line pt-3">
+                    {o.items.slice(0, 4).map((it) => (
+                      <li key={it.id} className="chip !min-h-0 !py-1 !text-[11px]">
+                        {it.qty}× {it.name}
+                      </li>
+                    ))}
+                    {o.items.length > 4 && <li className="chip !min-h-0 !py-1 !text-[11px]">+{o.items.length - 4} more</li>}
+                  </ul>
+                )}
+
+                {o.trackingNumber && (
+                  <p className="mt-2.5 break-all text-xs text-muted">
+                    <span className="font-bold text-ink">Tracking:</span> {o.trackingNumber}
+                    {o.trackingProvider && <span className="text-muted"> ({o.trackingProvider})</span>}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {orders.data && orders.data.totalPages > 1 && (
+        <div className="flex items-center justify-between gap-3">
+          <Btn variant="outline" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+            Previous
+          </Btn>
+          <span className="text-xs font-bold text-muted">
+            {orders.data.page} / {orders.data.totalPages}
+          </span>
+          <Btn
+            variant="outline"
+            disabled={page >= orders.data.totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next
+          </Btn>
+        </div>
+      )}
+
+      <Modal
+        open={!!detail}
+        title={`Order ${detail?.reference || ''}`}
+        onClose={() => setOpenId(null)}
+        wide
+        footer={
+          <>
+            <Btn variant="ghost" onClick={() => setOpenId(null)}>
+              Close
+            </Btn>
+            {detail && ['PAID', 'CONFIRMED', 'DELIVERED'].includes(String(detail.status)) && (
+              <Btn variant="danger" busy={busyId === detail.id} onClick={refund}>
+                Refund
+              </Btn>
+            )}
+          </>
+        }
+      >
+        {detail && (
+          <div className="space-y-5">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-line p-3">
+                <p className="text-[11px] font-bold uppercase text-muted">Customer</p>
+                <p className="mt-1 text-sm font-bold text-ink">{detail.contact?.name || detail.user?.name || 'Guest'}</p>
+                {detail.contact?.email && <p className="break-all text-xs text-muted">{detail.contact.email}</p>}
+                {detail.contact?.phone && <p className="text-xs text-muted">{detail.contact.phone}</p>}
+                {detail.contact?.address && (
+                  <p className="mt-1 text-xs leading-relaxed text-muted">{detail.contact.address}</p>
+                )}
+              </div>
+              <div className="rounded-xl border border-line p-3">
+                <p className="text-[11px] font-bold uppercase text-muted">Payment</p>
+                <p className="mt-1 text-sm font-bold text-ink">
+                  {money(detail.total)} · {humanise(detail.paymentStatus)}
+                </p>
+                <p className="text-xs text-muted">
+                  {humanise(detail.paymentMethod)}
+                  {detail.paymentProvider && ` via ${detail.paymentProvider}`}
+                </p>
+                {detail.paidAt && <p className="text-xs text-muted">Paid {formatDateTime(detail.paidAt)}</p>}
+                {detail.paymentReference && (
+                  <p className="mt-1 break-all text-xs text-muted">Ref: {detail.paymentReference}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-[11px] font-bold uppercase text-muted">Items</p>
+              <ul className="divide-y divide-line rounded-xl border border-line">
+                {(detail.items || []).map((it) => (
+                  <li key={it.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
+                    <span className="min-w-0 flex-1 truncate text-sm text-ink">
+                      {it.qty}× {it.name}
+                    </span>
+                    <span className="shrink-0 text-sm font-bold tabular-nums text-ink">{money(it.qty * it.price)}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-2 space-y-1 text-xs text-muted">
+                {detail.subtotal != null && (
+                  <p className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span className="tabular-nums">{money(detail.subtotal)}</span>
+                  </p>
+                )}
+                {detail.discountAmount ? (
+                  <p className="flex justify-between text-emerald-700">
+                    <span>Discount {detail.couponCode ? `(${detail.couponCode})` : ''}</span>
+                    <span className="tabular-nums">-{money(detail.discountAmount)}</span>
+                  </p>
+                ) : null}
+                {detail.shippingCost ? (
+                  <p className="flex justify-between">
+                    <span>Shipping</span>
+                    <span className="tabular-nums">{money(detail.shippingCost)}</span>
+                  </p>
+                ) : null}
+                <p className="flex justify-between text-sm font-extrabold text-ink">
+                  <span>Total</span>
+                  <span className="tabular-nums">{money(detail.total)}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-line p-3">
+              <p className="mb-2 text-[11px] font-bold uppercase text-muted">Update status</p>
+              {transitions.length === 0 ? (
+                <p className="text-sm text-muted">
+                  This order is {humanise(detail.status)} and has no further transitions available.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    {transitions.map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setDraft((d) => ({ ...d, status: t }))}
+                        className={`chip shrink-0 ${draft.status === t ? 'chip-active' : ''}`}
+                      >
+                        {TRACK_LABELS[t] || humanise(t)}
+                      </button>
+                    ))}
+                  </div>
+                  <Field
+                    label="Note for the customer"
+                    placeholder="Optional — shown in their tracking timeline"
+                    value={draft.note}
+                    onChange={(e) => setDraft((d) => ({ ...d, note: e.target.value }))}
+                  />
+                  <Btn
+                    busy={busyId === detail.id}
+                    disabled={!draft.status || draft.status === detail.status}
+                    onClick={changeStatus}
+                  >
+                    {draft.status ? `Mark as ${TRACK_LABELS[draft.status] || humanise(draft.status)}` : 'Pick a status'}
+                  </Btn>
+                </div>
+              )}
+              {ORDER_STATUSES.includes(detail.status as never) && !transitions.includes('CANCELLED') && detail.status !== 'DELIVERED' && (
+                <Select
+                  label="Or set any status directly"
+                  className="mt-3"
+                  value={draft.status}
+                  onChange={(e) => setDraft((d) => ({ ...d, status: e.target.value }))}
+                >
+                  <option value="">No change</option>
+                  {ORDER_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {TRACK_LABELS[s] || humanise(s)}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-line p-3">
+              <p className="mb-2 text-[11px] font-bold uppercase text-muted">Tracking</p>
+              <div className="space-y-3">
+                <Field
+                  label="Tracking number"
+                  value={draft.tracking}
+                  onChange={(e) => setDraft((d) => ({ ...d, tracking: e.target.value }))}
+                />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Field
+                    label="Carrier"
+                    placeholder="e.g. Aramex"
+                    value={draft.provider}
+                    onChange={(e) => setDraft((d) => ({ ...d, provider: e.target.value }))}
+                  />
+                  <Field
+                    label="Estimated delivery"
+                    type="date"
+                    value={draft.eta ? String(draft.eta).slice(0, 10) : ''}
+                    onChange={(e) => setDraft((d) => ({ ...d, eta: e.target.value }))}
+                  />
+                </div>
+                <Btn variant="outline" busy={busyId === detail.id} onClick={saveTracking}>
+                  Save tracking
+                </Btn>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-line p-3">
+              <p className="mb-2 text-[11px] font-bold uppercase text-muted">Internal notes</p>
+              <TextArea
+                rows={3}
+                value={draft.notes}
+                onChange={(e) => setDraft((d) => ({ ...d, notes: e.target.value }))}
+              />
+              <Btn variant="outline" className="mt-3" busy={busyId === detail.id} onClick={saveNotes}>
+                Save notes
+              </Btn>
+            </div>
+
+            {detail.trackingEvents && detail.trackingEvents.length > 0 && (
+              <div>
+                <p className="mb-2 text-[11px] font-bold uppercase text-muted">Timeline</p>
+                <ol className="space-y-2">
+                  {detail.trackingEvents.map((ev) => (
+                    <li key={ev.id || ev.at} className="flex flex-wrap items-baseline gap-x-2 text-xs">
+                      <span className="font-bold text-ink">{ev.label || humanise(ev.status)}</span>
+                      <span className="text-muted">{formatDateTime(ev.at)}</span>
+                      {ev.note && <span className="w-full text-muted">{ev.note}</span>}
+                    </li>
+                  ))}
+                </ol>
+              </div>
             )}
           </div>
-        </div>
-
-        {error && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-4 mb-4">{error}</p>
         )}
+      </Modal>
 
-        {orders === null && (
-          <div className="py-12 text-center text-muted text-sm bg-white border border-line rounded-2xl">Loading orders…</div>
-        )}
-        {orders !== null && !orders.length && (
-          <div className="py-12 text-center text-muted text-sm bg-white border border-line rounded-2xl">No orders match your filters.</div>
-        )}
-
-        {orders !== null && orders.length > 0 && (
-          <div className="bg-white border border-line rounded-2xl overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-line text-left text-[11px] uppercase tracking-wide text-muted">
-                    <th className="px-4 py-3 font-bold">Order</th>
-                    <th className="px-4 py-3 font-bold">Customer</th>
-                    <th className="px-4 py-3 font-bold text-right">Total</th>
-                    <th className="px-4 py-3 font-bold">Payment</th>
-                    <th className="px-4 py-3 font-bold">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((o) => {
-                    const expanded = openId === o.id;
-                    const currentStatus = (o.status || 'PENDING') as OrderStatus;
-                    const nextMoves = ORDER_TRANSITIONS[currentStatus] || [];
-                    const itemSubtotal = (o.items || []).reduce((s, it) => s + it.qty * (it.price || 0), 0);
-
-                    return (
-                      <FragmentRow key={o.id} expanded={expanded}>
-                        <td className="px-4 py-3 font-bold text-ink align-top">
-                          {o.reference}
-                          <span className="block text-[11px] font-normal text-muted mt-0.5">
-                            {new Date(o.placedAt || Date.now()).toLocaleDateString(undefined, {
-                              year: 'numeric', month: 'short', day: 'numeric',
-                            })}
-                            {' · '}
-                            {new Date(o.placedAt || Date.now()).toLocaleTimeString(undefined, {
-                              hour: '2-digit', minute: '2-digit',
-                            })}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 align-top">
-                          <span className="font-semibold text-ink">
-                            {o.user?.name || o.contact?.name || '—'}
-                          </span>
-                          <span className="block text-[11px] text-muted mt-0.5">
-                            {o.user?.email || o.contact?.email || '—'}
-                          </span>
-                          <span className="block text-[11px] text-muted">
-                            🚚 {o.contact?.address || 'no address'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-right font-extrabold text-brand align-top whitespace-nowrap">
-                          {formatAED(o.total)}
-                        </td>
-                        <td className="px-4 py-3 align-top whitespace-nowrap">
-                          <span className={`border text-[11px] font-bold px-2 py-0.5 rounded-lg ${PAYMENT_COLOR[o.paymentStatus || 'UNPAID'] || ''}`}>
-                            {o.paymentStatus || 'UNPAID'}
-                          </span>
-                          <span className="block text-[11px] text-muted font-normal mt-0.5">
-                            {o.paymentProvider || 'demo'}
-                            {o.paymentReference ? ` · ${o.paymentReference}` : ''}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 align-top">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className={`border text-[11px] font-bold px-2 py-0.5 rounded-lg ${STATUS_COLOR[currentStatus] || ''}`}>
-                              {currentStatus}
-                            </span>
-                            {nextMoves.length === 0 && (
-                              <span className="text-[11px] text-muted italic">
-                                {currentStatus === 'DELIVERED' ? 'Completed' : 'Closed'}
-                              </span>
-                            )}
-                            <button
-                              onClick={() => setOpenId(expanded ? '' : (o.id as string))}
-                              className="ml-auto text-[11px] font-bold text-accent-dark hover:underline whitespace-nowrap shrink-0"
-                            >
-                              {expanded ? 'Hide detail ↑' : 'View detail ↓'}
-                            </button>
-                          </div>
-
-                          {expanded && (
-                            <div className="mt-4 border border-line rounded-2xl bg-slate-50/50 p-5">
-                              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                                <p className="text-lg font-extrabold text-ink">{o.reference}</p>
-                                <span className={`border text-xs font-bold px-2.5 py-1 rounded-lg ${STATUS_COLOR[currentStatus] || ''}`}>
-                                  {currentStatus}
-                                </span>
-                              </div>
-
-                              <div className="grid gap-5 md:grid-cols-2">
-                                <div>
-                                  <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-2 border-b border-dashed border-line pb-1">
-                                    Customer
-                                  </p>
-                                  <div className="text-xs space-y-1">
-                                    <p>
-                                      <span className="text-muted">Name:</span>{' '}
-                                      <span className="font-semibold text-ink">{o.user?.name || o.contact?.name || '—'}</span>
-                                    </p>
-                                    <p>
-                                      <span className="text-muted">Email:</span>{' '}
-                                      <span className="font-semibold text-ink">{o.user?.email || o.contact?.email || '—'}</span>
-                                    </p>
-                                    <p>
-                                      <span className="text-muted">Phone:</span>{' '}
-                                      <span className="font-semibold text-ink">{o.contact?.phone || '—'}</span>
-                                    </p>
-                                    <p>
-                                      <span className="text-muted">Ship to:</span>{' '}
-                                      <span className="text-ink">{o.contact?.address || '—'}</span>
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <div>
-                                  <p className="text-[10px] font-bold text-muted uppercase tracking-wide mb-2 border-b border-dashed border-line pb-1">
-                                    Items
-                                  </p>
-                                  <ul className="text-xs space-y-1.5">
-                                    {o.items.map((it, i) => (
-                                      <li key={i} className="flex justify-between gap-3">
-                                        <span className="text-ink">{it.name} × {it.qty}</span>
-                                        <span className="font-semibold whitespace-nowrap">{formatAED(it.qty * (it.price || 0))}</span>
-                                      </li>
-                                    ))}
-                                    <li className="flex justify-between text-muted border-t border-dashed border-line pt-1.5 mt-1.5">
-                                      <span>Shipping</span>
-                                      <span className="font-semibold text-ink">{formatAED(SHIPPING_FEE)}</span>
-                                    </li>
-                                    {(o.discountAmount ?? 0) > 0 && (
-                                      <li className="flex justify-between text-green-600">
-                                        <span>{o.couponCode ? `Discount (${o.couponCode})` : 'Discount'}</span>
-                                        <span>−{formatAED(o.discountAmount as number)}</span>
-                                      </li>
-                                    )}
-                                    <li className="flex justify-between font-extrabold text-brand border-t border-line pt-1.5 mt-1.5">
-                                      <span>TOTAL</span>
-                                      <span>
-                                        {formatAED(itemSubtotal + SHIPPING_FEE - (o.discountAmount ?? 0))}
-                                      </span>
-                                    </li>
-                                  </ul>
-                                  <p className="text-[10px] text-muted mt-2">
-                                    Payment: {o.paymentProvider || '—'} · {o.paymentStatus || 'UNPAID'}
-                                    {o.paymentReference ? ` · ${o.paymentReference}` : ''} ·{' '}
-                                    Paid: {o.paidAt ? new Date(o.paidAt).toLocaleString() : 'Pending'}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="mt-5 flex flex-wrap items-center gap-2">
-                                <span className="text-xs font-bold text-muted uppercase tracking-wide mr-1">Status</span>
-                                <ScrollArea>
-                                  {nextMoves.map((next) => (
-                                    <button
-                                      key={next}
-                                      disabled={busyId === o.id}
-                                      onClick={() => changeStatus(o.id || '', next)}
-                                      className={`px-3 py-1.5 rounded-lg text-[11px] font-bold text-white transition disabled:opacity-50 whitespace-nowrap ${ACTION_STYLE[next] || 'bg-slate-400'}`}
-                                    >
-                                      {busyId === o.id ? '…' : ACTION_LABEL[next] || next}
-                                    </button>
-                                  ))}
-                                </ScrollArea>
-                              </div>
-                            </div>
-                          )}
-                        </td>
-                      </FragmentRow>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-3 mt-8 text-sm">
-            <button
-              disabled={page <= 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="px-4 py-1.5 rounded-lg border border-line font-semibold disabled:opacity-40 hover:bg-slate-50 transition"
-            >
-              ← Prev
-            </button>
-            <span className="text-muted">
-              Page <span className="font-bold text-ink">{page}</span> of{' '}
-              <span className="font-bold text-ink">{totalPages}</span>
-              <span className="ml-2 text-xs">({formatNumber(total)} orders)</span>
-            </span>
-            <button
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              className="px-4 py-1.5 rounded-lg border border-line font-semibold disabled:opacity-40 hover:bg-slate-50 transition"
-            >
-              Next →
-            </button>
-          </div>
-        )}
-      </div>
-    </section>
+      {toast.node}
+    </div>
   );
-}
-
-function FragmentRow({ children }: { expanded: boolean; children: ReactNode }) {
-  return <tr className="border-b border-line last:border-0 align-top hover:bg-slate-50/60 transition">{children}</tr>;
-}
-
-function ScrollArea({ children }: { children: ReactNode }) {
-  return <span className="flex gap-1 flex-wrap max-w-[220px]">{children}</span>;
 }

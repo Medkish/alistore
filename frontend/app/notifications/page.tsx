@@ -124,7 +124,7 @@ export default function NotificationsPage() {
                 </p>
               </div>
               {!n.read && (
-                <button onClick={() => markOne(n.id)} className="text-[11px] font-bold text-accent-dark hover:underline shrink-0">
+                <button onClick={() => markOne(n.id)} className="text-[11px] font-bold text-accent-dark hover:underline shrink-0 py-3 pl-3 -my-3">
                   Mark read
                 </button>
               )}

@@ -1,6 +1,6 @@
 {
-  "name": "AlioStore - Online Books & Programming Resources",
-  "short_name": "AlioStore",
+  "name": "Code-Me",
+  "short_name": "Code-Me",
   "description": "Your online bookstore for programming and tech. Browse, buy and read books on any device.",
   "start_url": "/alistore/",
   "scope": "/alistore/",

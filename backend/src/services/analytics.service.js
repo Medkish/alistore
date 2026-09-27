@@ -1,28 +1,8 @@
 const prisma = require('../lib/prisma');
 const { normalizeImage } = require('../utils/image');
+const { detectDevice, detectBrowser } = require('../utils/device');
 
 const EVENT_TYPES = new Set(['page_view', 'product_view', 'add_to_cart']);
-
-function detectDevice(ua) {
-  const s = String(ua || '');
-  if (/ipad|tablet|playbook|silk/i.test(s)) return 'Tablet';
-  if (/mobi|android|iphone|ipod/i.test(s)) return 'Mobile';
-  return 'Desktop';
-}
-
-function detectBrowser(ua) {
-  const s = String(ua || '');
-  const map = [
-    ['Opera', /opr\/|opera/i],
-    ['Edge', /edg\//i],
-    ['Chrome', /chrome|crios/i],
-    ['Firefox', /firefox|fxios/i],
-    ['Safari', /safari/i],
-    ['Samsung Internet', /samsungbrowser/i]
-  ];
-  for (const [label, re] of map) if (re.test(s)) return label;
-  return 'Other';
-}
 
 /* Never trust raw client data — clamp lengths and drop junk. */
 function clean(input, meta) {
@@ -268,4 +248,121 @@ async function summary({ days } = {}) {
   };
 }
 
-module.exports = { recordEvent, summary };
+/*
+ * Who logged in / visited: recent login events (with identity + device/IP) and
+ * per-visitor profiles (first/last seen, active time, book views, add-to-carts,
+ * and the linked account when the visitor was signed in).
+ */
+async function visitors({ days } = {}) {
+  const n = Math.min(90, Math.max(1, Number(days) || 14));
+  const since = new Date();
+  since.setHours(0, 0, 0, 0);
+  since.setDate(since.getDate() - (n - 1));
+
+  const logins = await prisma.actionLog.findMany({
+    where: { type: 'LOGIN', at: { gte: since } },
+    orderBy: { at: 'desc' },
+    take: 100,
+    include: { actor: { select: { id: true, name: true, email: true, role: true } } }
+  });
+
+  const events = await prisma.visitEvent.findMany({
+    where: { createdAt: { gte: since } },
+    select: {
+      id: true,
+      visitorId: true,
+      event: true,
+      userId: true,
+      device: true,
+      browser: true,
+      createdAt: true
+    },
+    orderBy: { createdAt: 'asc' },
+    take: 20000
+  });
+
+  const SESSION_GAP_MS = 30 * 60 * 1000;
+  const byVisitor = new Map();
+  for (const e of events) {
+    let v = byVisitor.get(e.visitorId);
+    if (!v) {
+      v = { visitorId: e.visitorId, userId: null, events: [], devices: new Map(), browsers: new Map() };
+      byVisitor.set(e.visitorId, v);
+    }
+    v.events.push(e);
+    if (e.userId) v.userId = e.userId;
+    v.devices.set(e.device || 'Unknown', (v.devices.get(e.device || 'Unknown') || 0) + 1);
+    v.browsers.set(e.browser || 'Other', (v.browsers.get(e.browser || 'Other') || 0) + 1);
+  }
+
+  const userIds = [...byVisitor.values()].map((v) => v.userId).filter(Boolean);
+  const users = userIds.length
+    ? await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, name: true, email: true } })
+    : [];
+  const userById = new Map(users.map((u) => [u.id, u]));
+
+  const loginCounts = userIds.length
+    ? await prisma.session.groupBy({ by: ['userId'], _count: { _all: true }, where: { userId: { in: userIds } } })
+    : [];
+  const loginCountByUser = new Map(loginCounts.map((r) => [r.userId, r._count._all]));
+
+  const visitorsList = [];
+  for (const v of byVisitor.values()) {
+    const times = v.events.map((e) => e.createdAt.getTime()).sort((a, b) => a - b);
+    let sessions = 0;
+    let activeMs = 0;
+    let start = times[0];
+    let prev = times[0];
+    for (let i = 1; i < times.length; i++) {
+      if (times[i] - prev > SESSION_GAP_MS) {
+        sessions++;
+        activeMs += prev - start;
+        start = times[i];
+      }
+      prev = times[i];
+    }
+    if (times.length) {
+      sessions++;
+      activeMs += prev - start;
+    }
+
+    const pageViews = v.events.filter((e) => e.event === 'page_view').length;
+    const productViews = v.events.filter((e) => e.event === 'product_view').length;
+    const addToCarts = v.events.filter((e) => e.event === 'add_to_cart').length;
+    const topDevice = [...v.devices.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || 'Unknown';
+    const topBrowser = [...v.browsers.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || 'Other';
+    const user = v.userId ? userById.get(v.userId) || null : null;
+
+    visitorsList.push({
+      visitorId: v.visitorId,
+      user: user ? { id: user.id, name: user.name, email: user.email } : null,
+      firstSeen: times.length ? new Date(times[0]).toISOString() : null,
+      lastSeen: times.length ? new Date(times[times.length - 1]).toISOString() : null,
+      sessions,
+      activeMinutes: Math.round(activeMs / 60000),
+      pageViews,
+      productViews,
+      addToCarts,
+      logins: user ? loginCountByUser.get(user.id) || 0 : 0,
+      device: topDevice,
+      browser: topBrowser
+    });
+  }
+  visitorsList.sort((a, b) => (a.lastSeen < b.lastSeen ? 1 : -1));
+
+  return {
+    logins: logins.map((l) => ({
+      id: l.id,
+      at: l.at.toISOString(),
+      name: l.actor ? l.actor.name : 'Unknown',
+      email: l.actor ? l.actor.email : '',
+      role: l.actor ? l.actor.role : '',
+      device: (l.data && l.data.device) || '',
+      browser: (l.data && l.data.browser) || '',
+      ip: (l.data && l.data.ip) || ''
+    })),
+    visitors: visitorsList
+  };
+}
+
+module.exports = { recordEvent, summary, visitors };

@@ -86,7 +86,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="bg-white border border-line rounded-2xl p-6 flex flex-col gap-4">
           {field('reg-name', 'Full name', name, setName, 'text', 'First Last')}
           {field('reg-email', 'Email', email, setEmail, 'email', 'you@email.com')}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="text-sm font-semibold text-ink mb-1 block">Country</label>
               <select
@@ -101,20 +101,20 @@ export default function RegisterPage() {
                 ))}
               </select>
             </div>
-            <div className="col-span-2">{field('reg-mobile', 'Mobile number', mobile, setMobile, 'tel', '50 123 4567')}</div>
+            <div className="sm:col-span-2">{field('reg-mobile', 'Mobile number', mobile, setMobile, 'tel', '50 123 4567')}</div>
           </div>
           {field('reg-pass', 'Password', password, setPassword, 'password', 'min 6 characters')}
           {field('reg-pass-confirm', 'Confirm password', confirm, setConfirm, 'password')}
           <div>
-            <label className="flex items-center gap-2 text-sm text-ink cursor-pointer">
+            <label className="flex flex-wrap items-center gap-2 text-sm text-ink cursor-pointer">
               <input
                 type="checkbox"
                 checked={terms}
                 onChange={(e) => setTerms(e.target.checked)}
-                className="accent-accent-dark w-4 h-4"
+                className="accent-accent-dark w-4 h-4 shrink-0"
               />
               I agree to the AlioStore{' '}
-              <button type="button" className="underline text-accent-dark font-semibold">
+              <button type="button" className="underline text-accent-dark font-semibold whitespace-nowrap py-2">
                 Terms &amp; Conditions
               </button>
             </label>

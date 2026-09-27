@@ -9,6 +9,24 @@ ALIOSTORE/
 └── backend/    # Node.js + Express API (auth, cart, orders, donations, subscriptions)
 ```
 
+## Architecture
+
+```
+Your Laptop / Phone
+        ↓
+   AlioStore Frontend
+        ↓
+   Render Backend
+        ↓
+   Neon PostgreSQL
+        ↓
+   Orders / Books / Users / Admin
+```
+
+Frontend (Next.js static build) is served to devices, talks to the Express backend
+hosted on Render, which stores and reads all data in a Neon PostgreSQL database —
+orders, books, users and admin.
+
 ## Pages
 
 | Path            | Page               |
@@ -145,6 +163,22 @@ Target pipeline:
 ```
 LOCAL COMPUTER → Git Repository → Production Hosting → Production Database → Domain → HTTPS → ALIOSTORE LIVE
 ```
+
+### 0. Why your site says "no database" (and how to fix it)
+
+- The static GitHub Pages URL (`medkish.github.io/alistore/`) is a **static preview** — it can never run Node/PostgreSQL, so the admin dashboard there intentionally shows "no database". That is expected behaviour.
+- The website **with** its database runs on the backend: `localhost:4000/admin` on this computer, or the public `.onrender.com` URL once deployed.
+- To get a live database accessible from anywhere, one-time setup:
+
+1. Create a free managed PostgreSQL at https://neon.tech (or Supabase / Render Postgres) and copy the connection string.
+2. On https://render.com create a **New → Web Service**, connect this repo (build `bash deploy/build.sh`, start `bash deploy/start.sh` — already in `render.yaml`), and set env vars in Settings → Environment:
+   - `DATABASE_URL` = your PostgreSQL connection string (add `?sslmode=require`)
+   - `CORS_ORIGIN` = the `.onrender.com` URL (or your domain)
+   - `PORT` = 4000, `NODE_ENV` = production (already set in `render.yaml`)
+3. Render runs `deploy/start.sh` on boot, which creates the schema (`prisma db push`) and seeds the 10 books automatically on a fresh database.
+4. Open the `https://<service>.onrender.com/admin` URL Render shows you and log in.
+
+After that, every push to `main` re-builds the frontend with the same-origin API and the database is live. (Set `autoDeploy: true` in `render.yaml` if you want automatic deploys instead of manual ones.)
 
 ### A. Frontend host (static)
 

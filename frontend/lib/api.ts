@@ -1,5 +1,5 @@
 import type {
-  ActivityLogEntry, AdminCart, AdminStats, AdminUser, AnalyticsSummary, AuthEvent, Book, BookReviews, BooksResult,
+  ActivityLogEntry, AdminCart, AdminStats, AdminUser, AnalyticsSummary, AnalyticsVisitors, AuthEvent, Book, BookReviews, BooksResult,
   BroadcastNotification, CartItem, Campaign, CategoryItem, CouponResult, DiscountItem, DonationItem, DonationReports, DonationRefundItem,
   DonationsResult, DonationSettings, DonationSummary, DonationSupporter, DonorItem, NotificationItem, Order,
   PaymentTransaction, SessionItem, ShippingInfo, ShippingMethod, ShippingZone, ShippingProvider,
@@ -343,6 +343,7 @@ adminCarts: () =>
         '/admin/payments',
       ),
     adminAnalytics: (days = 14) => request<AnalyticsSummary>(`/admin/analytics?days=${days}`),
+    adminAnalyticsVisitors: (days = 14) => request<AnalyticsVisitors>(`/admin/analytics/visitors?days=${days}`),
   adminCategories: () => request<{ categories: CategoryItem[] }>('/admin/categories'),
   adminCreateCategory: (body: { name: string; slug?: string; description?: string; image?: string; active?: boolean }) =>
     request<{ category: CategoryItem }>('/admin/categories', { method: 'POST', body }),

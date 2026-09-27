@@ -72,6 +72,11 @@ async function analytics(req, res) {
   res.json(data);
 }
 
+async function analyticsVisitors(req, res) {
+  const data = await analyticsService.visitors({ days: Number(req.query.days) || 14 });
+  res.json(data);
+}
+
 async function listBooks(req, res) {
   const q = req.query || {};
   const filters = {};
@@ -609,6 +614,7 @@ async function updateUserRole(req, res) {
 module.exports = {
   stats,
   analytics,
+  analyticsVisitors,
   listBooks,
   createBook,
   updateBook,

@@ -145,25 +145,21 @@ export default function ProfilePage() {
             <h1 className="text-2xl md:text-3xl font-extrabold text-brand">My Account</h1>
             <p className="text-sm text-muted mt-1">Manage your profile, orders and security.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="h-12 w-12 rounded-full bg-brand text-white font-extrabold flex items-center justify-center text-lg">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="h-12 w-12 shrink-0 rounded-full bg-brand text-white font-extrabold flex items-center justify-center text-lg">
               {user.name.charAt(0).toUpperCase()}
             </span>
-            <div>
-              <p className="font-bold text-ink">{user.name}</p>
-              <p className="text-xs text-muted">{user.email}</p>
+            <div className="min-w-0">
+              <p className="font-bold text-ink truncate">{user.name}</p>
+              <p className="text-xs text-muted truncate">{user.email}</p>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           <Link href="/orders/" className="bg-white border border-line rounded-2xl p-4 text-center hover:border-accent hover:shadow-md transition">
             <span className="text-2xl">📦</span>
             <p className="text-xs font-bold text-ink mt-1">Orders</p>
-          </Link>
-          <Link href="/wishlist/" className="bg-white border border-line rounded-2xl p-4 text-center hover:border-accent hover:shadow-md transition">
-            <span className="text-2xl">❤️</span>
-            <p className="text-xs font-bold text-ink mt-1">Wishlist</p>
           </Link>
           <Link href="/cart/" className="bg-white border border-line rounded-2xl p-4 text-center hover:border-accent hover:shadow-md transition">
             <span className="text-2xl">🛒</span>
@@ -182,7 +178,7 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           {tabs.map((t) => (
             <button
               key={t.id}
@@ -332,12 +328,12 @@ export default function ProfilePage() {
                         <td className="py-2.5 pr-3 text-muted text-xs">{d.recurring ? '⭐ Monthly' : 'One-time'}</td>
                         <td className="py-2.5 pr-3 text-muted text-xs">{new Date(d.createdAt).toLocaleDateString()}</td>
                         <td className="py-2.5">
-                          <div className="flex items-center gap-3 text-xs">
-                            <Link href={`/donate/receipt/?id=${d.id}`} className="font-bold text-accent-dark hover:underline">
+                          <div className="flex flex-wrap items-center gap-x-3 text-xs">
+                            <Link href={`/donate/receipt/?id=${d.id}`} className="font-bold text-accent-dark hover:underline py-2.5">
                               Receipt
                             </Link>
                             {d.recurring && (
-                              <button onClick={() => cancelRecurring(d)} className="font-bold text-red-600 hover:underline">
+                              <button onClick={() => cancelRecurring(d)} className="font-bold text-red-600 hover:underline py-2.5">
                                 Cancel recurring
                               </button>
                             )}

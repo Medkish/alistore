@@ -72,7 +72,7 @@ export default function SubscribePage() {
             <p className="text-5xl mb-5">🎉</p>
             <h1 className="text-2xl md:text-3xl font-extrabold text-brand uppercase mb-2">Subscription Started</h1>
             <p className="text-sm text-muted mb-6">Welcome to the {done.plan} plan. We emailed your welcome pack.</p>
-            <div className="inline-flex items-center gap-2 bg-brand/5 border border-brand/30 rounded-2xl px-5 py-3 mb-6">
+            <div className="inline-flex flex-wrap items-center gap-2 bg-brand/5 border border-brand/30 rounded-2xl px-5 py-3 mb-6">
               <span className="text-xs font-bold text-muted uppercase">Reference</span>
               <span className="font-extrabold text-brand tracking-wide">{done.reference}</span>
             </div>

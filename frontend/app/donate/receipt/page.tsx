@@ -92,8 +92,8 @@ function Receipt() {
             <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
               {rows.map(([k, v]) => (
                 <div key={k} className="flex justify-between gap-3 border-b border-line pb-2">
-                  <dt className="text-muted">{k}</dt>
-                  <dd className="font-bold text-ink text-right">{v}</dd>
+                  <dt className="text-muted shrink-0">{k}</dt>
+                  <dd className="font-bold text-ink text-right min-w-0 break-all sm:break-normal">{v}</dd>
                 </div>
               ))}
             </dl>
